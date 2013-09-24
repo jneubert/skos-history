@@ -3,20 +3,60 @@
 
 # load a series of graphs and deltas into a fuseki dataset
 
-BASEDIR=/opt/thes/var/stw
-VERSIONS=(8.04 8.06 8.08 8.10)
+
+# Requirements:
+
+# FUSEKI_HOME should already be defined.
+
+# If the installed system-wide ruby version is < 1.8.7 (e.g., on CentOS 5),
+# Fuseki utilities will refuse to work. A more current ruby version may be
+# installed somewhere and put at the beginning of $PATH. The Ruby section of
+# http://www.geekytidbits.com/ruby-on-rails-in-centos-5/ worked for me.
+
+# Redland's rapper and rdf.sh`s rdf command should be in $PATH
+
+
+# START CONFIGURATION
+
+# is used to store the SKOS files locally
+#BASEDIR=/opt/thes/var/stw
+BASEDIR=/tmp/stw_versions
 ENDPOINT=http://localhost:3030/stwv
+
+# END CONFIGURATION
+
+
+# publicly available STW versions
+VERSIONS=(8.04 8.06 8.08 8.10)
 BASEURI=http://zbw.eu/stw/version
 PREFIXES="
-prefix : <http://zbw.eu/namespaces/skos-history/> 
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
-prefix owl: <http://www.w3.org/2002/07/owl#> 
-prefix xsd: <http://www.w3.org/2001/XMLSchema#> 
-prefix dc: <http://purl.org/dc/elements/1.1/> 
-prefix dcterms: <http://purl.org/dc/terms/> 
-prefix skos: <http://www.w3.org/2004/02/skos/core#> 
+prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+prefix dc: <http://purl.org/dc/elements/1.1/>
+prefix dcterms: <http://purl.org/dc/terms/>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 "
+
+# getting the data from http://zbw.eu/stw, if it does not exist locally
+for index in ${!VERSIONS[*]}
+do
+  version=${VERSIONS[$index]}
+  dir=$BASEDIR/$version/rdf
+  file=$dir/stw.nt
+  if [ ! -f $file ]; then
+    mkdir -p $dir
+    download_url="http://zbw.eu/stw/versions/$version/download/stw.rdf.zip"
+    echo "downloading $download_url"
+    download_file="$dir/stw.rdf.zip"
+    wget -O $download_file $download_url
+    unzip -d $dir $download_file
+    rapper -i guess $dir/stw.rdf > $file
+    rm $download_file $dir/stw.rdf
+  fi
+done
 
 # load latest version to the default graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
@@ -48,7 +88,7 @@ where {}
   $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
 
   # add triples to the default graph
-  statement="  
+  statement="
 $PREFIXES
 insert {
   <$BASEURI/$old> a :SchemeVersion .
@@ -120,6 +160,9 @@ where {}
     # load delta
     for op in deletions insertions; do
 
+      # make variable with first character uppercased
+      op_var="$(tr '[:lower:]' '[:upper:]' <<< ${op:0:1})${op:1}"
+
       # load file
       $FUSEKI_HOME/s-put $ENDPOINT/data $delta_uri/$op ${filebase}_$op.nt
 
@@ -128,7 +171,7 @@ where {}
 $PREFIXES
 with <$delta_uri/$op>
 insert {
-  <$delta_uri/$op> a :SchemeDelta${op^} .
+  <$delta_uri/$op> a :SchemeDelta$op_var .
   <$delta_uri/$op> <http://purl.org/dc/terms/isPartOf> <$delta_uri> .
 }
 where {}
@@ -139,7 +182,7 @@ where {}
 $PREFIXES
 with <$BASEURI/$old>
 insert {
-  <$delta_uri/$op> a :SchemeDelta${op^} .
+  <$delta_uri/$op> a :SchemeDelta$op_var .
   <$delta_uri> <http://purl.org/dc/terms/hasPart> <$delta_uri/$op> .
 }
 where {}
@@ -149,7 +192,7 @@ where {}
 $PREFIXES
 with <$BASEURI/$new>
 insert {
-  <$delta_uri/$op> a :SchemeDelta${op^} .
+  <$delta_uri/$op> a :SchemeDelta$op_var .
   <$delta_uri> <http://purl.org/dc/terms/hasPart> <$delta_uri/$op> .
 }
 where {}
