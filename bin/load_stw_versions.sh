@@ -81,7 +81,7 @@ with <$BASEURI/$old>
 insert {
   <$BASEURI/$old> a :SchemeVersion .
   <$BASEURI/$old> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <http://zbw.eu/stw> .
-  <$BASEURI/$old> <http://purl.org/dc/terms/isVersionOf> <http://zbw.eu/stw> .
+  <$BASEURI/$old> dcterms:isVersionOf <http://zbw.eu/stw> .
 }
 where {}
 "
@@ -92,7 +92,7 @@ where {}
 $PREFIXES
 insert {
   <$BASEURI/$old> a :SchemeVersion .
-  <http://zbw.eu/stw> <http://purl.org/dc/terms/hasVersion> <$BASEURI/$old>
+  <http://zbw.eu/stw> dcterms:hasVersion <$BASEURI/$old>
 }
 where {}
 "
@@ -125,9 +125,9 @@ do
     statement="
 $PREFIXES
 insert {
-  <http://zbw.eu/stw> <http://zbw.eu/namespaces/skos-history/hasDelta> <$delta_uri> .
-  <$delta_uri> <http://zbw.eu/namespaces/skos-history/deltaFrom> <$BASEURI/$old> .
-  <$delta_uri> <http://zbw.eu/namespaces/skos-history/deltaTo> <$BASEURI/$new> .
+  <http://zbw.eu/stw> :hasDelta <$delta_uri> .
+  <$delta_uri> :deltaFrom <$BASEURI/$old> .
+  <$delta_uri> :deltaTo <$BASEURI/$new> .
 }
 where {}
 "
@@ -137,9 +137,9 @@ where {}
 $PREFIXES
 with <$BASEURI/$old>
 insert {
-  <$BASEURI/$old> <http://zbw.eu/namespaces/skos-history/hasDelta> <$delta_uri> .
-  <$delta_uri> <http://zbw.eu/namespaces/skos-history/deltaFrom> <$BASEURI/$old> .
-  <$delta_uri> <http://zbw.eu/namespaces/skos-history/deltaTo> <$BASEURI/$new> .
+  <$BASEURI/$old> :hasDelta <$delta_uri> .
+  <$delta_uri> :deltaFrom <$BASEURI/$old> .
+  <$delta_uri> :deltaTo <$BASEURI/$new> .
 }
 where {}
 "
@@ -149,9 +149,10 @@ where {}
 $PREFIXES
 with <$BASEURI/$new>
 insert {
-  <$BASEURI/$new> <http://zbw.eu/namespaces/skos-history/hasDelta> <$delta_uri> .
-  <$delta_uri> <http://zbw.eu/namespaces/skos-history/deltaFrom> <$BASEURI/$old> .
-  <$delta_uri> <http://zbw.eu/namespaces/skos-history/deltaTo> <$BASEURI/$new> .
+  <$BASEURI/$new> :hasDelta <$delta_uri> .
+  <$delta_uri> a :SchemeDelta .
+  <$delta_uri> :deltaFrom <$BASEURI/$old> .
+  <$delta_uri> :deltaTo <$BASEURI/$new> .
 }
 where {}
 "
@@ -172,7 +173,7 @@ $PREFIXES
 with <$delta_uri/$op>
 insert {
   <$delta_uri/$op> a :SchemeDelta$op_var .
-  <$delta_uri/$op> <http://purl.org/dc/terms/isPartOf> <$delta_uri> .
+  <$delta_uri/$op> dcterms:isPartOf <$delta_uri> .
 }
 where {}
 "
@@ -183,7 +184,7 @@ $PREFIXES
 with <$BASEURI/$old>
 insert {
   <$delta_uri/$op> a :SchemeDelta$op_var .
-  <$delta_uri> <http://purl.org/dc/terms/hasPart> <$delta_uri/$op> .
+  <$delta_uri> dcterms:hasPart <$delta_uri/$op> .
 }
 where {}
 "
@@ -193,7 +194,7 @@ $PREFIXES
 with <$BASEURI/$new>
 insert {
   <$delta_uri/$op> a :SchemeDelta$op_var .
-  <$delta_uri> <http://purl.org/dc/terms/hasPart> <$delta_uri/$op> .
+  <$delta_uri> dcterms:hasPart <$delta_uri/$op> .
 }
 where {}
 "
