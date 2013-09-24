@@ -3,15 +3,16 @@ PREFIX owl:     <http://www.w3.org/2002/07/owl#>
 
 # get the current version graph name
 
-select (?version as ?currentVersion)
-where {
-  # all versions of the scheme
-  ?scheme dcterms:hasVersion $version .
-  # name of the current version
-  ?scheme owl:versionInfo ?versionName .
-  # version graph with this version name
-  graph ?version {
-    [] owl:versionInfo ?versionName
-  }
-}
+SELECT  (?version AS ?currentVersion)
+WHERE
+  { 
+    # all versions of the scheme
+    ?scheme dcterms:hasVersion ?version .
 
+  # name of the current version
+    ?scheme owl:versionInfo ?versionName
+
+    # version graph with this version name
+    GRAPH ?version
+      { [] owl:versionInfo ?versionName }
+  }
