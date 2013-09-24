@@ -1,4 +1,4 @@
-@prefix : <http://zbw.eu/namespaces/skos-history/> .
+@prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -7,12 +7,15 @@
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
-<http://zbw.eu/namespaces/skos-history/>
+# Ontology
+
+<>
     dc:creator "Joachim Neubert" ;
-    dc:publisher "ZBW German National Library of Economics"@en ;
     dc:title "Ontology for expressing versions and deltas of versions for SKOS files."@en ;
     dcterms:created "2013-09-02" ;
     dcterms:modified "2013-09-19" .
+
+# Classes
 
 :SchemeVersion
     a owl:Class ;
@@ -63,7 +66,7 @@
     # rdfs:subClassOf skos:Concept ;
     skos:definition "The delta of two versions of a SKOS concept."@en .
 
-# properties
+# Properties
 
 :deltaFrom
     a rdf:Property ;
