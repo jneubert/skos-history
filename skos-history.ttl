@@ -1,0 +1,109 @@
+@prefix : <http://zbw.eu/namespaces/skos-history/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<http://zbw.eu/namespaces/skos-history/>
+    dc:creator "Joachim Neubert" ;
+    dc:publisher "ZBW German National Library of Economics"@en ;
+    dc:title "Ontology for expressing versions and deltas of versions for SKOS files."@en ;
+    dcterms:created "2013-09-02" ;
+    dcterms:modified "2013-09-19" .
+
+:SchemeVersion
+    a owl:Class ;
+    rdfs:comment """Should be related to the concept scheme by dcterms:isVersionOf."""@en ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Scheme Version"@en ;
+    rdfs:subClassOf skos:ConceptScheme ;
+    skow:definition "A version of a SKOS concept scheme."@en .
+
+:SchemeDelta
+    a rdfs:Class ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Scheme Delta"@en ;
+    rdfs:subClassOf skos:ConceptScheme ;
+    skos:definition "The delta of two versions of a SKOS concept scheme."@en .
+
+:SchemeDeltaInsertions
+    a rdfs:Class ;
+    rdfs:comment """Should be related to the delta by dcterms:isPartOf."""@en ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Scheme Delta Insertions"@en ;
+    rdfs:subClassOf skos:ConceptScheme ;
+    skos:definition "The statements to insert into one version of a SKOS concept scheme to create another version (in addition to deletions)."@en .
+
+:SchemeDeltaDeletions
+    a rdfs:Class ;
+    rdfs:comment """Should be related to the delta by dcterms:isPartOf."""@en ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Scheme Delta Deletions"@en ;
+    rdfs:subClassOf skos:ConceptScheme ;
+    skos:definition "The statements to delete from one version of a SKOS concept scheme to create another version (in addition to insertions)."@en .
+
+# TODO are these needed??
+
+:ConceptVersion
+    a rdfs:Class ;
+    rdfs:comment """Should be related to the concept by dcterms:isVersionOf."""@en ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Concept Version"@en ;
+    rdfs:subClassOf skos:Concept ;
+    skow:definition "A version of a SKOS concept."@en .
+
+:ConceptDelta
+    a rdfs:Class ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Concept Delta"@en ;
+    # TODO that's not true!
+    # rdfs:subClassOf skos:Concept ;
+    skos:definition "The delta of two versions of a SKOS concept."@en .
+
+# properties
+
+:deltaFrom
+    a rdf:Property ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Delta From"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    skos:definition "The versions from which the delta is taken."@en . 
+  
+:deltaTo
+    a rdf:Property ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Delta To"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    skos:definition "The versions to which the delta is taken."@en . 
+  
+:hasDelta
+    a rdf:Property ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "Has Delta"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    skos:definition "A delta for this version."@en . 
+  
+:prefLabelInsertion
+    a rdf:Property ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "prefLabel Insertion"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    skos:definition "skos:prefLabel which is to be inserted."@en . 
+
+:prefLabelDeletion
+    a rdf:Property ;
+    rdfs:isDefinedBy :skos-history.ttl ;
+    rdfs:label "prefLabel Deletion"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    skos:definition "skos:prefLabel which is to be deleted."@en . 
+
+
+
