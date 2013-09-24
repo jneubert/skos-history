@@ -23,7 +23,7 @@
     rdfs:isDefinedBy :skos-history.ttl ;
     rdfs:label "Scheme Version"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
-    skow:definition "A version of a SKOS concept scheme."@en .
+    skos:definition "A version of a SKOS concept scheme."@en .
 
 :SchemeDelta
     a rdfs:Class ;
@@ -56,7 +56,7 @@
     rdfs:isDefinedBy :skos-history.ttl ;
     rdfs:label "Concept Version"@en ;
     rdfs:subClassOf skos:Concept ;
-    skow:definition "A version of a SKOS concept."@en .
+    skos:definition "A version of a SKOS concept."@en .
 
 :ConceptDelta
     a rdfs:Class ;
