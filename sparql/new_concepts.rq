@@ -6,7 +6,7 @@ PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 
 # identify concepts inserted with a certain version
 
-SELECT  ?s ?prefLabel
+SELECT  ?concept ?prefLabel
 WHERE
   { 
     # fixed version, will be parameter or current version
@@ -26,13 +26,14 @@ WHERE
 
         # for each inserted concept, a (newly inserted) prefLabel must exist ...
         GRAPH ?insertions
-          { ?s skos:prefLabel ?prefLabel }
+          { ?concept skos:prefLabel ?prefLabel }
 
 
         # ... without any prefLabel deleted for this concept
         FILTER NOT EXISTS {GRAPH ?deletions
-            { ?s skos:prefLabel [] }
+            { ?concept skos:prefLabel [] }
         }
       }
   }
-ORDER BY ?s
+ORDER BY ?concept
+
