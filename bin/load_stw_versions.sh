@@ -1,7 +1,7 @@
 #!/bin/sh
 # nbt, 1.9.2013
 
-# load a series of graphs and deltas into a fuseki dataset
+# load a series of version and delta graphs into a fuseki dataset
 
 
 # Requirements:
@@ -21,6 +21,7 @@
 # is used to store the SKOS files locally
 #BASEDIR=/opt/thes/var/stw
 BASEDIR=/tmp/stw_versions
+FILENAME=rdf/stw.nt
 ENDPOINT=http://localhost:3030/stwv
 
 # END CONFIGURATION
@@ -28,7 +29,8 @@ ENDPOINT=http://localhost:3030/stwv
 
 # publicly available STW versions
 VERSIONS=(8.04 8.06 8.08 8.10)
-BASEURI=http://zbw.eu/stw/version
+SCHEMEURI='http://zbw.eu/stw'
+BASEURI=$SCHEMEURI/version
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 prefix dc: <http://purl.org/dc/elements/1.1/>
@@ -44,12 +46,12 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 for index in ${!VERSIONS[*]}
 do
   version=${VERSIONS[$index]}
-  dir=$BASEDIR/$version/rdf
-  file=$dir/stw.nt
+  dir=$BASEDIR/$version
+  file=$dir/$FILENAME
   if [ ! -f $file ]; then
+    echo "downloading $download_url"
     mkdir -p $dir
     download_url="http://zbw.eu/stw/versions/$version/download/stw.rdf.zip"
-    echo "downloading $download_url"
     download_file="$dir/stw.rdf.zip"
     wget -O $download_file $download_url
     unzip -d $dir $download_file
@@ -61,7 +63,7 @@ done
 # load latest version to the default graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
 printf "\nLoading latest version $latest to default graph\n"
-$FUSEKI_HOME/s-put $ENDPOINT/data default $BASEDIR/$latest/rdf/stw.nt
+$FUSEKI_HOME/s-put $ENDPOINT/data default $BASEDIR/$latest/$FILENAME
 
 
 # iterate over the versions, create and load the deltas
@@ -71,7 +73,7 @@ do
 
   # load the version graph
   printf "\nLoading $BASEURI/$old\n"
-  $FUSEKI_HOME/s-put $ENDPOINT/data $BASEURI/$old $BASEDIR/$old/rdf/stw.nt
+  $FUSEKI_HOME/s-put $ENDPOINT/data $BASEURI/$old $BASEDIR/$old/$FILENAME
 
   # add triples to the version graph
   # (particularly frbrer is Realization Of
@@ -80,8 +82,8 @@ $PREFIXES
 with <$BASEURI/$old>
 insert {
   <$BASEURI/$old> a :SchemeVersion .
-  <$BASEURI/$old> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <http://zbw.eu/stw> .
-  <$BASEURI/$old> dcterms:isVersionOf <http://zbw.eu/stw> .
+  <$BASEURI/$old> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <$SCHEMEURI> .
+  <$BASEURI/$old> dcterms:isVersionOf <$SCHEMEURI> .
 }
 where {}
 "
@@ -92,7 +94,7 @@ where {}
 $PREFIXES
 insert {
   <$BASEURI/$old> a :SchemeVersion .
-  <http://zbw.eu/stw> dcterms:hasVersion <$BASEURI/$old>
+  <$SCHEMEURI> dcterms:hasVersion <$BASEURI/$old>
 }
 where {}
 "
@@ -115,7 +117,7 @@ do
     diff=$filebase.diff
 
     # create the diff
-    rdf diff $BASEDIR/$old/rdf/stw.nt $BASEDIR/$new/rdf/stw.nt > $diff
+    rdf diff $BASEDIR/$old/$FILENAME $BASEDIR/$new/$FILENAME > $diff
 
     # split into delete and insert files (filtering out blank nodes)
     grep '^< ' $diff | egrep -v "(^_:|> _:)" | sed 's/^< //' > ${filebase}_deletions.nt
@@ -125,7 +127,7 @@ do
     statement="
 $PREFIXES
 insert {
-  <http://zbw.eu/stw> :hasDelta <$delta_uri> .
+  <$SCHEMEURI> :hasDelta <$delta_uri> .
   <$delta_uri> :deltaFrom <$BASEURI/$old> .
   <$delta_uri> :deltaTo <$BASEURI/$new> .
 }
