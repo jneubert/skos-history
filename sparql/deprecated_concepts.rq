@@ -1,0 +1,44 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+
+# identify concepts deprecated with a certain version
+
+SELECT  ?concept ?label ?replacedBy ?replacedByPrefLabel
+WHERE
+  { 
+    # fixed version, will be parameter or current version
+    BIND(<http://zbw.eu/stw/version/8.10> AS ?version)
+
+    GRAPH ?version
+      { 
+        # this assumes that only one delta to a prior version exists
+        # (not multiple, overlapping deltas!)
+        ?delta sh:deltaTo ?version .
+
+        # identify insertions parts/graphs
+        ?delta dcterms:hasPart ?insertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
+
+        # identify the deprecated concepts
+        GRAPH ?insertions
+          { ?concept owl:deprecated true }
+
+        # different kinds of remaining labels should be supported
+          { ?concept skos:prefLabel ?label }
+        UNION
+          { ?concept rdfs:label ?label }
+        
+        # perhaps the deprecated concept was merged into another one
+        OPTIONAL
+          { ?concept dcterms:isReplacedBy ?replacedBy .
+            ?replacedBy skos:prefLabel ?replacedByPrefLabel
+            FILTER (lang(?label) = lang(?replacedByPrefLabel))
+          }
+      }
+  }
+ORDER BY ?concept
+
