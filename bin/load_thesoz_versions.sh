@@ -19,18 +19,17 @@
 # START CONFIGURATION
 
 # is used to store the SKOS files locally
-#BASEDIR=/opt/thes/var/stw
-BASEDIR=/tmp/stw_versions
-FILENAME=rdf/stw.nt
-ENDPOINT=http://localhost:3030/stwv
+BASEDIR=/opt/thes/var/thesoz
+FILENAME=rdf/thesoz.ttl
+ENDPOINT=http://localhost:3030/thesozv
 
 # END CONFIGURATION
 
 
-# publicly available STW versions
-VERSIONS=(8.04 8.06 8.08 8.10)
-SCHEMEURI='http://zbw.eu/stw'
-BASEURI=$SCHEMEURI/version
+# publicly available TheSoz versions
+VERSIONS=(0.7 0.92)
+SCHEMEURI='http://lod.gesis.org/thesoz/'
+BASEURI='http://lod.gesis.org/thesoz/version'
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 prefix dc: <http://purl.org/dc/elements/1.1/>
@@ -41,24 +40,6 @@ prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 "
-
-# getting the data from http://zbw.eu/stw, if it does not exist locally
-for index in ${!VERSIONS[*]}
-do
-  version=${VERSIONS[$index]}
-  dir=$BASEDIR/$version
-  file=$dir/$FILENAME
-  if [ ! -f $file ]; then
-    echo "downloading $download_url"
-    mkdir -p $dir
-    download_url="http://zbw.eu/stw/versions/$version/download/stw.rdf.zip"
-    download_file="$dir/stw.rdf.zip"
-    wget -O $download_file $download_url
-    unzip -d $dir $download_file
-    rapper -i guess $dir/stw.rdf > $file
-    rm $download_file $dir/stw.rdf
-  fi
-done
 
 # load latest version to the default graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
@@ -113,7 +94,7 @@ do
     delta_uri=$BASEURI/$old/delta/$new
     printf "\nCreating and loading $delta_uri\n"
 
-    filebase=/tmp/stw_${old}_${new}
+    filebase=/tmp/thesoz_${old}_${new}
     diff=$filebase.diff
 
     # create the diff
