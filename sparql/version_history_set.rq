@@ -1,0 +1,40 @@
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix iso-thes: <http://dummy.org/schemas/iso25964/DataSet/Versioning#>
+prefix dc: <http://purl.org/dc/elements/1.1/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix dcterms: <http://purl.org/dc/terms/>
+
+# build a iso-25964 version history set, as suggested by
+# http://www.niso.org/apps/group_public/download.php/9627/Correspondence%20ISO25964-SKOSXL-MADS-2012-10-21.pdf
+
+CONSTRUCT
+  {
+    ?versionHistorySet iso-thes:currentVersion ?currentVersion .
+    ?version a iso-thes:VersionHistory ;
+        iso-thes:isVersionOf ?scheme ;
+        iso-thes:hasVersionHistorySet ?versionHistorySet ;
+        dc:identifier ?id ;
+        dc:date ?date .
+    ?scheme iso-thes:hasVersion ?version .
+  }
+WHERE
+  {
+    # get info about all versions
+    ?scheme dcterms:hasVersion ?version .
+    GRAPH ?version
+      { ?scheme owl:versionInfo ?id .
+        ?scheme dcterms:issued ?date
+      }
+
+    # get name and graph of the current version
+    ?scheme owl:versionInfo ?versionName .
+    ?scheme dcterms:hasVersion ?currentVersion .
+    GRAPH ?currentVersion
+      { [] owl:versionInfo ?versionName }
+
+    # build versionHistorySet uri
+    BIND (uri(concat(str(?scheme), '/version/set')) AS ?versionHistorySet)
+  }
