@@ -1,0 +1,48 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+
+# identify concepts inserted with a certain version, and show their top concepts
+
+SELECT  ?topLabel ?prefLabel ?concept
+WHERE
+  { 
+    # fixed version, will be parameter or current version
+    BIND(<http://zbw.eu/stw/version/8.10> AS ?version)
+
+    GRAPH ?version
+      { 
+        # this assumes that only one delta to a prior version exists
+        # (not multiple, overlapping deltas!)
+        ?delta sh:deltaTo ?version .
+
+        # identify insertions and deletions parts/graphs
+        ?delta dcterms:hasPart ?insertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?delta dcterms:hasPart ?deletions .
+        ?deletions rdf:type sh:SchemeDeltaDeletions
+
+        # for each inserted concept, a (newly inserted) prefLabel must exist ...
+        GRAPH ?insertions
+          { ?concept skos:prefLabel ?prefLabel }
+
+
+        # ... without any prefLabel deleted for this concept
+        FILTER NOT EXISTS {GRAPH ?deletions
+            { ?concept skos:prefLabel [] }
+        }
+      }
+
+    # get the top concept(s) (which, for STW, always are defined
+    # as a subsection of the thesaurus). A concept may have multiple
+    # top concepts
+    ?concept skos:broader+ ?topConcept .
+    ?scheme skos:hasTopConcept ?topConcept .
+    ?topConcept skos:prefLabel ?topLabel .
+
+    FILTER (lang(?prefLabel) = 'en' && lang(?topLabel) = 'en')
+  }
+
+ORDER BY ?topLabel ?prefLabel
