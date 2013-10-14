@@ -23,13 +23,19 @@ BASEDIR=/opt/thes/var/thesoz
 FILENAME=rdf/thesoz.ttl
 ENDPOINT=http://localhost:3030/thesozv
 
-# END CONFIGURATION
-
-
 # publicly available TheSoz versions
 VERSIONS=(0.7 0.92)
 SCHEMEURI='http://lod.gesis.org/thesoz/'
-BASEURI='http://lod.gesis.org/thesoz/version'
+
+# END CONFIGURATION
+
+# handle trailing slash in scheme uri
+if [ "${SCHEMEURI: -1}" == "/" ]; then
+  BASEURI=${SCHEMEURI}version
+else
+  BASEURI=$SCHEMEURI/version
+fi
+
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 prefix dc: <http://purl.org/dc/elements/1.1/>
@@ -43,7 +49,7 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
 # load latest version to the default graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
-printf "\nLoading latest version $latest to default graph\n"
+printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to default graph\n"
 $FUSEKI_HOME/s-put $ENDPOINT/data default $BASEDIR/$latest/$FILENAME
 
 
@@ -94,7 +100,7 @@ do
     delta_uri=$BASEURI/$old/delta/$new
     printf "\nCreating and loading $delta_uri\n"
 
-    filebase=/tmp/thesoz_${old}_${new}
+    filebase=$BASEDIR/${old}_${new}
     diff=$filebase.diff
 
     # create the diff
@@ -184,5 +190,8 @@ where {}
       $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
 
     done
+
+    # cleanup
+    /bin/rm $filebase*
   fi
 done
