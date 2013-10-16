@@ -1,22 +1,25 @@
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix dsv: <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
 prefix dc: <http://purl.org/dc/elements/1.1/>
-prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix dcterms: <http://purl.org/dc/terms/>
+prefix dsv: <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
-# build a iso-25964 version history set, according to
+# build a iso-25964 version history, according to
 # https://github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-, based on
 # http://www.niso.org/apps/group_public/download.php/9627/Correspondence%20ISO25964-SKOSXL-MADS-2012-10-21.pdf
 
 CONSTRUCT
   {
-    ?versionHistorySet dsv:currentVersionRecord ?currentVersionRecord .
     ?versionRecord a dsv:VersionHistoryRecord ;
         dsv:isVersionRecordOf ?version ;
         dsv:hasVersionHistorySet ?versionHistorySet ;
         dc:identifier ?id ;
         dc:date ?date .
-    ?version dsv:hasVersionRecord ?versionRecord .
+    ?versionHistorySet dsv:currentVersionRecord ?currentVersionRecord .
+
+    # the following triples would be part of the version graphs
+    ##?scheme dsv:hasVersionRecord ?versionRecord .
   }
 WHERE
   {
