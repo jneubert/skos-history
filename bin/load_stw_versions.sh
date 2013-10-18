@@ -57,7 +57,6 @@ if [ "${SCHEMEURI: -1}" == "/" ]; then
 else
   BASEURI=$SCHEMEURI/version
 fi
-CURRENT=$BASEURI/current
 
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
@@ -91,7 +90,7 @@ done
 # load latest version to the current graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
 printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to current graph\n"
-sparql_put $CURRENT $BASEDIR/$latest/$FILENAME
+sparql_put $BASEURI/current $BASEDIR/$latest/$FILENAME
 
 # iterate over the versions, create and load the deltas
 for index in ${!VERSIONS[*]}
@@ -119,7 +118,7 @@ where {}
   # add triples to the current graph
   statement="
 $PREFIXES
-with <$CURRENT>
+with <$BASEURI/current>
 insert {
   <$BASEURI/$old> a :SchemeVersion .
   <$SCHEMEURI> dcterms:hasVersion <$BASEURI/$old>
@@ -154,7 +153,7 @@ do
     # add triples to current graph
     statement="
 $PREFIXES
-with <$CURRENT>
+with <$BASEURI/current>
 insert {
   <$SCHEMEURI> :hasDelta <$delta_uri> .
   <$delta_uri> :deltaFrom <$BASEURI/$old> .
