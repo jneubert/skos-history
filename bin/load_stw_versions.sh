@@ -22,7 +22,7 @@
 #BASEDIR=/opt/thes/var/stw
 BASEDIR=/tmp/stw_versions
 FILENAME=rdf/stw.nt
-ENDPOINT=http://localhost:3030/stwv
+ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/stwv
 
 # publicly available STW versions
 VERSIONS=(8.04 8.06 8.08 8.10)
@@ -30,12 +30,24 @@ SCHEMEURI='http://zbw.eu/stw'
 
 # END CONFIGURATION
 
+sesame_put()
+{
+  if [ $2 ]; then
+    sesame_uri=$ENDPOINT/rdf-graphs/service?graph=$2
+  else
+    sesame_uri=$ENDPOINT/rdf-graphs/statements
+  fi
+  echo $sesame_uri
+  curl -X PUT -H "Content-Type: application/x-turtle" -d @$1 $sesame_uri
+}
+
 # handle trailing slash in scheme uri
 if [ "${SCHEMEURI: -1}" == "/" ]; then
   BASEURI=${SCHEMEURI}version
 else
   BASEURI=$SCHEMEURI/version
 fi
+CURRENT=$BASEURI/current
 
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
@@ -66,11 +78,10 @@ do
   fi
 done
 
-# load latest version to the default graph
+# load latest version to the current graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
 printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to default graph\n"
-$FUSEKI_HOME/s-put $ENDPOINT/data default $BASEDIR/$latest/$FILENAME
-
+sesame_put $BASEDIR/$latest/$FILENAME $CURRENT
 
 # iterate over the versions, create and load the deltas
 for index in ${!VERSIONS[*]}
@@ -79,7 +90,7 @@ do
 
   # load the version graph
   printf "\nLoading $BASEURI/$old\n"
-  $FUSEKI_HOME/s-put $ENDPOINT/data $BASEURI/$old $BASEDIR/$old/$FILENAME
+  sesame_put $BASEDIR/$old/$FILENAME $BASEURI/$old
 
   # add triples to the version graph
   # (particularly frbrer is Realization Of
@@ -106,6 +117,8 @@ where {}
 "
   $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
 done
+
+exit
 
 # do a second pass, to avoid triples being overridden by version loading
 for index in ${!VERSIONS[*]}
