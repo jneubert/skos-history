@@ -116,9 +116,10 @@ where {}
 "
   sparql_update "$statement"
 
-  # add triples to the default graph
+  # add triples to the current graph
   statement="
 $PREFIXES
+with <$CURRENT>
 insert {
   <$BASEURI/$old> a :SchemeVersion .
   <$SCHEMEURI> dcterms:hasVersion <$BASEURI/$old>
@@ -150,9 +151,10 @@ do
     grep '^< ' $diff | egrep -v "(^_:|> _:)" | sed 's/^< //' > ${filebase}_deletions.nt
     grep '^> ' $diff | egrep -v "(^_:|> _:)" | sed 's/^> //' > ${filebase}_insertions.nt
 
-    # add triples to default graph
+    # add triples to current graph
     statement="
 $PREFIXES
+with <$CURRENT>
 insert {
   <$SCHEMEURI> :hasDelta <$delta_uri> .
   <$delta_uri> :deltaFrom <$BASEURI/$old> .
