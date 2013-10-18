@@ -33,8 +33,13 @@ SCHEMEURI='http://zbw.eu/stw'
 sesame_put()
 {
   sesame_uri=$ENDPOINT/rdf-graphs/service?graph=$1
-  #echo $sesame_uri
   curl -X PUT -H "Content-Type: application/x-turtle" -d @$2 $sesame_uri
+}
+
+sesame_update()
+{
+  sesame_uri=$ENDPOINT/statements
+  curl -X POST -d "update=$1" $sesame_uri
 }
 
 # handle trailing slash in scheme uri
@@ -100,7 +105,7 @@ insert {
 }
 where {}
 "
-  $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+  sesame_update "$statement"
 
   # add triples to the default graph
   statement="
@@ -111,10 +116,8 @@ insert {
 }
 where {}
 "
-  $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+  sesame_update "$statement"
 done
-
-exit
 
 # do a second pass, to avoid triples being overridden by version loading
 for index in ${!VERSIONS[*]}
@@ -148,7 +151,7 @@ insert {
 }
 where {}
 "
-    $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+    sesame_update "$statement"
     # add triples to old version graph
     statement="
 $PREFIXES
@@ -160,7 +163,7 @@ insert {
 }
 where {}
 "
-    $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+    sesame_update "$statement"
     # add triples to old version graph
     statement="
 $PREFIXES
@@ -173,7 +176,7 @@ insert {
 }
 where {}
 "
-    $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+    sesame_update "$statement"
 
     # load delta
     for op in deletions insertions; do
@@ -182,7 +185,7 @@ where {}
       op_var="$(tr '[:lower:]' '[:upper:]' <<< ${op:0:1})${op:1}"
 
       # load file
-      $FUSEKI_HOME/s-put $ENDPOINT/data $delta_uri/$op ${filebase}_$op.nt
+      sesame_put $delta_uri/$op ${filebase}_$op.nt
 
       echo add triples to the delta graph for $op
       statement="
@@ -194,7 +197,7 @@ insert {
 }
 where {}
 "
-      $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+      sesame_update "$statement"
       echo add triples to both version graphs for $op
       statement="
 $PREFIXES
@@ -205,7 +208,7 @@ insert {
 }
 where {}
 "
-      $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+      sesame_update "$statement"
       statement="
 $PREFIXES
 with <$BASEURI/$new>
@@ -215,7 +218,7 @@ insert {
 }
 where {}
 "
-      $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+      sesame_update "$statement"
 
     done
 
