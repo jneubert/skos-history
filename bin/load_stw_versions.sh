@@ -1,45 +1,54 @@
 #!/bin/sh
 # nbt, 1.9.2013
 
-# load a series of version and delta graphs into a fuseki dataset
+# load a series of version and delta graphs into a SPARQL 1.1 RDF dataset
 
 
 # Requirements:
-
-# FUSEKI_HOME should already be defined.
-
-# If the installed system-wide ruby version is < 1.8.7 (e.g., on CentOS 5),
-# Fuseki utilities will refuse to work. A more current ruby version may be
-# installed somewhere and put at the beginning of $PATH. The Ruby section of
-# http://www.geekytidbits.com/ruby-on-rails-in-centos-5/ worked for me.
 
 # Redland's rapper and rdf.sh`s rdf command should be in $PATH
 
 
 # START CONFIGURATION
 
+DATASET=stwv
+
 # is used to store the SKOS files locally
 #BASEDIR=/opt/thes/var/stw
 BASEDIR=/tmp/stw_versions
 FILENAME=rdf/stw.nt
-ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/stwv
 
 # publicly available STW versions
 VERSIONS=(8.04 8.06 8.08 8.10)
 SCHEMEURI='http://zbw.eu/stw'
 
+# implementation-specific uris
+#IMPL='sesame'
+IMPL='fuseki'
+if [ $IMPL == "sesame" ]; then
+  ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/$DATASET
+  PUT_URI=$ENDPOINT/rdf-graphs/service
+  UPDATE_URI=$ENDPOINT/statements
+elif [ $IMPL == "fuseki" ]; then
+  ENDPOINT=http://localhost:3030/$DATASET
+  PUT_URI=$ENDPOINT/data
+  UPDATE_URI=$ENDPOINT/update
+else
+  echo implementation $IMPL not defined
+  exit
+fi
+
 # END CONFIGURATION
 
-sesame_put()
+sparql_put()
 {
-  sesame_uri=$ENDPOINT/rdf-graphs/service?graph=$1
-  curl -X PUT -H "Content-Type: application/x-turtle" -d @$2 $sesame_uri
+  curl -X PUT -H "Content-Type: application/x-turtle" -d @$2 $PUT_URI?graph=$1
 }
 
-sesame_update()
+sparql_update()
 {
-  sesame_uri=$ENDPOINT/statements
-  curl -X POST -d "update=$1" $sesame_uri
+  # suppress output of returned HTML (in case of fuseki)
+  curl -X POST --silent -d "update=$1" $UPDATE_URI > /dev/null
 }
 
 # handle trailing slash in scheme uri
@@ -82,7 +91,7 @@ done
 # load latest version to the current graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
 printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to current graph\n"
-sesame_put $CURRENT $BASEDIR/$latest/$FILENAME
+sparql_put $CURRENT $BASEDIR/$latest/$FILENAME
 
 # iterate over the versions, create and load the deltas
 for index in ${!VERSIONS[*]}
@@ -91,7 +100,7 @@ do
 
   # load the version graph
   printf "\nLoading $BASEURI/$old\n"
-  sesame_put $BASEURI/$old $BASEDIR/$old/$FILENAME
+  sparql_put $BASEURI/$old $BASEDIR/$old/$FILENAME
 
   # add triples to the version graph
   # (particularly frbrer is Realization Of
@@ -105,7 +114,7 @@ insert {
 }
 where {}
 "
-  sesame_update "$statement"
+  sparql_update "$statement"
 
   # add triples to the default graph
   statement="
@@ -116,7 +125,7 @@ insert {
 }
 where {}
 "
-  sesame_update "$statement"
+  sparql_update "$statement"
 done
 
 # do a second pass, to avoid triples being overridden by version loading
@@ -151,7 +160,7 @@ insert {
 }
 where {}
 "
-    sesame_update "$statement"
+    sparql_update "$statement"
     # add triples to old version graph
     statement="
 $PREFIXES
@@ -163,7 +172,7 @@ insert {
 }
 where {}
 "
-    sesame_update "$statement"
+    sparql_update "$statement"
     # add triples to old version graph
     statement="
 $PREFIXES
@@ -176,7 +185,7 @@ insert {
 }
 where {}
 "
-    sesame_update "$statement"
+    sparql_update "$statement"
 
     # load delta
     for op in deletions insertions; do
@@ -185,7 +194,7 @@ where {}
       op_var="$(tr '[:lower:]' '[:upper:]' <<< ${op:0:1})${op:1}"
 
       # load file
-      sesame_put $delta_uri/$op ${filebase}_$op.nt
+      sparql_put $delta_uri/$op ${filebase}_$op.nt
 
       echo add triples to the delta graph for $op
       statement="
@@ -197,7 +206,7 @@ insert {
 }
 where {}
 "
-      sesame_update "$statement"
+      sparql_update "$statement"
       echo add triples to both version graphs for $op
       statement="
 $PREFIXES
@@ -208,7 +217,7 @@ insert {
 }
 where {}
 "
-      sesame_update "$statement"
+      sparql_update "$statement"
       statement="
 $PREFIXES
 with <$BASEURI/$new>
@@ -218,7 +227,7 @@ insert {
 }
 where {}
 "
-      sesame_update "$statement"
+      sparql_update "$statement"
 
     done
 
