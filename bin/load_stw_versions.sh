@@ -32,13 +32,9 @@ SCHEMEURI='http://zbw.eu/stw'
 
 sesame_put()
 {
-  if [ $2 ]; then
-    sesame_uri=$ENDPOINT/rdf-graphs/service?graph=$2
-  else
-    sesame_uri=$ENDPOINT/rdf-graphs/statements
-  fi
-  echo $sesame_uri
-  curl -X PUT -H "Content-Type: application/x-turtle" -d @$1 $sesame_uri
+  sesame_uri=$ENDPOINT/rdf-graphs/service?graph=$1
+  #echo $sesame_uri
+  curl -X PUT -H "Content-Type: application/x-turtle" -d @$2 $sesame_uri
 }
 
 # handle trailing slash in scheme uri
@@ -80,8 +76,8 @@ done
 
 # load latest version to the current graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
-printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to default graph\n"
-sesame_put $BASEDIR/$latest/$FILENAME $CURRENT
+printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to current graph\n"
+sesame_put $CURRENT $BASEDIR/$latest/$FILENAME
 
 # iterate over the versions, create and load the deltas
 for index in ${!VERSIONS[*]}
@@ -90,7 +86,7 @@ do
 
   # load the version graph
   printf "\nLoading $BASEURI/$old\n"
-  sesame_put $BASEDIR/$old/$FILENAME $BASEURI/$old
+  sesame_put $BASEURI/$old $BASEDIR/$old/$FILENAME
 
   # add triples to the version graph
   # (particularly frbrer is Realization Of
