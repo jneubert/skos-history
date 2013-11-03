@@ -1,34 +1,55 @@
 #!/bin/sh
 # nbt, 1.9.2013
 
-# load a series of version and delta graphs into a fuseki dataset
+# load a series of version and delta graphs into a SPARQL 1.1 RDF dataset
 
 
 # Requirements:
-
-# FUSEKI_HOME should already be defined.
-
-# If the installed system-wide ruby version is < 1.8.7 (e.g., on CentOS 5),
-# Fuseki utilities will refuse to work. A more current ruby version may be
-# installed somewhere and put at the beginning of $PATH. The Ruby section of
-# http://www.geekytidbits.com/ruby-on-rails-in-centos-5/ worked for me.
 
 # Redland's rapper and rdf.sh`s rdf command should be in $PATH
 
 
 # START CONFIGURATION
 
+DATASET=stwv
+
 # is used to store the SKOS files locally
 #BASEDIR=/opt/thes/var/stw
 BASEDIR=/tmp/stw_versions
 FILENAME=rdf/stw.nt
-ENDPOINT=http://localhost:3030/stwv
 
 # publicly available STW versions
 VERSIONS=(8.04 8.06 8.08 8.10 8.12)
 SCHEMEURI='http://zbw.eu/stw'
 
+# implementation-specific uris
+#IMPL='sesame'
+IMPL='fuseki'
+if [ $IMPL == "sesame" ]; then
+  ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/$DATASET
+  PUT_URI=$ENDPOINT/rdf-graphs/service
+  UPDATE_URI=$ENDPOINT/statements
+elif [ $IMPL == "fuseki" ]; then
+  ENDPOINT=http://localhost:3030/$DATASET
+  PUT_URI=$ENDPOINT/data
+  UPDATE_URI=$ENDPOINT/update
+else
+  echo implementation $IMPL not defined
+  exit
+fi
+
 # END CONFIGURATION
+
+sparql_put()
+{
+  curl -X PUT -H "Content-Type: application/x-turtle" -d @$2 $PUT_URI?graph=$1
+}
+
+sparql_update()
+{
+  # suppress output of returned HTML (in case of fuseki)
+  curl -X POST --silent -d "update=$1" $UPDATE_URI > /dev/null
+}
 
 # handle trailing slash in scheme uri
 if [ "${SCHEMEURI: -1}" == "/" ]; then
@@ -66,11 +87,10 @@ do
   fi
 done
 
-# load latest version to the default graph
+# load latest version to the current graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
-printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to default graph\n"
-$FUSEKI_HOME/s-put $ENDPOINT/data default $BASEDIR/$latest/$FILENAME
-
+printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to current graph\n"
+sparql_put $BASEURI/current $BASEDIR/$latest/$FILENAME
 
 # iterate over the versions, create and load the deltas
 for index in ${!VERSIONS[*]}
@@ -79,7 +99,7 @@ do
 
   # load the version graph
   printf "\nLoading $BASEURI/$old\n"
-  $FUSEKI_HOME/s-put $ENDPOINT/data $BASEURI/$old $BASEDIR/$old/$FILENAME
+  sparql_put $BASEURI/$old $BASEDIR/$old/$FILENAME
 
   # add triples to the version graph
   # (particularly frbrer is Realization Of
@@ -93,18 +113,19 @@ insert {
 }
 where {}
 "
-  $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+  sparql_update "$statement"
 
-  # add triples to the default graph
+  # add triples to the current graph
   statement="
 $PREFIXES
+with <$BASEURI/current>
 insert {
   <$BASEURI/$old> a :SchemeVersion .
   <$SCHEMEURI> dcterms:hasVersion <$BASEURI/$old>
 }
 where {}
 "
-  $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+  sparql_update "$statement"
 done
 
 # do a second pass, to avoid triples being overridden by version loading
@@ -129,9 +150,10 @@ do
     grep '^< ' $diff | egrep -v "(^_:|> _:)" | sed 's/^< //' > ${filebase}_deletions.nt
     grep '^> ' $diff | egrep -v "(^_:|> _:)" | sed 's/^> //' > ${filebase}_insertions.nt
 
-    # add triples to default graph
+    # add triples to current graph
     statement="
 $PREFIXES
+with <$BASEURI/current>
 insert {
   <$SCHEMEURI> :hasDelta <$delta_uri> .
   <$delta_uri> :deltaFrom <$BASEURI/$old> .
@@ -139,7 +161,7 @@ insert {
 }
 where {}
 "
-    $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+    sparql_update "$statement"
     # add triples to old version graph
     statement="
 $PREFIXES
@@ -151,7 +173,7 @@ insert {
 }
 where {}
 "
-    $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+    sparql_update "$statement"
     # add triples to old version graph
     statement="
 $PREFIXES
@@ -164,7 +186,7 @@ insert {
 }
 where {}
 "
-    $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+    sparql_update "$statement"
 
     # load delta
     for op in deletions insertions; do
@@ -173,7 +195,7 @@ where {}
       op_var="$(tr '[:lower:]' '[:upper:]' <<< ${op:0:1})${op:1}"
 
       # load file
-      $FUSEKI_HOME/s-put $ENDPOINT/data $delta_uri/$op ${filebase}_$op.nt
+      sparql_put $delta_uri/$op ${filebase}_$op.nt
 
       echo add triples to the delta graph for $op
       statement="
@@ -185,7 +207,7 @@ insert {
 }
 where {}
 "
-      $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+      sparql_update "$statement"
       echo add triples to both version graphs for $op
       statement="
 $PREFIXES
@@ -196,7 +218,7 @@ insert {
 }
 where {}
 "
-      $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+      sparql_update "$statement"
       statement="
 $PREFIXES
 with <$BASEURI/$new>
@@ -206,7 +228,7 @@ insert {
 }
 where {}
 "
-      $FUSEKI_HOME/s-update --service $ENDPOINT/update "$statement"
+      sparql_update "$statement"
 
     done
 
