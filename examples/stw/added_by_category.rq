@@ -5,8 +5,13 @@ PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history
 PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 PREFIX zbwext:  <http://zbw.eu/namespaces/zbw-extensions/>
 
-# identify concepts inserted with a certain version,
-# ordered by the second level subject category
+
+# Identify concepts inserted with a certain version,
+# ordered by the second level subject category.
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
 
 SELECT distinct ?secondLevelLabel ?prefLabel ?concept
 WHERE
@@ -22,7 +27,7 @@ WHERE
 
         # identify insertions and deletions parts/graphs
         ?delta dcterms:hasPart ?insertions .
-       ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
         ?delta dcterms:hasPart ?deletions .
         ?deletions rdf:type sh:SchemeDeltaDeletions
 
@@ -38,7 +43,6 @@ WHERE
       }
 
     # get the top subject category (concept of subclass Thsys)
-    # subject categories form a mono-hierarchy within STW
     ?concept skos:broader ?category .
     ?category rdf:type zbwext:Thsys .
     ?category skos:broader* ?topConcept .
