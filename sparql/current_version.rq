@@ -1,18 +1,12 @@
 PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv:     <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
 PREFIX owl:     <http://www.w3.org/2002/07/owl#>
 
 # get the current version graph name
 
-SELECT  (?version AS ?currentVersion)
+SELECT  ?currentVersion
 WHERE
   { 
-    # all versions of the scheme
-    ?scheme dcterms:hasVersion ?version .
-
-  # name of the current version
-    ?scheme owl:versionInfo ?versionName
-
-    # version graph with this version name
-    GRAPH ?version
-      { [] owl:versionInfo ?versionName }
+    GRAPH <http://zbw.eu/stw/version>
+      { ?versionset dsv:currentVersionRecord ?currentVersion }
   }

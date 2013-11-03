@@ -28,11 +28,13 @@ WHERE
         GRAPH ?insertions
           { ?concept skos:prefLabel ?prefLabel }
 
-
         # ... without any prefLabel deleted for this concept
         FILTER NOT EXISTS {GRAPH ?deletions
             { ?concept skos:prefLabel [] }
         }
+
+        # restrict output to a certain language
+        FILTER (lang(?prefLabel) = 'en' && lang(?topLabel) = 'en')
       }
   }
 ORDER BY ?concept

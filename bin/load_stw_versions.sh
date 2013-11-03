@@ -90,6 +90,7 @@ done
 
 # load latest version to the version history  graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
+echo Creating version history
 statement="
 $PREFIXES
 with <$BASEURI>

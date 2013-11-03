@@ -13,7 +13,7 @@ PREFIX zbwext:  <http://zbw.eu/namespaces/zbw-extensions/>
 # level subject categories are the sub-thesauri. A descriptor
 # often belongs to more than one subject category.
 
-SELECT distinct ?secondLevelLabel ?prefLabel ?concept
+SELECT distinct ?secondLevelCategoryLabel ?prefLabel ?concept
 WHERE
   {
     # fixed version, will be parameter or current version
@@ -40,22 +40,24 @@ WHERE
         FILTER NOT EXISTS {GRAPH ?deletions
             { ?concept skos:prefLabel [] }
         }
+
+        # get the top subject category (concept of subclass Thsys)
+        ?concept skos:broader ?category .
+        ?category rdf:type zbwext:Thsys .
+        ?category skos:broader* ?topConcept .
+        ?scheme skos:hasTopConcept ?topConcept .
+
+        # get the second level category
+        ?topConcept skos:narrower ?secondLevelConcept .
+        ?concept skos:broader+ ?secondLevelConcept .
+
+        # get the label of the second level category
+        ?secondLevelConcept skos:prefLabel ?secondLevelCategoryLabel
+
+        # restrict output to a certain language
+        FILTER (lang(?prefLabel) = 'en' && lang(?secondLevelCategoryLabel) = 'en')
       }
-
-    # get the top subject category (concept of subclass Thsys)
-    ?concept skos:broader ?category .
-    ?category rdf:type zbwext:Thsys .
-    ?category skos:broader* ?topConcept .
-    ?scheme skos:hasTopConcept ?topConcept .
-
-    # get the second level category
-    ?topConcept skos:narrower ?secondLevelConcept .
-    ?concept skos:broader+ ?secondLevelConcept .
-
-    # get the label of the second level category
-    ?secondLevelConcept skos:prefLabel ?secondLevelLabel
-    FILTER (lang(?prefLabel) = 'en' && lang(?secondLevelLabel) = 'en')
   }
 
-ORDER BY ?secondLevelLabel ?prefLabel
+ORDER BY ?secondLevelCategoryLabel ?prefLabel
 
