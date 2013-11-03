@@ -1,0 +1,61 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX zbwext:  <http://zbw.eu/namespaces/zbw-extensions/>
+
+# Identify concepts inserted with a certain version,
+# ordered by the second level subject category.
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
+
+SELECT distinct ?secondLevelLabel ?prefLabel ?concept
+WHERE
+  {
+    # fixed version, should be parameter (or default to current version)
+    BIND(<http://zbw.eu/stw/version/8.12> AS ?version)
+
+    GRAPH ?version
+      {
+        # this assumes that only one delta to a prior version exists
+        # (not multiple, overlapping deltas!)
+        ?delta sh:deltaTo ?version .
+
+        # identify insertions and deletions parts/graphs
+        ?delta dcterms:hasPart ?insertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?delta dcterms:hasPart ?deletions .
+        ?deletions rdf:type sh:SchemeDeltaDeletions
+
+        # for each inserted concept, a (newly inserted) prefLabel must exist ...
+        GRAPH ?insertions
+          { ?concept skos:prefLabel ?prefLabel }
+
+
+        # ... without any prefLabel deleted for this concept
+        FILTER NOT EXISTS {GRAPH ?deletions
+            { ?concept skos:prefLabel [] }
+        }
+      }
+
+    # get the top subject category (concept of subclass Thsys)
+    ?concept skos:broader ?category .
+    ?category rdf:type zbwext:Thsys .
+    ?category skos:broader* ?topConcept .
+    ?scheme skos:hasTopConcept ?topConcept .
+
+    # get the second level category
+    ?topConcept skos:narrower ?secondLevelConcept .
+    ?concept skos:broader+ ?secondLevelConcept .
+
+    # get the label of the second level category
+    ?secondLevelConcept skos:prefLabel ?secondLevelLabel
+    FILTER (lang(?prefLabel) = 'de' && lang(?secondLevelLabel) = 'de')
+  }
+
+ORDER BY ?secondLevelLabel ?prefLabel
+
+

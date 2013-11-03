@@ -25,7 +25,7 @@ FILENAME=rdf/stw.nt
 ENDPOINT=http://localhost:3030/stwv
 
 # publicly available STW versions
-VERSIONS=(8.04 8.06 8.08 8.10)
+VERSIONS=(8.04 8.06 8.08 8.10 8.12)
 SCHEMEURI='http://zbw.eu/stw'
 
 # END CONFIGURATION
