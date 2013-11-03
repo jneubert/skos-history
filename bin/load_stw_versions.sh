@@ -62,6 +62,7 @@ PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 prefix dc: <http://purl.org/dc/elements/1.1/>
 prefix dcterms: <http://purl.org/dc/terms/>
+prefix dsv: <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -87,10 +88,18 @@ do
   fi
 done
 
-# load latest version to the current graph
+# load latest version to the version history  graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
-printf "\nLoading latest version $latest from $BASEDIR/$latest/$FILENAME to current graph\n"
-sparql_put $BASEURI/current $BASEDIR/$latest/$FILENAME
+statement="
+$PREFIXES
+with <$BASEURI>
+insert {
+  <${BASEURI}set> a dsv:VersionHistorySet .
+  <${BASEURI}set> dsv:currentVersionRecord <${BASEURI}record/$latest> .
+}
+where {}
+"
+sparql_update "$statement"
 
 # iterate over the versions, create and load the deltas
 for index in ${!VERSIONS[*]}
@@ -107,23 +116,31 @@ do
 $PREFIXES
 with <$BASEURI/$old>
 insert {
-  <$BASEURI/$old> a :SchemeVersion .
   <$BASEURI/$old> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <$SCHEMEURI> .
-  <$BASEURI/$old> dcterms:isVersionOf <$SCHEMEURI> .
+  <$SCHEMEURI> dsv:hasVersionRecord <${BASEURI}record/$latest> .
 }
 where {}
 "
   sparql_update "$statement"
 
-  # add triples to the current graph
+  # add triples to the version history graph
   statement="
 $PREFIXES
-with <$BASEURI/current>
+with <$BASEURI>
 insert {
-  <$BASEURI/$old> a :SchemeVersion .
-  <$SCHEMEURI> dcterms:hasVersion <$BASEURI/$old>
+  <${BASEURI}record/$old>
+      a dsv:VersionHistoryRecord ;
+      dsv:hasVersionHistorySet <${BASEURI}set> ;
+      dsv:isVersionRecordOf <$BASEURI/$old> ;
+      dc:date ?date ;
+      dc:identifier ?identifier .
 }
-where {}
+where {
+  GRAPH <$BASEURI/$old> {
+    <$SCHEMEURI> dcterms:issued ?date .
+    <$SCHEMEURI> owl:versionInfo ?identifier .
+  }
+}
 "
   sparql_update "$statement"
 done
@@ -150,10 +167,10 @@ do
     grep '^< ' $diff | egrep -v "(^_:|> _:)" | sed 's/^< //' > ${filebase}_deletions.nt
     grep '^> ' $diff | egrep -v "(^_:|> _:)" | sed 's/^> //' > ${filebase}_insertions.nt
 
-    # add triples to current graph
+    # add triples to version history graph
     statement="
 $PREFIXES
-with <$BASEURI/current>
+with <$BASEURI>
 insert {
   <$SCHEMEURI> :hasDelta <$delta_uri> .
   <$delta_uri> :deltaFrom <$BASEURI/$old> .
