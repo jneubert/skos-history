@@ -30,11 +30,13 @@ WHERE
         GRAPH ?deletions
           { ?concept skos:prefLabel ?prefLabel }
 
-
         # ... without anything remaining for this concept in the current version
         FILTER NOT EXISTS { graph ?version
             { ?concept ?p [] }
         }
+
+        # restrict output to a certain language
+        FILTER (lang(?label) = 'en')
       }
   }
 ORDER BY ?concept

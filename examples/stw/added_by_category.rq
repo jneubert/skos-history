@@ -5,10 +5,15 @@ PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history
 PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 PREFIX zbwext:  <http://zbw.eu/namespaces/zbw-extensions/>
 
-# identify concepts inserted with a certain version,
-# ordered by the second level subject category
 
-SELECT distinct ?secondLevelLabel ?prefLabel ?concept
+# Identify concepts inserted with a certain version,
+# ordered by the second level subject category.
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
+
+SELECT distinct ?secondLevelCategoryLabel ?prefLabel ?concept
 WHERE
   {
     # fixed version, will be parameter or current version
@@ -22,7 +27,7 @@ WHERE
 
         # identify insertions and deletions parts/graphs
         ?delta dcterms:hasPart ?insertions .
-       ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
         ?delta dcterms:hasPart ?deletions .
         ?deletions rdf:type sh:SchemeDeltaDeletions
 
@@ -35,23 +40,24 @@ WHERE
         FILTER NOT EXISTS {GRAPH ?deletions
             { ?concept skos:prefLabel [] }
         }
+
+        # get the top subject category (concept of subclass Thsys)
+        ?concept skos:broader ?category .
+        ?category rdf:type zbwext:Thsys .
+        ?category skos:broader* ?topConcept .
+        ?scheme skos:hasTopConcept ?topConcept .
+
+        # get the second level category
+        ?topConcept skos:narrower ?secondLevelConcept .
+        ?concept skos:broader+ ?secondLevelConcept .
+
+        # get the label of the second level category
+        ?secondLevelConcept skos:prefLabel ?secondLevelCategoryLabel
+
+        # restrict output to a certain language
+        FILTER (lang(?prefLabel) = 'en' && lang(?secondLevelCategoryLabel) = 'en')
       }
-
-    # get the top subject category (concept of subclass Thsys)
-    # subject categories form a mono-hierarchy within STW
-    ?concept skos:broader ?category .
-    ?category rdf:type zbwext:Thsys .
-    ?category skos:broader* ?topConcept .
-    ?scheme skos:hasTopConcept ?topConcept .
-
-    # get the second level category
-    ?topConcept skos:narrower ?secondLevelConcept .
-    ?concept skos:broader+ ?secondLevelConcept .
-
-    # get the label of the second level category
-    ?secondLevelConcept skos:prefLabel ?secondLevelLabel
-    FILTER (lang(?prefLabel) = 'en' && lang(?secondLevelLabel) = 'en')
   }
 
-ORDER BY ?secondLevelLabel ?prefLabel
+ORDER BY ?secondLevelCategoryLabel ?prefLabel
 

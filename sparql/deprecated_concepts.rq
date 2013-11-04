@@ -32,6 +32,9 @@ WHERE
         UNION
           { ?concept rdfs:label ?label }
         
+        # restrict output to a certain language
+        FILTER (lang(?label) = 'en')
+
         # perhaps the deprecated concept was merged into another one
         OPTIONAL
           { ?concept dcterms:isReplacedBy ?replacedBy .

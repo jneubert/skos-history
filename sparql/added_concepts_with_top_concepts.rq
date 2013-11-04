@@ -33,16 +33,17 @@ WHERE
         FILTER NOT EXISTS {GRAPH ?deletions
             { ?concept skos:prefLabel [] }
         }
+
+        # get the top concept(s) (which, for STW, always are defined
+        # as a subsection of the thesaurus). A concept may have multiple
+        # top concepts
+        ?concept skos:broader+ ?topConcept .
+        ?scheme skos:hasTopConcept ?topConcept .
+        ?topConcept skos:prefLabel ?topLabel .
+
+        # restrict output to a certain language
+        FILTER (lang(?prefLabel) = 'en' && lang(?topLabel) = 'en')
       }
-
-    # get the top concept(s) (which, for STW, always are defined
-    # as a subsection of the thesaurus). A concept may have multiple
-    # top concepts
-    ?concept skos:broader+ ?topConcept .
-    ?scheme skos:hasTopConcept ?topConcept .
-    ?topConcept skos:prefLabel ?topLabel .
-
-    FILTER (lang(?prefLabel) = 'en' && lang(?topLabel) = 'en')
   }
 
 ORDER BY ?topLabel ?prefLabel
