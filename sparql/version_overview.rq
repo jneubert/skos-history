@@ -1,0 +1,17 @@
+PREFIX dc:      <http://purl.org/dc/elements/1.1/>
+PREFIX dsv:     <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
+
+# list all available scheme versions
+
+SELECT  ?version ?identifier ?date
+WHERE
+  { # currently, the version history graph must have a known name and endpoint
+    GRAPH <http://zbw.eu/stw/version>
+    { ?vhr dsv:hasVersionHistorySet <http://zbw.eu/stw/versionset> .
+      ?vhr dsv:isVersionRecordOf ?version .
+      ?vhr dc:date ?date .
+      ?vhr dc:identifier ?identifier .
+    }
+  }
+ORDER BY ?version
+
