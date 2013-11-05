@@ -3,14 +3,17 @@ PREFIX dsv:     <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data
 
 # list all available scheme versions
 
-SELECT  ?version ?identifier ?date
+SELECT  ?version ?identifier ?date ?current
 WHERE
-  { # currently, the version history graph must have a known name and endpoint
-    GRAPH <http://zbw.eu/stw/version>
-    { ?vhr dsv:hasVersionHistorySet <http://zbw.eu/stw/versionset> .
+  { GRAPH <http://zbw.eu/stw/version>
+    { ?vhr dsv:hasVersionHistorySet ?vhs .
       ?vhr dsv:isVersionRecordOf ?version .
       ?vhr dc:date ?date .
       ?vhr dc:identifier ?identifier .
+      OPTIONAL
+        { ?vhs dsv:currentVersionRecord ?current .
+          FILTER (?vhr = ?current)
+        }
     }
   }
 ORDER BY ?version
