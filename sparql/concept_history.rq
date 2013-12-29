@@ -1,38 +1,38 @@
-prefix : <http://zbw.eu/namespaces/skos-history/>
-prefix dcterms: <http://purl.org/dc/terms/>
-prefix skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 
-construct {
-  ?s :history ?delta .
+CONSTRUCT {
+  ?concept sh:history ?delta .
   ?delta
-    :prefLabelDeletion ?prefDelete ;
-    :prefLabelInsertion ?prefInsert ;
-    :altLabelDeltion ?altDelete ;
-    :altLabelInsertion ?altInsert .
+    sh:prefLabelDeletion ?prefDelete ;
+    sh:prefLabelInsertion ?prefInsert ;
+    sh:altLabelDeltion ?altDelete ;
+    sh:altLabelInsertion ?altInsert .
 }
 
-where {
-  bind (<http://zbw.eu/stw/descriptor/10112-4> as ?s)
+WHERE {
+  BIND (<http://zbw.eu/stw/descriptor/10112-4> AS ?concept)
 
-  ?version a :SchemeVersion .
-  graph ?version {
-    ?version :hasDelta ?delta .
+  ?version a sh:SchemeVersion .
+  GRAPH ?version {
+    ?version sh:hasDelta ?delta .
     ?delta dcterms:hasPart ?part .
 
-      { bind (?part as ?deletionsPart)
-        ?deletionsPart a :SchemeDeltaDeletions .
-        graph ?deletionsPart {
-          ?s skos:prefLabel ?prefDelete . 
-          ?s skos:altLabel ?altDelete . 
+      { BIND (?part AS ?deletionsPart)
+        ?deletionsPart a sh:SchemeDeltaDeletions .
+        GRAPH ?deletionsPart {
+          ?concept skos:prefLabel ?prefDelete .
+          ?concept skos:altLabel ?altDelete .
         }
       }
-    union
-      { bind (?part as ?insertionsPart)
-        ?insertionsPart a :SchemeDeltaInsertions .
-        graph ?insertionsPart {
-          ?s skos:prefLabel ?prefInsert . 
-          ?s skos:altLabel ?altInsert } .
+    UNION
+      { BIND (?part AS ?insertionsPart)
+        ?insertionsPart a sh:SchemeDeltaInsertions .
+        GRAPH ?insertionsPart {
+          ?concept skos:prefLabel ?prefInsert .
+          ?concept skos:altLabel ?altInsert } .
       }
   }
 }
-  
+
