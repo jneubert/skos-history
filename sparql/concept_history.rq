@@ -3,8 +3,8 @@ PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 
 CONSTRUCT {
-  ?concept sh:history ?delta .
-  ?delta
+  ?concept sh:history ?conceptDelta .
+  ?conceptDelta
     sh:prefLabelDeletion ?prefDelete ;
     sh:prefLabelInsertion ?prefInsert ;
     sh:altLabelDeltion ?altDelete ;
@@ -33,6 +33,8 @@ WHERE {
           ?concept skos:prefLabel ?prefInsert .
           ?concept skos:altLabel ?altInsert } .
       }
+
+    BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
   }
 }
 
