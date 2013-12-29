@@ -1,0 +1,38 @@
+prefix : <http://zbw.eu/namespaces/skos-history/>
+prefix dcterms: <http://purl.org/dc/terms/>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+
+construct {
+  ?s :history ?delta .
+  ?delta
+    :prefLabelDeletion ?prefDelete ;
+    :prefLabelInsertion ?prefInsert ;
+    :altLabelDeltion ?altDelete ;
+    :altLabelInsertion ?altInsert .
+}
+
+where {
+  bind (<http://zbw.eu/stw/descriptor/10112-4> as ?s)
+
+  ?version a :SchemeVersion .
+  graph ?version {
+    ?version :hasDelta ?delta .
+    ?delta dcterms:hasPart ?part .
+
+      { bind (?part as ?deletionsPart)
+        ?deletionsPart a :SchemeDeltaDeletions .
+        graph ?deletionsPart {
+          ?s skos:prefLabel ?prefDelete . 
+          ?s skos:altLabel ?altDelete . 
+        }
+      }
+    union
+      { bind (?part as ?insertionsPart)
+        ?insertionsPart a :SchemeDeltaInsertions .
+        graph ?insertionsPart {
+          ?s skos:prefLabel ?prefInsert . 
+          ?s skos:altLabel ?altInsert } .
+      }
+  }
+}
+  
