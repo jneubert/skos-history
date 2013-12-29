@@ -8,5 +8,5 @@ SELECT  ?currentVersion
 WHERE
   { 
     GRAPH <http://zbw.eu/stw/version>
-      { ?versionset dsv:currentVersionRecord ?currentVersion }
+      { ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currentVersion }
   }

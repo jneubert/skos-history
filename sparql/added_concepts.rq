@@ -1,4 +1,5 @@
 PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv:     <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
 PREFIX owl:     <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
@@ -9,8 +10,12 @@ PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 SELECT  ?concept ?prefLabel
 WHERE
   { 
-    # fixed version, will be parameter or current version
-    BIND(<http://zbw.eu/stw/version/8.10> AS ?version)
+    # use current version as default
+    GRAPH <http://zbw.eu/stw/version>
+      {
+        ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currrentVersion
+      }
+    BIND(?currentVersion AS ?version)
 
     GRAPH ?version
       { 
@@ -34,7 +39,7 @@ WHERE
         }
 
         # restrict output to a certain language
-        FILTER (lang(?prefLabel) = 'en' && lang(?topLabel) = 'en')
+        FILTER (lang(?prefLabel) = 'en')
       }
   }
 ORDER BY ?concept
