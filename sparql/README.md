@@ -5,4 +5,4 @@ The queries in this directory should be executable against an example endpoint w
 
   http://zbw.eu/beta/sparql/stwv/query
 
-In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example a [link prepared for concept_history.rq](http://bit.ly/1iz5BZ3).
+In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example a [link prepared for concept_history.rq](http://bit.ly/1dhL6bL).
