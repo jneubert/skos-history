@@ -7,7 +7,7 @@ CONSTRUCT {
   ?conceptDelta
     sh:prefLabelDeletion ?prefDelete ;
     sh:prefLabelInsertion ?prefInsert ;
-    sh:altLabelDeltion ?altDelete ;
+    sh:altLabelDeletion ?altDelete ;
     sh:altLabelInsertion ?altInsert .
 }
 
