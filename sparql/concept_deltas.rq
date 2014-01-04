@@ -1,0 +1,55 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX delta:   <http://www.w3.org/2004/delta#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+
+# version deltas for a single concept
+# (restricted to skos properties, to get rid of some less interesting
+# dataset-wide changes/enhancements of the STW example dataset)
+
+CONSTRUCT {
+  ?concept sh:history ?conceptDelta .
+  ?conceptDelta
+    delta:deletion [ ?predicate ?deletion ] ;
+    delta:insertion [ ?predicate ?insertion ] .
+}
+
+WHERE {
+  {
+    # use subquery to filter out duplicates
+    SELECT DISTINCT ?concept ?conceptDelta ?predicate ?deletion ?insertion
+    WHERE
+    {
+      # currently, fixed concept
+      BIND (<http://zbw.eu/stw/descriptor/12571-4> AS ?concept)
+
+      ?version a sh:SchemeVersion .
+      GRAPH ?version {
+        ?version sh:hasDelta ?delta .
+        ?delta dcterms:hasPart ?part .
+
+        # for each version, work on insertions and deletions part
+          { BIND (?part AS ?deletionsPart)
+            ?deletionsPart a sh:SchemeDeltaDeletions .
+            GRAPH ?deletionsPart {
+              ?concept ?predicate ?deletion .
+              # restrict to skos attributes
+              FILTER ( contains(str(?predicate), '/skos/core#') )
+            }
+          }
+        UNION
+          { BIND (?part AS ?insertionsPart)
+            ?insertionsPart a sh:SchemeDeltaInsertions .
+            GRAPH ?insertionsPart {
+              ?concept ?predicate ?insertion .
+              # restrict to skos attributes
+              FILTER ( contains(str(?predicate), '/skos/core#') )
+            }
+          }
+
+        # build a uri to group the changes for a particular version
+        BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
+      }
+    }
+  }
+}
