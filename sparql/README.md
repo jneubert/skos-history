@@ -5,4 +5,4 @@ The queries in this directory should be executable against an example endpoint w
 
   http://zbw.eu/beta/sparql/stwv/query
 
-In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" concept_history.rq](http://bit.ly/1dhL6bL), ["Personnel selection" concept_deltas.rq](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virual community"](http://bit.ly/JQ56dX).
+In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" (concept_history.rq)](http://bit.ly/1dhL6bL), ["Personnel selection" (concept_deltas.rq)](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virtual community" (concept_deltas.rq)](http://bit.ly/JQ56dX).
