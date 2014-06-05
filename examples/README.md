@@ -12,7 +12,7 @@ So while the examples will not run with other datasets, they may show how
 value can be added by exploiting custom data structures, while at the same
 time making use of a common version history scheme.
 
-An [example rdfa page](stw/version_about.en.html) ([extracted triples](stw/version_about.ttl))
-enriches the currently used
+An [example RDFa page](https://rawgithub.com/jneubert/skos-history/master/examples/stw/version_about.en.html)
+([extracted triples](stw/version_about.ttl)) enriches the currently used
 [STW version overview](http://zbw.eu/stw/versions) with data according to the proposed
 [Dataset versioning vocabulary](https://github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-). 
