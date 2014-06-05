@@ -1,0 +1,71 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://www.w3.org/1999/xhtml> .
+@prefix cc: <http://creativecommons.org/ns#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dsv: <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix gbv: <http://purl.org/ontology/gbv/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix stw: <http://zbw.eu/stw/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix waiver: <http://vocab.org/waiver/terms/> .
+@prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix zbwext: <http://zbw.eu/namespaces/zbw-extensions/> .
+
+<file:///opt/thes/bin/../var/html/stw/version/about.en.html>
+    cc:attributionName "ZBW - Leibniz Information Centre for Economics"@en ;
+    cc:morePermissions <http://www.zbw.eu/e_imprint.htm> ;
+    dcterms:issued "2013-10-30"^^xsd:date ;
+    dcterms:publisher "ZBW - Leibniz Information Centre for Economics"@en ;
+    xhv:alternate <file:///opt/thes/bin/../var/html/stw/version/./about.de.html>, <file:///opt/thes/bin/../var/html/stw/version/about.rdf>, <file:///opt/thes/bin/../var/html/stw/version/about.ttl> ;
+    xhv:license <http://creativecommons.org/licenses/by-nc-sa/3.0/de/> ;
+    xhv:stylesheet <file:///opt/thes/bin/../var/html/stw/version/styles/stw.css>, <file:///opt/thes/bin/../var/html/stw/version/styles/yui/combo.css>, <file:///opt/thes/bin/../var/html/stw/version/styles/yui/treeview-menu.css> ;
+    owl:versionInfo "8.12"@en .
+
+stw:version
+    a dsv:VersionHistorySet ;
+    dsv:currentVersionRecord <http://zbw.eu/stw/version/8.12#record> .
+
+<http://zbw.eu/stw/version/8.12#record>
+    dc:date "2013-10-30"@en ;
+    dc:identifier "8.12"@en ;
+    a dsv:VersionHistoryRecord ;
+    xhv:prev <http://zbw.eu/stw/version/8.10#record> ;
+    dsv:hasVersionHistorySet stw:version ;
+    dsv:isVersionRecordOf <http://zbw.eu/stw/version/8.12> .
+
+<http://zbw.eu/stw/version/8.10#record>
+    dc:date "2012-03-21"@en ;
+    dc:identifier "8.10"@en ;
+    a dsv:VersionHistoryRecord ;
+    xhv:prev <http://zbw.eu/stw/version/8.08#record> ;
+    dsv:hasVersionHistorySet stw:version ;
+    dsv:isVersionRecordOf <http://zbw.eu/stw/version/8.10> .
+
+<http://zbw.eu/stw/version/8.08#record>
+    dc:date "2011-06-30"@en ;
+    dc:identifier "8.08"@en ;
+    a dsv:VersionHistoryRecord ;
+    xhv:prev <http://zbw.eu/stw/version/8.06#record> ;
+    dsv:hasVersionHistorySet stw:version ;
+    dsv:isVersionRecordOf <http://zbw.eu/stw/version/8.08> .
+
+<http://zbw.eu/stw/version/8.06#record>
+    dc:date "2010-04-22"@en ;
+    dc:identifier "8.06"@en ;
+    a dsv:VersionHistoryRecord ;
+    xhv:prev <http://zbw.eu/stw/version/8.04#record> ;
+    dsv:hasVersionHistorySet stw:version ;
+    dsv:isVersionRecordOf <http://zbw.eu/stw/version/8.06> .
+
+<http://zbw.eu/stw/version/8.04#record>
+    dc:date "2009-02-16"@en ;
+    dc:identifier "8.04"@en ;
+    a dsv:VersionHistoryRecord ;
+    dsv:hasVersionHistorySet stw:version ;
+    dsv:isVersionRecordOf <http://zbw.eu/stw/version/8.04> .
+
