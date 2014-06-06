@@ -16,9 +16,9 @@ The proposed [Dataset versioning vocabulary](https://github.com/JohanDS/Dataset-
 approach is experimentally applied to the currently used [STW version overview](http://zbw.eu/stw/versions)
 and actual [STW 8.12 version](http://zbw.eu/stw/versions/8.12/about) RDFa pages:
 
-* [version overview](https://rawgithub.com/jneubert/skos-history/master/examples/stw/dataset_versioning/version_about.en.html)
+* [version overview](https://rawgithub.com/jneubert/skos-history/master/examples/stw/dataset_versioning/version_about.html)
 ([extracted triples](stw/dataset_versioning/version_about.ttl))
 
-* [version 8.12](https://rawgithub.com/jneubert/skos-history/master/examples/stw/dataset_versioning/version_8.12_about.en.html)
+* [version 8.12](https://rawgithub.com/jneubert/skos-history/master/examples/stw/dataset_versioning/version_8.12_about.html)
 ([extracted triples](stw/dataset_versioning/version_8.12_about.ttl))
 
