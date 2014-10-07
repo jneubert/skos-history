@@ -125,6 +125,7 @@ where {}
   sparql_update "$statement"
 
   # add triples to the version history graph
+  # (fix invalid string date format for older versions)
   statement="
 $PREFIXES
 with <$BASEURI>
@@ -133,13 +134,14 @@ insert {
       a dsv:VersionHistoryRecord ;
       dsv:hasVersionHistorySet <${BASEURI}set> ;
       dsv:isVersionRecordOf <$BASEURI/$old> ;
-      dc:date ?date ;
+      dc:date ?fixeddate;
       dc:identifier ?identifier .
 }
 where {
   GRAPH <$BASEURI/$old> {
     <$SCHEMEURI> dcterms:issued ?date .
     <$SCHEMEURI> owl:versionInfo ?identifier .
+    BIND(coalesce(strdt(?date, xsd:date), ?date) as ?fixeddate)
   }
 }
 "
