@@ -1,5 +1,5 @@
 PREFIX dc:      <http://purl.org/dc/elements/1.1/>
-PREFIX dsv:     <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
+PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
 
 # list all available scheme versions
 
