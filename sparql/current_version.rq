@@ -1,5 +1,5 @@
 PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX dsv:     <https://raw.github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl#>
+PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl:     <http://www.w3.org/2002/07/owl#>
 
 # get the current version graph name

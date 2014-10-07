@@ -1,0 +1,48 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://www.w3.org/1999/xhtml> .
+@prefix cc: <http://creativecommons.org/ns#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix gbv: <http://purl.org/ontology/gbv/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix stw: <http://zbw.eu/stw/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix waiver: <http://vocab.org/waiver/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix zbwext: <http://zbw.eu/namespaces/zbw-extensions/> .
+
+<file:///opt/skos-history/examples/stw/dataset_versioning/version_8.12_about.html>
+    dcterms:isPartOf <http://zbw.eu/stw/void.ttl#stw> ;
+    <http://www.w3.org/1999/xhtml/vocab#alternate> <file:///opt/skos-history/examples/stw/dataset_versioning/./about.de.html>, <file:///opt/skos-history/examples/stw/dataset_versioning/about.rdf>, <file:///opt/skos-history/examples/stw/dataset_versioning/about.ttl> ;
+    <http://www.w3.org/1999/xhtml/vocab#stylesheet> <file:///opt/skos-history/examples/stw/dataset_versioning/styles/stw.css>, <file:///opt/skos-history/examples/stw/dataset_versioning/styles/yui/combo.css>, <file:///opt/skos-history/examples/stw/dataset_versioning/styles/yui/treeview-menu.css> .
+
+<http://zbw.eu/stw>
+    cc:attributionName "ZBW - Leibniz Information Centre for Economics"@en ;
+    cc:attributionURL <http://zbw.eu> ;
+    cc:license <http://creativecommons.org/licenses/by-nc-sa/3.0/de/> ;
+    cc:morePermissions "http://www.zbw.eu/e_imprint.htm"@en ;
+    dc:creator "German National Library of Economics (Kiel) / Hamburgisches Welt-Wirtschaft-Archiv (Hamburg) / ifo Institute (Munich) / GBI-Genios German Business Information (Munich) (for the 1995-1997 built und publicly funded german version of the STW)"@en, "ZBW - Leibniz Information Centre for Economics (for the current german-english version of the STW)"@en ;
+    dc:publisher "ZBW - Leibniz Information Centre for Economics"@en ;
+    dcterms:hasVersion <http://zbw.eu/stw/version/8.12> ;
+    dcterms:issued "2013-10-30"^^xsd:date ;
+    dcterms:title "STW Thesaurus for Economics"@en ;
+    a skos:ConceptScheme ;
+    rdfs:isDefinedBy stw:about ;
+    owl:versionInfo "8.12"^^xsd:string ;
+    skos:hasTopConcept <http://zbw.eu/stw/thsys/a>, <http://zbw.eu/stw/thsys/b>, <http://zbw.eu/stw/thsys/g>, <http://zbw.eu/stw/thsys/n>, <http://zbw.eu/stw/thsys/p>, <http://zbw.eu/stw/thsys/v>, <http://zbw.eu/stw/thsys/w> ;
+    skos:prefLabel "STW Thesaurus for Economics"@en ;
+    dsv:hasVersionHistoryRecord <http://zbw.eu/stw/version/8.12#record> .
+
+<http://zbw.eu/stw/version/8.12>
+    dcterms:isVersionOf <http://zbw.eu/stw> .
+
+<http://zbw.eu/stw/version/8.12#record>
+    dc:date "2013-10-30"^^xsd:date ;
+    dc:identifier "8.12"^^xsd:string ;
+    a dsv:VersionHistoryRecord ;
+    dsv:hasVersionHistorySet stw:version .
+

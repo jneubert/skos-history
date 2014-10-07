@@ -1,21 +1,17 @@
 PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl:     <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX zbwext:  <http://zbw.eu/namespaces/zbw-extensions/>
 
-# identify concepts inserted with a certain version
+# show all labels deleted in the last version
 
-SELECT  ?concept ?prefLabel
+SELECT  ?label 
 WHERE
   { 
-    # use current version as default
-    GRAPH <http://zbw.eu/stw/version>
-      {
-        ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currrentVersion
-      }
-    BIND(?currentVersion AS ?version)
+    # fixed version, will be parameter or current version
+    BIND(<http://zbw.eu/stw/version/8.12> AS ?version)
 
     GRAPH ?version
       { 
@@ -29,18 +25,17 @@ WHERE
         ?delta dcterms:hasPart ?deletions .
         ?deletions rdf:type sh:SchemeDeltaDeletions
 
-        # for each inserted concept, a (newly inserted) prefLabel must exist ...
-        GRAPH ?insertions
-          { ?concept skos:prefLabel ?prefLabel }
+        # get all deleted labels
+        GRAPH ?deletions
+          { [] skos:prefLabel | skos:altLabel ?label }
 
-        # ... without any prefLabel deleted for this concept
-        FILTER NOT EXISTS {GRAPH ?deletions
-            { ?concept skos:prefLabel [] }
+        # ... which are not attached to some (other) concept now
+        FILTER NOT EXISTS {GRAPH ?insertions
+            { [] skos:prefLabel | skos:altLabel ?label }
         }
 
         # restrict output to a certain language
-        FILTER (lang(?prefLabel) = 'en')
+        FILTER (lang(?label) = 'en')
       }
   }
-ORDER BY ?concept
-
+ORDER BY ?label
