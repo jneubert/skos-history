@@ -12,4 +12,4 @@ So while the examples will not run with other datasets, they may show how
 value can be added by exploiting custom data structures, while at the same
 time making use of a common version history scheme.
 
-The [dataset versioning approach](https://github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-) is experimentally applied to STW at [stw/dataset_versioning](stw/dataset_versioning).
+The dataset versioning approach is experimentally applied to STW at [stw/dataset_versioning](stw/dataset_versioning).

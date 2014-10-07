@@ -1,4 +1,5 @@
-The proposed [Dataset versioning vocabulary](https://github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-)
+The proposed [Dataset versioning ontology](http://purl.org/iso25964/DataSet/Versioning#)
+([github])(https://github.com/JohanDS/Dataset-versioning--for-KOS-data-sets-)
 approach is experimentally applied to the currently used [STW version overview](http://zbw.eu/stw/versions)
 and actual [STW 8.12 version](http://zbw.eu/stw/versions/8.12/about) RDFa pages:
 
