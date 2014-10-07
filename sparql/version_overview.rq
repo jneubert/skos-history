@@ -3,11 +3,10 @@ PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
 
 # list all available scheme versions
 
-SELECT  ?version ?identifier ?date ?current
+SELECT  ?vhr ?identifier ?date ?current
 WHERE
   { GRAPH <http://zbw.eu/stw/version>
     { ?vhr dsv:hasVersionHistorySet ?vhs .
-      ?vhr dsv:isVersionRecordOf ?version .
       ?vhr dc:date ?date .
       ?vhr dc:identifier ?identifier .
       OPTIONAL
@@ -16,5 +15,5 @@ WHERE
         }
     }
   }
-ORDER BY ?version
+ORDER BY ?date
 
