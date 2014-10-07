@@ -7,6 +7,9 @@ PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history
 
 # version deltas for a single concept
 
+# TODO: remove empty blank nodes (see
+# http://answers.semanticweb.com/questions/20908/sparql-construct-without-distinct-produces-non-lean-output)
+
 CONSTRUCT {
   ?concept sh:history ?conceptDelta .
   ?conceptDelta
