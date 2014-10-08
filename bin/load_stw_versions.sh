@@ -66,6 +66,7 @@ prefix dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix sd: <http://www.w3.org/ns/sparql-service-description#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 "
@@ -133,9 +134,13 @@ insert {
   <${BASEURI}record/$old>
       a dsv:VersionHistoryRecord ;
       dsv:hasVersionHistorySet <${BASEURI}set> ;
-      dsv:isVersionRecordOf <$BASEURI/$old> ;
+      dsv:isVersionRecordOf <$BASEURI/$old/download/stw.rdf.zip> ;
+      dsv:isVersionRecordOf <$BASEURI/$old/download/stw.ttl.zip> ;
+      dsv:isVersionRecordOf <$BASEURI/$old/ng> ;
       dc:date ?fixeddate;
       dc:identifier ?identifier .
+  <$BASEURI/$old/ng> a sd:NamedGraph ;
+      sd:name <$BASEURI/$old> .
 }
 where {
   GRAPH <$BASEURI/$old> {

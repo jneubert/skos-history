@@ -2,6 +2,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl:     <http://www.w3.org/2002/07/owl#>
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sd:      <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 
@@ -13,15 +14,16 @@ WHERE
     # use current version as default
     GRAPH <http://zbw.eu/stw/version>
       {
-        ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currrentVersion
+        ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currentVersion .
+        ?currentVersion a sd:NamedGraph .
+        ?currentVersion sd:name ?graphName
       }
-    BIND(?currentVersion AS ?version)
 
-    GRAPH ?version
+    GRAPH ?graphName
       { 
         # this assumes that only one delta to a prior version exists
         # (not multiple, overlapping deltas!)
-        ?delta sh:deltaTo ?version .
+        ?delta sh:deltaTo ?graphName .
 
         # identify insertions and deletions parts/graphs
         ?delta dcterms:hasPart ?insertions .
