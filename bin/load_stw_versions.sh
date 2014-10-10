@@ -19,7 +19,8 @@ BASEDIR=/tmp/stw_versions
 FILENAME=rdf/stw.nt
 
 # publicly available STW versions
-VERSIONS=(8.04 8.06 8.08 8.10 8.12)
+##VERSIONS=(8.04 8.06 8.08 8.10 8.12)
+VERSIONS=(8.08 8.10 8.12)
 SCHEMEURI='http://zbw.eu/stw'
 
 # implementation-specific uris
@@ -29,10 +30,12 @@ if [ $IMPL == "sesame" ]; then
   ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/$DATASET
   PUT_URI=$ENDPOINT/rdf-graphs/service
   UPDATE_URI=$ENDPOINT/statements
+  QUERY_URI=$ENDPOINT
 elif [ $IMPL == "fuseki" ]; then
   ENDPOINT=http://localhost:3030/$DATASET
   PUT_URI=$ENDPOINT/data
   UPDATE_URI=$ENDPOINT/update
+  QUERY_URI=$ENDPOINT/query
 else
   echo implementation $IMPL not defined
   exit
@@ -68,6 +71,7 @@ prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix sd: <http://www.w3.org/ns/sparql-service-description#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix void: <http://rdfs.org/ns/void#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 "
 
@@ -113,7 +117,7 @@ do
   sparql_put $BASEURI/$old $BASEDIR/$old/$FILENAME
 
   # add triples to the version graph
-  # (particularly frbrer is Realization Of
+  # (particularly frbrer is Realization Of)
   statement="
 $PREFIXES
 with <$BASEURI/$old>
@@ -126,7 +130,7 @@ where {}
   sparql_update "$statement"
 
   # add triples to the version history graph
-  # (fix invalid string date format for older versions)
+  # (fix invalid string date format for older stw versions)
   statement="
 $PREFIXES
 with <$BASEURI>
@@ -137,9 +141,11 @@ insert {
       dsv:isVersionRecordOf <$BASEURI/$old/download/stw.rdf.zip> ;
       dsv:isVersionRecordOf <$BASEURI/$old/download/stw.ttl.zip> ;
       dsv:isVersionRecordOf <$BASEURI/$old/ng> ;
+      :usingNamedGraph <$BASEURI/$old/ng> ;
       dc:date ?fixeddate;
       dc:identifier ?identifier .
   <$BASEURI/$old/ng> a sd:NamedGraph ;
+      void:sparqlEndpoint <$QUERY_URI> ;
       sd:name <$BASEURI/$old> .
 }
 where {
@@ -180,34 +186,11 @@ do
 $PREFIXES
 with <$BASEURI>
 insert {
-  <$SCHEMEURI> :hasDelta <$delta_uri> .
-  <$delta_uri> :deltaFrom <$BASEURI/$old> .
-  <$delta_uri> :deltaTo <$BASEURI/$new> .
-}
-where {}
-"
-    sparql_update "$statement"
-    # add triples to old version graph
-    statement="
-$PREFIXES
-with <$BASEURI/$old>
-insert {
-  <$BASEURI/$old> :hasDelta <$delta_uri> .
-  <$delta_uri> :deltaFrom <$BASEURI/$old> .
-  <$delta_uri> :deltaTo <$BASEURI/$new> .
-}
-where {}
-"
-    sparql_update "$statement"
-    # add triples to old version graph
-    statement="
-$PREFIXES
-with <$BASEURI/$new>
-insert {
-  <$BASEURI/$new> :hasDelta <$delta_uri> .
-  <$delta_uri> a :SchemeDelta .
-  <$delta_uri> :deltaFrom <$BASEURI/$old> .
-  <$delta_uri> :deltaTo <$BASEURI/$new> .
+  <${BASEURI}record/$old> :hasDelta <$delta_uri> .
+  <${BASEURI}record/$new> :hasDelta <$delta_uri> .
+  <$delta_uri> a :SchemeDelta ;
+      :deltaFrom <${BASEURI}/$old> ;
+      :deltaTo <${BASEURI}/$new> .
 }
 where {}
 "
@@ -222,34 +205,19 @@ where {}
       # load file
       sparql_put $delta_uri/$op ${filebase}_$op.nt
 
-      echo add triples to the delta graph for $op
+      echo add triples to the version graph for $op
       statement="
 $PREFIXES
-with <$delta_uri/$op>
+with <$BASEURI>
 insert {
-  <$delta_uri/$op> a :SchemeDelta$op_var .
-  <$delta_uri/$op> dcterms:isPartOf <$delta_uri> .
-}
-where {}
-"
-      sparql_update "$statement"
-      echo add triples to both version graphs for $op
-      statement="
-$PREFIXES
-with <$BASEURI/$old>
-insert {
-  <$delta_uri/$op> a :SchemeDelta$op_var .
   <$delta_uri> dcterms:hasPart <$delta_uri/$op> .
-}
-where {}
-"
-      sparql_update "$statement"
-      statement="
-$PREFIXES
-with <$BASEURI/$new>
-insert {
-  <$delta_uri/$op> a :SchemeDelta$op_var .
-  <$delta_uri> dcterms:hasPart <$delta_uri/$op> .
+  <$delta_uri/$op> a :SchemeDelta$op_var ;
+      dcterms:isPartOf <$delta_uri> ;
+      :usingNamedGraph <$delta_uri/$op/ng> .
+  <$delta_uri/$op/ng> a sd:NamedGraph ;
+      void:sparqlEndpoint <$QUERY_URI> ;
+      sd:name <$delta_uri/$op/ng> .
+
 }
 where {}
 "
