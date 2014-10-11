@@ -189,8 +189,8 @@ insert {
   <${BASEURI}record/$old> :hasDelta <$delta_uri> .
   <${BASEURI}record/$new> :hasDelta <$delta_uri> .
   <$delta_uri> a :SchemeDelta ;
-      :deltaFrom <${BASEURI}/$old> ;
-      :deltaTo <${BASEURI}/$new> .
+      :deltaFrom <${BASEURI}record/$old> ;
+      :deltaTo <${BASEURI}record/$new> .
 }
 where {}
 "
@@ -216,7 +216,7 @@ insert {
       :usingNamedGraph <$delta_uri/$op/ng> .
   <$delta_uri/$op/ng> a sd:NamedGraph ;
       void:sparqlEndpoint <$QUERY_URI> ;
-      sd:name <$delta_uri/$op/ng> .
+      sd:name <$delta_uri/$op> .
 
 }
 where {}

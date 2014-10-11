@@ -11,38 +11,37 @@ PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 SELECT  ?concept ?prefLabel
 WHERE
   { 
-    # use current version as default
     GRAPH <http://zbw.eu/stw/version>
       {
-        ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currentVersion .
-        ?currentVersion a sd:NamedGraph .
-        ?currentVersion sd:name ?graphName
-      }
+        # use current version as default
+        ?versionset dsv:currentVersionRecord ?currentVHR .
+        ?currentVHR sh:hasDelta ?delta .
 
-    GRAPH ?graphName
-      { 
-        # this assumes that only one delta to a prior version exists
+        # This assumes that only one delta to a prior version exists
         # (not multiple, overlapping deltas!)
-        ?delta sh:deltaTo ?graphName .
-
+        # TODO Identify xhv:prev version.
+        ?delta sh:deltaTo ?currentVHR .
+        
         # identify insertions and deletions parts/graphs
         ?delta dcterms:hasPart ?insertions .
         ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
         ?delta dcterms:hasPart ?deletions .
-        ?deletions rdf:type sh:SchemeDeltaDeletions
-
-        # for each inserted concept, a (newly inserted) prefLabel must exist ...
-        GRAPH ?insertions
-          { ?concept skos:prefLabel ?prefLabel }
-
-        # ... without any prefLabel deleted for this concept
-        FILTER NOT EXISTS {GRAPH ?deletions
-            { ?concept skos:prefLabel [] }
-        }
-
-        # restrict output to a certain language
-        FILTER (lang(?prefLabel) = 'en')
+        ?deletions rdf:type sh:SchemeDeltaDeletions .
+        ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
       }
-  }
+
+      # for each inserted concept, a (newly inserted) prefLabel must exist ...
+      GRAPH ?insertionsGraph
+        { ?concept skos:prefLabel ?prefLabel }
+
+      # ... without any prefLabel deleted for this concept
+      FILTER NOT EXISTS {GRAPH ?deletionsGraph
+          { ?concept skos:prefLabel [] }
+      }
+
+      # restrict output to a certain language
+      FILTER (lang(?prefLabel) = 'en')
+    }
 ORDER BY ?concept
 
