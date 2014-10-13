@@ -1,9 +1,12 @@
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX delta:   <http://www.w3.org/2004/delta#>
-PREFIX owl:     <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
-PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX  dcterms: <http://purl.org/dc/terms/>
+PREFIX  delta: <http://www.w3.org/2004/delta#>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
+PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
 
 # version deltas for a single concept
 
@@ -19,32 +22,37 @@ CONSTRUCT {
 
 WHERE {
   {
-    # use subquery to filter out duplicates
-    SELECT DISTINCT ?concept ?conceptDelta ?predicate ?deletion ?insertion
-    WHERE
-    {
-      # currently, fixed concept
-      BIND (<http://zbw.eu/stw/descriptor/12571-4> AS ?concept)
+    GRAPH ?versionHistoryGraph
+      {
+        # use subquery to filter out duplicates
+        SELECT DISTINCT ?concept ?conceptDelta ?predicate ?deletion ?insertion
+        WHERE
+        {
+          ?vhr a dsv:VersionHistoryRecord .#
+          ?vhr sh:hasDelta ?delta .
+          ?delta dcterms:hasPart ?part .
 
-      ?version a sh:SchemeVersion .
-      GRAPH ?version {
-        ?version sh:hasDelta ?delta .
-        ?delta dcterms:hasPart ?part .
+          # identify insertions and deletions parts/graphs
+          ?delta dcterms:hasPart ?insertions .
+          ?insertions rdf:type sh:SchemeDeltaInsertions .
+          ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+          ?delta dcterms:hasPart ?deletions .
+          ?deletions rdf:type sh:SchemeDeltaDeletions .
+          ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
 
-        # for each version, work on insertions and deletions part
-          { BIND (?part AS ?deletionsPart)
-            ?deletionsPart a sh:SchemeDeltaDeletions .
-            GRAPH ?deletionsPart {
-              ?concept ?predicate ?deletion .
+
+          # for each version, work on insertions and deletions part
+            {
+              GRAPH ?deletionsGraph {
+                ?concept ?predicate ?deletion .
+              }
             }
-          }
-        UNION
-          { BIND (?part AS ?insertionsPart)
-            ?insertionsPart a sh:SchemeDeltaInsertions .
-            GRAPH ?insertionsPart {
-              ?concept ?predicate ?insertion .
+          UNION
+            {
+              GRAPH ?insertionsGraph {
+                ?concept ?predicate ?insertion .
+              }
             }
-          }
 
         # for the clarity of the example, filter out some dataset-wide changes in STW
         FILTER ( ?predicate NOT IN (<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>, <http://purl.org/ontology/gbv/gvkppn>) )
@@ -55,3 +63,7 @@ WHERE {
     }
   }
 }
+
+# parameters
+VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> ) }
+
