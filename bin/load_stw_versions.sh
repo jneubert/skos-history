@@ -100,8 +100,13 @@ statement="
 $PREFIXES
 with <$BASEURI>
 insert {
-  <${BASEURI}set> a dsv:VersionHistorySet .
-  <${BASEURI}set> dsv:currentVersionRecord <${BASEURI}record/$latest> .
+  <$BASEURI> a dsv:VersionHistorySet ;
+      :isVersionHistoryOf <$SCHEMEURI> ;
+      dsv:currentVersionRecord <${BASEURI}record/$latest> ;
+      :usingNamedGraph <$BASEURI/ng> .
+  <$BASEURI/ng> a sd:NamedGraph ;
+      void:sparqlEndpoint <$QUERY_URI> ;
+      sd:name <$BASEURI> .
 }
 where {}
 "
@@ -123,7 +128,8 @@ $PREFIXES
 with <$BASEURI/$old>
 insert {
   <$BASEURI/$old> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <$SCHEMEURI> .
-  <$SCHEMEURI> dsv:hasVersionRecord <${BASEURI}record/$latest> .
+  <$SCHEMEURI> dsv:hasVersionRecord <${BASEURI}record/$latest> ;
+      :hasVersionHistory <$BASEURI> .
 }
 where {}
 "
@@ -137,7 +143,7 @@ with <$BASEURI>
 insert {
   <${BASEURI}record/$old>
       a dsv:VersionHistoryRecord ;
-      dsv:hasVersionHistorySet <${BASEURI}set> ;
+      dsv:hasVersionHistorySet <${BASEURI}> ;
       dsv:isVersionRecordOf <$BASEURI/$old/download/stw.rdf.zip> ;
       dsv:isVersionRecordOf <$BASEURI/$old/download/stw.ttl.zip> ;
       dsv:isVersionRecordOf <$BASEURI/$old/ng> ;
@@ -150,8 +156,8 @@ insert {
 }
 where {
   GRAPH <$BASEURI/$old> {
-    <$SCHEMEURI> dcterms:issued ?date .
-    <$SCHEMEURI> owl:versionInfo ?identifier .
+    <$SCHEMEURI> dcterms:issued ?date ;
+        owl:versionInfo ?identifier .
     BIND(coalesce(strdt(?date, xsd:date), ?date) as ?fixeddate)
   }
 }
