@@ -6,8 +6,10 @@ PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.t
 
 SELECT  ?currentVersion
 WHERE
-  { GRAPH ?versionGraphName
+  { GRAPH ?versionHistoryGraph
       { ?versionset (dsv:currentVersionRecord/sh:usingNamedGraph)/sd:name ?currentVersion }
   }
-VALUES ?versionGraphName { <http://zbw.eu/stw/version> }
+
+# parameters
+VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
 
