@@ -1,8 +1,11 @@
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX owl:     <http://www.w3.org/2002/07/owl#>
-PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
-PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX  dcterms: <http://purl.org/dc/terms/>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
+PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
 
 # identify concepts deleted with a certain version
 
@@ -13,31 +16,41 @@ PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 SELECT  ?concept ?prefLabel
 WHERE
   { 
-    # fixed version, will be parameter or current version
-    BIND(<http://zbw.eu/stw/version/8.10> AS ?version)
+    GRAPH ?versionHistoryGraph
+      {
+        # use the current version as default
+        ?versionset dsv:currentVersionRecord ?currentVHR .
+        ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
+        ?currentVHR sh:hasDelta ?delta .
 
-    GRAPH ?version
-      { 
-        # this assumes that only one delta to a prior version exists
-        # (not multiple, overlapping deltas!)
-        ?delta sh:deltaTo ?version .
+        # get the delta to the previous version
+        ?currentVHR xhv:prev ?previousVHR .
+        ?delta sh:deltaTo ?currentVHR .
+        ?delta sh:deltaFrom ?previousVHR .
 
-        # identify deletions parts/graphs
+        # identify insertions and deletions parts/graphs
+        ?delta dcterms:hasPart ?insertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
         ?delta dcterms:hasPart ?deletions .
-        ?deletions rdf:type sh:SchemeDeltaDeletions
-
-        # for each deleted concept, a deleted prefLabel must exist ...
-        GRAPH ?deletions
-          { ?concept skos:prefLabel ?prefLabel }
-
-        # ... without anything remaining for this concept in the current version
-        FILTER NOT EXISTS { graph ?version
-            { ?concept ?p [] }
-        }
-
-        # restrict output to a certain language
-        FILTER (lang(?label) = 'en')
+        ?deletions rdf:type sh:SchemeDeltaDeletions .
+        ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
       }
+
+    # for each deleted concept, a deleted prefLabel must exist ...
+    GRAPH ?deletionsGraph
+      { ?concept skos:prefLabel ?prefLabel }
+
+    # ... without anything remaining for this concept in the current version
+    FILTER NOT EXISTS { GRAPH ?versionGraph
+        { ?concept ?p [] }
+    }
+
+    # restrict output to a certain language
+    FILTER (lang(?prefLabel) = 'en')
   }
 ORDER BY ?concept
+
+# parameters
+VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
 
