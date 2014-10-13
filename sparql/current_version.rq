@@ -1,12 +1,13 @@
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
+PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 
-# get the current version graph name
+# get the graph name of the current version
 
 SELECT  ?currentVersion
 WHERE
-  { 
-    GRAPH <http://zbw.eu/stw/version>
-      { ?versionset dsv:currentVersionRecord/dsv:isVersionRecordOf ?currentVersion }
+  { GRAPH ?versionGraphName
+      { ?versionset (dsv:currentVersionRecord/sh:usingNamedGraph)/sd:name ?currentVersion }
   }
+VALUES ?versionGraphName { <http://zbw.eu/stw/version> }
+
