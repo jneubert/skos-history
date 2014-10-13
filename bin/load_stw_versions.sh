@@ -35,7 +35,7 @@ elif [ $IMPL == "fuseki" ]; then
   ENDPOINT=http://localhost:3030/$DATASET
   PUT_URI=$ENDPOINT/data
   UPDATE_URI=$ENDPOINT/update
-  QUERY_URI=$ENDPOINT/query
+  QUERY_URI=http://zbw.eu/beta/sparql/stwv/query
 else
   echo implementation $IMPL not defined
   exit
@@ -104,9 +104,9 @@ insert {
   <$BASEURI> a dsv:VersionHistorySet ;
       :isVersionHistoryOf <$SCHEMEURI> ;
       dsv:currentVersionRecord <${BASEURI}record/$latest> ;
+      void:sparqlEndpoint <$QUERY_URI> ;
       :usingNamedGraph <$BASEURI/ng> .
   <$BASEURI/ng> a sd:NamedGraph ;
-      void:sparqlEndpoint <$QUERY_URI> ;
       sd:name <$BASEURI> .
 }
 where {}
@@ -152,7 +152,6 @@ insert {
       dc:date ?fixeddate;
       dc:identifier ?identifier .
   <$BASEURI/$old/ng> a sd:NamedGraph ;
-      void:sparqlEndpoint <$QUERY_URI> ;
       sd:name <$BASEURI/$old> .
 }
 where {
@@ -223,7 +222,6 @@ insert {
       dcterms:isPartOf <$delta_uri> ;
       :usingNamedGraph <$delta_uri/$op/ng> .
   <$delta_uri/$op/ng> a sd:NamedGraph ;
-      void:sparqlEndpoint <$QUERY_URI> ;
       sd:name <$delta_uri/$op> .
 
 }
