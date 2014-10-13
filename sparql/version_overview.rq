@@ -1,19 +1,19 @@
-PREFIX dc:      <http://purl.org/dc/elements/1.1/>
-PREFIX dsv:     <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
 
 # list all available scheme versions
 
-SELECT  ?vhr ?identifier ?date ?current
+SELECT  (?vhr AS ?versionHistoryRecord) ?identifier (str(?vhrDate) AS ?date) ?current
 WHERE
-  { GRAPH <http://zbw.eu/stw/version>
-    { ?vhr dsv:hasVersionHistorySet ?vhs .
-      ?vhr dc:date ?date .
-      ?vhr dc:identifier ?identifier .
-      OPTIONAL
-        { ?vhs dsv:currentVersionRecord ?current .
-          FILTER (?vhr = ?current)
-        }
-    }
+  { GRAPH ?versionGraphName
+      { ?vhr dsv:hasVersionHistorySet ?vhs .
+        ?vhr dc:date ?vhrDate .
+        ?vhr dc:identifier ?identifier
+        OPTIONAL
+          { ?vhs dsv:currentVersionRecord ?current
+            FILTER ( ?vhr = ?current )
+          }
+      }
   }
 ORDER BY ?date
-
+VALUES ?versionGraphName { <http://zbw.eu/stw/version> }
