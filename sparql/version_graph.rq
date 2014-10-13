@@ -1,0 +1,22 @@
+PREFIX  dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX  dcterms: <http://purl.org/dc/terms/>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
+PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX  void: <http://rdfs.org/ns/void#>
+PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX  xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# the complete version history graph
+
+CONSTRUCT 
+  { ?s ?p ?o .}
+WHERE
+  { GRAPH ?versionGraphName
+      { ?s ?p ?o }
+  }
+VALUES ?versionGraphName { <http://zbw.eu/stw/version> }
