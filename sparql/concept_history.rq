@@ -1,48 +1,60 @@
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
-PREFIX sh:      <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX  dcterms: <http://purl.org/dc/terms/>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
+PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 
 # history of a single concept 
 # (currently restricted to changes of skos:prefLabel/altLabel)
 
-CONSTRUCT {
-  ?concept sh:history ?conceptDelta .
-  ?conceptDelta
-    sh:prefLabelDeletion ?prefDelete ;
-    sh:prefLabelInsertion ?prefInsert ;
-    sh:altLabelDeletion ?altDelete ;
-    sh:altLabelInsertion ?altInsert .
-}
-
-WHERE {
-  # currently, fixed concept
-  BIND (<http://zbw.eu/stw/descriptor/12571-4> AS ?concept)
-
-  ?version a sh:SchemeVersion .
-  GRAPH ?version {
-    ?version sh:hasDelta ?delta .
-    ?delta dcterms:hasPart ?part .
-
-    # for each version, work on insertions and deletions part
-      { BIND (?part AS ?deletionsPart)
-        ?deletionsPart a sh:SchemeDeltaDeletions .
-        GRAPH ?deletionsPart {
-          ?concept ?somePred [] .
-          OPTIONAL { ?concept skos:prefLabel ?prefDelete } .
-          OPTIONAL { ?concept skos:altLabel ?altDelete } .
-        }
-      }
-    UNION
-      { BIND (?part AS ?insertionsPart)
-        ?insertionsPart a sh:SchemeDeltaInsertions .
-        GRAPH ?insertionsPart {
-          ?concept ?somePred [] .
-          OPTIONAL { ?concept skos:prefLabel ?prefInsert } .
-          OPTIONAL { ?concept skos:altLabel ?altInsert } .
-        }
-      }
-
-    # build a uri to group the changes for a particular version
-    BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
+CONSTRUCT
+  {
+    ?concept sh:history ?conceptDelta .
+    ?conceptDelta sh:prefLabelDeletion ?prefDelete .
+    ?conceptDelta sh:prefLabelInsertion ?prefInsert .
+    ?conceptDelta sh:altLabelDeletion ?altDelete .
+    ?conceptDelta sh:altLabelInsertion ?altInsert .
   }
-}
+
+WHERE
+  {
+    GRAPH ?versionHistoryGraph
+      {
+        ?vhr a dsv:VersionHistoryRecord .#
+        ?vhr sh:hasDelta ?delta .
+        ?delta dcterms:hasPart ?part .
+
+        # identify insertions and deletions parts/graphs
+        ?delta dcterms:hasPart ?insertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+        ?delta dcterms:hasPart ?deletions .
+        ?deletions rdf:type sh:SchemeDeltaDeletions .
+        ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+
+        # for each version, work on insertions and deletions part
+          {
+            GRAPH ?deletionsGraph {
+              ?concept ?somePred [] .
+              OPTIONAL { ?concept skos:prefLabel ?prefDelete } .
+              OPTIONAL { ?concept skos:altLabel ?altDelete } .
+            }
+          }
+        UNION
+          {
+            GRAPH ?insertionsGraph {
+              ?concept ?somePred [] .
+              OPTIONAL { ?concept skos:prefLabel ?prefInsert } .
+              OPTIONAL { ?concept skos:altLabel ?altInsert } .
+            }
+          }
+
+        # build a uri to group the changes for a particular version
+        BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
+      }
+  }
+
+# parameter
+VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> ) }
+
