@@ -60,6 +60,7 @@ if [ "${SCHEMEURI: -1}" == "/" ]; then
 else
   BASEURI=$SCHEMEURI/version
 fi
+SPARQL_DDDURI=$BASEURI/sparq-service/ddd
 
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
@@ -75,6 +76,26 @@ prefix void: <http://rdfs.org/ns/void#>
 prefix xhv: <http://www.w3.org/1999/xhtml/vocab#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 "
+
+# create a SPARQL service description in the default graph
+SERVICE_URI=$BASEURI/sparq-service
+SERVICE_DDDURI=$SERVICE_URI/ddd
+statement="
+$PREFIXES
+insert {
+<$SERVICE_URI> a sd:Service;
+    sd:url <$QUERY_URI>;
+    sd:defaultDatasetDescription <$SERVICE_DDDURI> .
+<$SERVICE_DDDURI> a sd:Dataset;
+    dcterms:title \"STW Versions SPARQL Service\";
+    sd:defaultGraph [
+        a sd:Graph, void:Dataset;
+        dcterms:title \"STW Versions SPARQL Service Description\";
+    ] .
+}
+where {}
+"
+sparql_update "$statement"
 
 # getting the data from http://zbw.eu/stw, if it does not exist locally
 for index in ${!VERSIONS[*]}
@@ -106,6 +127,18 @@ insert {
       dsv:currentVersionRecord <${BASEURI}record/$latest> ;
       void:sparqlEndpoint <$QUERY_URI> ;
       :usingNamedGraph <$BASEURI/ng> .
+  <$BASEURI/ng> a sd:NamedGraph ;
+      sd:name <$BASEURI> .
+}
+where {}
+"
+sparql_update "$statement"
+
+# complement service description
+statement="
+$PREFIXES
+insert {
+  <$SERVICE_DDDURI> sd:namedGraph <$BASEURI/ng> .
   <$BASEURI/ng> a sd:NamedGraph ;
       sd:name <$BASEURI> .
 }
@@ -163,6 +196,19 @@ where {
 }
 "
   sparql_update "$statement"
+
+  # complement service description
+  statement="
+$PREFIXES
+insert {
+  <$SERVICE_DDDURI> sd:namedGraph <$BASEURI/$old/ng> .
+  <$BASEURI/$old/ng> a sd:NamedGraph ;
+      sd:name <$BASEURI/$old> .
+}
+where {}
+"
+      sparql_update "$statement"
+
 done
 
 # do a second pass, to avoid triples being overridden by version loading
@@ -223,7 +269,18 @@ insert {
       :usingNamedGraph <$delta_uri/$op/ng> .
   <$delta_uri/$op/ng> a sd:NamedGraph ;
       sd:name <$delta_uri/$op> .
+}
+where {}
+"
+      sparql_update "$statement"
 
+      # complement service description
+      statement="
+$PREFIXES
+insert {
+  <$SERVICE_DDDURI> sd:namedGraph <$delta_uri/$op/ng> .
+  <$delta_uri/$op/ng> a sd:NamedGraph ;
+      sd:name <$delta_uri/$op> .
 }
 where {}
 "
