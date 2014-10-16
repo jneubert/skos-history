@@ -89,7 +89,7 @@ insert {
 <$SERVICE_DDDURI> a sd:Dataset;
     dcterms:title \"STW Versions SPARQL Service\";
     sd:defaultGraph [
-        a sd:Graph, void:Dataset;
+        a sd:Graph;
         dcterms:title \"STW Versions SPARQL Service Description\";
     ] .
 }
