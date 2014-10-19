@@ -67,3 +67,7 @@ WHERE {
 # parameters
 VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> ) }
 
+# alternate examples
+#   newly introduced thsys
+# VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/thsys/180783> ) }
+
