@@ -5,11 +5,17 @@ The queries in this directory should be executable against an example endpoint w
 
   http://zbw.eu/beta/sparql/stwv/query
 
-In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" (concept_history.rq)](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq), ["Personnel selection" (concept_deltas.rq)](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virtual community" (concept_deltas.rq)](http://bit.ly/JQ56dX).
+The queries in this directory can be executed via an interactive SPARQL GUI (powered by <a href="http://yasqe.yasgui.org">YASQUE</a> and <a href="http://yasr.yasgui.org/">YASR</a>):
 
 | Query | Note |
 |---|---|
-| [added_concepts.rq](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts.rq) | Identify concepts inserted with the current version |
-| deleted_concepts.rq  | Identify concepts deleted with the current version  |
+| [version_overview](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | All available scheme versions |
+| [added_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts.rq) | Identify concepts inserted with the current version |
+| [added_concepts_with_top_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts.rq) | Identify concepts inserted with the current version with their top concepts |
+| [deprecated_concepts.rq](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deprecated_concepts.rq)  | Identify concepts deprecated with the current version  |
+| [deleted_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq)  | Identify concepts deleted with the current version  |
 |   |   |
-|   |   |
+
+In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" (concept_history.rq)](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq), ["Personnel selection" (concept_deltas.rq)](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virtual community" (concept_deltas.rq)](http://bit.ly/JQ56dX).
+
+
