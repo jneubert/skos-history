@@ -78,7 +78,7 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 "
 
 # create a SPARQL service description in the default graph
-SERVICE_URI=$BASEURI/sparq-service
+SERVICE_URI=$BASEURI/sparql-service
 SERVICE_DDDURI=$SERVICE_URI/ddd
 statement="
 $PREFIXES
