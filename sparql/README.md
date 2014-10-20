@@ -1,21 +1,16 @@
 SPARQL query examples
 =====================
 
-The queries in this directory should be executable against an example endpoint with diffent versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
+The queries in this directory can be executed via an <strong>interactive SPARQL GUI</strong> (powered by <a href="http://yasqe.yasgui.org">YASQUE</a> and <a href="http://yasr.yasgui.org/">YASR</a>) against an <a href="http://zbw.eu/beta/sparql/stwv/query">example endpoint</a> with diffent versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
 
-  http://zbw.eu/beta/sparql/stwv/query
-
-The queries in this directory can be executed via an interactive SPARQL GUI (powered by <a href="http://yasqe.yasgui.org">YASQUE</a> and <a href="http://yasr.yasgui.org/">YASR</a>):
-
-| Query | Note |
+| Query | Description |
 |---|---|
 | [version_overview](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | All available scheme versions |
-| [added_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts.rq) | Identify concepts inserted with the current version |
-| [added_concepts_with_top_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts_with_top_concepts.rq) | Identify concepts inserted with the current version with their top concepts |
-| [deprecated_concepts.rq](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deprecated_concepts.rq)  | Identify concepts deprecated with the current version  |
-| [deleted_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq)  | Identify concepts deleted with the current version  |
-|   |   |
+| [added_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts.rq) | Identify all concepts inserted in the current version |
+| [added_concepts_with_top_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts_with_top_concepts.rq) | Identify all concepts inserted in the current version with their top concepts |
+| [deprecated_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deprecated_concepts.rq)  | Identify all concepts deprecated with the current version  |
+| [deleted_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq)  | Identify all concepts deleted with the current version  |
 
-In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" (concept_history.rq)](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq), ["Personnel selection" (concept_deltas.rq)](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virtual community" (concept_deltas.rq)](http://bit.ly/JQ56dX).
+~~In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" (concept_history.rq)](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq), ["Personnel selection" (concept_deltas.rq)](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virtual community" (concept_deltas.rq)](http://bit.ly/JQ56dX).~~
 
 
