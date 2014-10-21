@@ -1,0 +1,47 @@
+PREFIX  dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX  dcterms: <http://purl.org/dc/terms/>
+PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
+PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
+
+# count concepts inserted per version
+
+SELECT ?version (str(count(?concept)) as ?count)
+WHERE
+  { 
+    GRAPH ?versionHistoryGraph
+      {
+        ?delta a sh:SchemeDelta .
+        ?delta sh:deltaTo/dc:identifier ?version .
+
+        # identify insertions and deletions parts/graphs
+        ?delta dcterms:hasPart ?insertions .
+        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+        ?delta dcterms:hasPart ?deletions .
+        ?deletions rdf:type sh:SchemeDeltaDeletions .
+        ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+      }
+
+    # for each inserted concept, a (newly inserted) prefLabel must exist ...
+    GRAPH ?insertionsGraph
+      { ?concept skos:prefLabel ?prefLabel }
+
+    # ... without any prefLabel deleted for this concept
+    FILTER NOT EXISTS { GRAPH ?deletionsGraph
+        { ?concept skos:prefLabel [] }
+    }
+
+    # restrict output to a certain language
+    FILTER ( lang(?prefLabel) = 'en' )
+  }
+GROUP BY ?version
+ORDER BY ?version
+
+# parameters
+VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
+
