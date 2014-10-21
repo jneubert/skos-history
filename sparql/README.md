@@ -12,7 +12,7 @@ __Aggregated information about versions__
 | [count_deleted_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_concepts.rq) | Count concepts deleted per version |
 | [count_deprecated_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deprecated_concepts.rq) | Count concepts deprecated per version |
 
-__List of new and removed concepts__
+__Lists of concepts__
 
 | Query | Description |
 |-------|-------------|

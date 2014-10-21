@@ -32,18 +32,18 @@ WHERE
         ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
       }
 
-      # for each inserted concept, a (newly inserted) prefLabel must exist ...
-      GRAPH ?insertionsGraph
-        { ?concept skos:prefLabel ?prefLabel }
+    # for each inserted concept, a (newly inserted) prefLabel must exist ...
+    GRAPH ?insertionsGraph
+      { ?concept skos:prefLabel ?prefLabel }
 
-      # ... without any prefLabel deleted for this concept
-      FILTER NOT EXISTS { GRAPH ?deletionsGraph
-          { ?concept skos:prefLabel [] }
-      }
-
-      # restrict output to a certain language
-      FILTER ( lang(?prefLabel) = 'en' )
+    # ... without any prefLabel deleted for this concept
+    FILTER NOT EXISTS { GRAPH ?deletionsGraph
+        { ?concept skos:prefLabel [] }
     }
+
+    # restrict output to a certain language
+    FILTER ( lang(?prefLabel) = 'en' )
+  }
 ORDER BY ?concept
 
 # parameters
