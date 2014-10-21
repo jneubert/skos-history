@@ -5,6 +5,7 @@ The queries in this directory can be executed via an <strong>interactive SPARQL 
 
 *Aggregated information about versions*
 
+|---|---|
 | [version_overview](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | All available scheme versions |
 | [count_added_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_concepts.rq) | Count concepts inserted per version |
 | [count_deleted_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_concepts.rq) | Count concepts inserted per version |
