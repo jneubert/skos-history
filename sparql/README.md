@@ -3,8 +3,9 @@ SPARQL query examples
 
 The queries in this directory can be executed via an <strong>interactive SPARQL GUI</strong> (powered by <a href="http://yasqe.yasgui.org">YASQUE</a> and <a href="http://yasr.yasgui.org/">YASR</a>) against an <a href="http://zbw.eu/beta/sparql/stwv/query">example endpoint</a> with diffent versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
 
-*Aggregated information about versions*
+__Aggregated information about versions__
 
+| Query | Description |
 |---|---|
 | [version_overview](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | All available scheme versions |
 | [count_added_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_concepts.rq) | Count concepts inserted per version |
