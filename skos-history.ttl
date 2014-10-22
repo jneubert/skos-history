@@ -63,7 +63,7 @@ sh:ConceptDelta
 # Properties
 
 sh:deltaFrom
-    a rdf:Property ;
+    a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Delta From"@en ;
     # TODO
@@ -71,7 +71,7 @@ sh:deltaFrom
     skos:definition "The versions from which the delta is taken."@en . 
   
 sh:deltaTo
-    a rdf:Property ;
+    a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Delta To"@en ;
     # TODO
@@ -79,7 +79,7 @@ sh:deltaTo
     skos:definition "The versions to which the delta is taken."@en . 
   
 sh:hasDelta
-    a rdf:Property ;
+    a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Has Delta"@en ;
     # TODO
@@ -89,7 +89,7 @@ sh:hasDelta
 # TODO check following properties as possibly obsolete
 
 sh:prefLabelInsertion
-    a rdf:Property ;
+    a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "prefLabel Insertion"@en ;
     # TODO
@@ -97,7 +97,7 @@ sh:prefLabelInsertion
     skos:definition "skos:prefLabel which is to be inserted."@en . 
 
 sh:prefLabelDeletion
-    a rdf:Property ;
+    a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "prefLabel Deletion"@en ;
     # TODO
