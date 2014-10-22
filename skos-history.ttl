@@ -13,8 +13,8 @@
     a owl:Ontology ;
     dc:creator "Joachim Neubert" ;
     dc:title "skos-history - Ontology for expressing versions and deltas of versions for SKOS files."@en ;
-    dcterms:created "2013-09-02" ;
-    dcterms:modified "2014-10-22" ;
+    dc:created "2013-09-02" ;
+#    dcterms:modified "2014-10-22" ;
     dc:date "2014-10-22" .
 
 # Classes
