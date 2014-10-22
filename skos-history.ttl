@@ -50,7 +50,7 @@ sh:ConceptVersion
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Concept Version"@en ;
     rdfs:subClassOf skos:Concept ;
-    rdfs:comment "A version of a SKOS concept."@en .
+    rdfs:comment "(???) A version of a SKOS concept."@en .
 
 sh:ConceptDelta
     a rdfs:Class ;
@@ -58,9 +58,18 @@ sh:ConceptDelta
     rdfs:label "Concept Delta"@en ;
     # TODO that's not true!
     # rdfs:subClassOf skos:Concept ;
-    rdfs:comment "The delta of two versions of a SKOS concept."@en .
+    rdfs:comment "(???) The delta of two versions of a SKOS concept."@en .
 
 # Properties
+
+sh:usingNamedGraph
+    a owl:ObjectProperty ;
+    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:label "Using Named Graph"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    rdfs:range sd:NamedGraph ;
+    rdfs:comment "The named graph where the data can be queried. (The endpoint should be given as void:sparqlEndpoint property of the version history set."@en . 
 
 sh:deltaFrom
     a owl:ObjectProperty ;
@@ -86,7 +95,7 @@ sh:hasDelta
     #rdfs:subPropertyOf <???> ;
     rdfs:comment "A delta for this version."@en . 
   
-# TODO check following properties as possibly obsolete
+# TODO check the following properties as possibly obsolete when using delta ontology
 
 sh:prefLabelInsertion
     a owl:ObjectProperty ;
@@ -103,6 +112,4 @@ sh:prefLabelDeletion
     # TODO
     #rdfs:subPropertyOf <???> ;
     rdfs:comment "skos:prefLabel which is to be deleted."@en . 
-
-
 
