@@ -19,14 +19,6 @@
 
 # Classes
 
-sh:SchemeVersion
-    a owl:Class ;
-    rdfs:comment """Should be related to the concept scheme by dcterms:isVersionOf."""@en ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
-    rdfs:label "Scheme Version"@en ;
-    rdfs:subClassOf skos:ConceptScheme ;
-    skos:definition "A version of a SKOS concept scheme."@en .
-
 sh:SchemeDelta
     a rdfs:Class ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
@@ -94,6 +86,8 @@ sh:hasDelta
     #rdfs:subPropertyOf <???> ;
     skos:definition "A delta for this version."@en . 
   
+# TODO check following properties as possibly obsolete
+
 sh:prefLabelInsertion
     a rdf:Property ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
