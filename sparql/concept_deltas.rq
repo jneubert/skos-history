@@ -67,7 +67,14 @@ WHERE {
 # parameters
 VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> ) }
 
-# alternate examples
-#   newly introduced thsys
-# VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/thsys/180783> ) }
+# alternate examples:
+
+# newly introduced thsys "B.04.02.01 Recruitment"
+#VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/thsys/180783> ) }
+
+# changes in "Welfare analyis"
+#VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/10112-4> ) }
+
+# complete lifecycle of "Virtual community"
+#VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/27212-1> ) }
 

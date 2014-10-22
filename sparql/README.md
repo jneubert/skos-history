@@ -21,13 +21,18 @@ __Lists of concepts__
 | [deprecated_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deprecated_concepts.rq)  | Identify all concepts deprecated with the current version  |
 | [deleted_concepts](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq)  | Identify all concepts deleted with the current version  |
 
+__History of selected concepts__
+
+| Query | Description |
+|-------|-------------|
+| [concept_history](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq) | History of the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) (changes in pref/altLabels) |
+| [concept_deltas] | All version deltas for the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) |
+
+
 __Technical background information__
 
 | Query | Description |
 |-------|-------------|
 | [version_graph](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_graph.rq) | Complete version history graph |
 | [service_graph](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/service_graph.rq) | Complete service description graph (default graph) |
-
-~~In order to experiment with a query, you may want to load it to [YASGUI](http://laurensrietveld.nl/yasgui/). Here for example YASGUI links prepared for ["Welfare analysis" (concept_history.rq)](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq), ["Personnel selection" (concept_deltas.rq)](http://bit.ly/1hnpIJp), or the complete lifecyle of the ephemeral concept ["Virtual community" (concept_deltas.rq)](http://bit.ly/JQ56dX).~~
-
 
