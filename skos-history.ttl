@@ -5,7 +5,6 @@
 @prefix  xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix  dc:   <http://purl.org/dc/elements/1.1/> .
 @prefix  dcterms: <http://purl.org/dc/terms/> .
-@prefix  skos: <http://www.w3.org/2004/02/skos/core#> .
 
 # Ontology
 
@@ -24,7 +23,7 @@ sh:SchemeDelta
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Scheme Delta"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
-    skos:definition "The delta of two versions of a SKOS concept scheme."@en .
+    rdfs:comment "The delta of two versions of a SKOS concept scheme."@en .
 
 sh:SchemeDeltaInsertions
     a rdfs:Class ;
@@ -32,7 +31,7 @@ sh:SchemeDeltaInsertions
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Scheme Delta Insertions"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
-    skos:definition "The statements to insert into one version of a SKOS concept scheme to create another version (in addition to deletions)."@en .
+    rdfs:comment "The statements to insert into one version of a SKOS concept scheme to create another version (in addition to deletions)."@en .
 
 sh:SchemeDeltaDeletions
     a rdfs:Class ;
@@ -40,7 +39,7 @@ sh:SchemeDeltaDeletions
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Scheme Delta Deletions"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
-    skos:definition "The statements to delete from one version of a SKOS concept scheme to create another version (in addition to insertions)."@en .
+    rdfs:comment "The statements to delete from one version of a SKOS concept scheme to create another version (in addition to insertions)."@en .
 
 # TODO are these needed??
 
@@ -50,7 +49,7 @@ sh:ConceptVersion
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
     rdfs:label "Concept Version"@en ;
     rdfs:subClassOf skos:Concept ;
-    skos:definition "A version of a SKOS concept."@en .
+    rdfs:comment "A version of a SKOS concept."@en .
 
 sh:ConceptDelta
     a rdfs:Class ;
@@ -58,7 +57,7 @@ sh:ConceptDelta
     rdfs:label "Concept Delta"@en ;
     # TODO that's not true!
     # rdfs:subClassOf skos:Concept ;
-    skos:definition "The delta of two versions of a SKOS concept."@en .
+    rdfs:comment "The delta of two versions of a SKOS concept."@en .
 
 # Properties
 
@@ -68,7 +67,7 @@ sh:deltaFrom
     rdfs:label "Delta From"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    skos:definition "The versions from which the delta is taken."@en . 
+    rdfs:comment "The versions from which the delta is taken."@en . 
   
 sh:deltaTo
     a owl:ObjectProperty ;
@@ -76,7 +75,7 @@ sh:deltaTo
     rdfs:label "Delta To"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    skos:definition "The versions to which the delta is taken."@en . 
+    rdfs:comment "The versions to which the delta is taken."@en . 
   
 sh:hasDelta
     a owl:ObjectProperty ;
@@ -84,7 +83,7 @@ sh:hasDelta
     rdfs:label "Has Delta"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    skos:definition "A delta for this version."@en . 
+    rdfs:comment "A delta for this version."@en . 
   
 # TODO check following properties as possibly obsolete
 
@@ -94,7 +93,7 @@ sh:prefLabelInsertion
     rdfs:label "prefLabel Insertion"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    skos:definition "skos:prefLabel which is to be inserted."@en . 
+    rdfs:comment "skos:prefLabel which is to be inserted."@en . 
 
 sh:prefLabelDeletion
     a owl:ObjectProperty ;
@@ -102,7 +101,7 @@ sh:prefLabelDeletion
     rdfs:label "prefLabel Deletion"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    skos:definition "skos:prefLabel which is to be deleted."@en . 
+    rdfs:comment "skos:prefLabel which is to be deleted."@en . 
 
 
 
