@@ -13,10 +13,11 @@
 <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl#>
     a owl:Ontology ;
     dc:creator "Joachim Neubert" ;
-    dc:title "skos-history - Ontology for expressing versions and deltas of versions for SKOS files."@en ;
-    dcterms:created "2013-09-02"^^xsd:dateTime ;
-    dcterms:modified "2014-10-22"^^xsd:dateTime ;
-    dc:date "2014-10-22" .
+    dc:title "skos-history - Ontology for expressing version deltas of SKOS files"@en ;
+    dcterms:created "2013-09-02"^^xsd:date ;
+    dcterms:modified "2014-10-22"^^xsd:date ;
+    dc:date "2014-10-22" ;
+    rdfs:comment "This ontology is intended to be used in conjunction with the dataset versioning ontology for addressing different versions of a (skos) dataset."@en .
 
 # Classes
 
@@ -70,7 +71,7 @@ sh:usingNamedGraph
     # TODO
     #rdfs:subPropertyOf <???> ;
     rdfs:range sd:NamedGraph ;
-    rdfs:comment "The named graph where the data can be queried. (The endpoint should be given as void:sparqlEndpoint property of the version history set."@en . 
+    rdfs:comment "The named graph where the data can be queried. (The endpoint should be given as void:sparqlEndpoint property of the version history set.)"@en .
 
 sh:deltaFrom
     a owl:ObjectProperty ;
