@@ -26,7 +26,7 @@ __History of selected concepts__
 | Query | Description |
 |-------|-------------|
 | [concept_history](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq) | History of the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) (changes in pref/altLabels) |
-| [concept_deltas] | All version deltas for the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) |
+| [concept_deltas](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_deltas.rq) | All version deltas for the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) |
 
 
 __Technical background information__
