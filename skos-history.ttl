@@ -9,7 +9,7 @@
 
 # Ontology
 
-<ihttp://raw.github.com/jneubert/skos-history/master/skos-history.ttl>
+<http://raw.github.com/jneubert/skos-history/master/skos-history.ttl>
     a owl:Ontology ;
     dc:creator "Joachim Neubert" ;
     dc:title "Ontology for expressing versions and deltas of versions for SKOS files."@en ;
