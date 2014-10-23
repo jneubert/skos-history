@@ -1,10 +1,11 @@
 @prefix  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/> .
-@prefix  sd:   <http://www.w3.org/ns/sparql-service-description#> .
 @prefix  dc:   <http://purl.org/dc/elements/1.1/> .
 @prefix  dcterms: <http://purl.org/dc/terms/> .
+@prefix  dsv:  <http://purl.org/iso25964/DataSet/Versioning#> .
 @prefix  owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix  rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix  sd:   <http://www.w3.org/ns/sparql-service-description#> .
 @prefix  skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix  xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
@@ -15,9 +16,16 @@
     dc:creator "Joachim Neubert" ;
     dc:title "skos-history - Ontology for expressing version deltas of SKOS files"@en ;
     dcterms:created "2013-09-02"^^xsd:date ;
-    dcterms:modified "2014-10-22"^^xsd:date ;
-    dc:date "2014-10-22" ;
-    rdfs:comment "This ontology is intended to be used in conjunction with the dataset versioning ontology for addressing different versions of a (skos) dataset."@en .
+    dcterms:modified "2014-10-23"^^xsd:date ;
+    dc:date "2014-10-23" ;
+    rdfs:comment """This ontology proposal is meant to support comparisons
+between versions of SKOS vocabularies, both on the level of single concepts
+and on the level of aggregations of certain types of changes. The version
+deltas are expressed as graphs of insertions and deletions. The ontology
+may be used in conjunction with the proposed dataset versioning ontology
+(http://purl.org/iso25964/DataSet/Versioning#)
+for addressing the versions of a (SKOS) dataset via their
+related version history records."""@en .
 
 # Classes
 
@@ -67,7 +75,7 @@ sh:ConceptDelta
 sh:usingNamedGraph
     a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
-    rdfs:label "Using Named Graph"@en ;
+    rdfs:label "using Named Graph"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
     rdfs:range sd:NamedGraph ;
@@ -76,27 +84,30 @@ sh:usingNamedGraph
 sh:deltaFrom
     a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
-    rdfs:label "Delta From"@en ;
+    rdfs:label "delta From"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    rdfs:comment "The versions from which the delta is taken."@en . 
-  
+    rdfs:domain sh:SchemeDelta ;
+    rdfs:comment "The version from which the delta is taken. The object of the triple may be a dsv:VersionHistoryRecord."@en .
+
 sh:deltaTo
     a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
-    rdfs:label "Delta To"@en ;
+    rdfs:label "delta To"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    rdfs:comment "The versions to which the delta is taken."@en . 
-  
+    rdfs:domain sh:SchemeDelta ;
+    rdfs:comment "The versions to which the delta is taken. The object of the triple may be a dsv:VersionHistoryRecord."@en .
+
 sh:hasDelta
     a owl:ObjectProperty ;
     rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
-    rdfs:label "Has Delta"@en ;
+    rdfs:label "has Delta"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    rdfs:comment "A delta for this version."@en . 
-  
+    rdfs:range sh:SchemeDelta
+    rdfs:comment "A delta for this version. The subject of the triple may be a dsv:VersionHistoryRecord."@en .
+
 # TODO check the following properties as possibly obsolete when using delta ontology
 
 sh:prefLabelInsertion
@@ -105,7 +116,7 @@ sh:prefLabelInsertion
     rdfs:label "prefLabel Insertion"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    rdfs:comment "skos:prefLabel which is to be inserted."@en . 
+    rdfs:comment "skos:prefLabel which is to be inserted."@en .
 
 sh:prefLabelDeletion
     a owl:ObjectProperty ;
@@ -113,5 +124,5 @@ sh:prefLabelDeletion
     rdfs:label "prefLabel Deletion"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    rdfs:comment "skos:prefLabel which is to be deleted."@en . 
+    rdfs:comment "skos:prefLabel which is to be deleted."@en .
 
