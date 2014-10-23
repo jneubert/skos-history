@@ -17,6 +17,7 @@
     dcterms:created "2013-09-02"^^xsd:date ;
     dcterms:modified "2014-10-22"^^xsd:date ;
     dc:date "2014-10-22" ;
+    owl:imports <http://www.w3.org/ns/sparql-service-description#> ;
     rdfs:comment "This ontology is intended to be used in conjunction with the dataset versioning ontology for addressing different versions of a (skos) dataset."@en .
 
 # Classes
