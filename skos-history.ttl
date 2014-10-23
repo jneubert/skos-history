@@ -18,14 +18,8 @@
     dcterms:created "2013-09-02"^^xsd:date ;
     dcterms:modified "2014-10-23"^^xsd:date ;
     dc:date "2014-10-23" ;
-    rdfs:comment """This ontology proposal is meant to support comparisons
-between versions of SKOS vocabularies, both on the level of single concepts
-and on the level of aggregations of certain types of changes. The version
-deltas are expressed as graphs of insertions and deletions. The ontology
-may be used in conjunction with the proposed dataset versioning ontology
-(http://purl.org/iso25964/DataSet/Versioning#)
-for addressing the versions of a (SKOS) dataset via their
-related version history records."""@en .
+    rdfs:comment """This ontology proposal is meant to support comparisons between versions of SKOS vocabularies, both on the level of single concepts and on the level of aggregations of certain types of changes. The version deltas are expressed as graphs of insertions and deletions.
+The ontology may be used in conjunction with the proposed dataset versioning ontology (http://purl.org/iso25964/DataSet/Versioning#) for addressing the versions of a (SKOS) dataset via their related version history records."""@en .
 
 # Classes
 
