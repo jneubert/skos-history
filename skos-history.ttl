@@ -110,7 +110,7 @@ sh:concepthistory
     rdfs:label "concept History"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
-    rdfs:Comment "Collects the concept deltas of a concept (given in the subject of the triple)."@en .
+    rdfs:comment "Collects the concept deltas of a concept (given in the subject of the triple)."@en .
 
 sh:prefLabelInsertion
     a owl:ObjectProperty ;
