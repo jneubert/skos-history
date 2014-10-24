@@ -16,8 +16,8 @@
     dc:creator "Joachim Neubert" ;
     dc:title "skos-history - Ontology for expressing version deltas of SKOS files"@en ;
     dcterms:created "2013-09-02"^^xsd:date ;
-    dcterms:modified "2014-10-23"^^xsd:date ;
-    dc:date "2014-10-23" ;
+    dcterms:modified "2014-10-24"^^xsd:date ;
+    dc:date "2014-10-24" ;
     rdfs:comment """This ontology proposal is meant to support comparisons between versions of SKOS vocabularies, both on the level of single concepts and on the level of aggregations of certain types of changes. The version deltas are expressed as graphs of insertions and deletions.
 The ontology may be used in conjunction with the proposed dataset versioning ontology (http://purl.org/iso25964/DataSet/Versioning#) for addressing the versions of a (SKOS) dataset via their related version history records."""@en .
 
@@ -62,7 +62,7 @@ sh:ConceptDelta
     rdfs:label "Concept Delta"@en ;
     # TODO that's not true!
     # rdfs:subClassOf skos:Concept ;
-    rdfs:comment "(???) The delta of two versions of a SKOS concept."@en .
+    rdfs:comment "The delta of two versions of a SKOS concept."@en .
 
 # Properties
 
@@ -103,6 +103,14 @@ sh:hasDelta
     rdfs:comment "A delta for this version. The subject of the triple may be a dsv:VersionHistoryRecord."@en .
 
 # TODO check the following properties as possibly obsolete when using delta ontology
+
+sh:concepthistory
+    a owl:ObjectProperty ;
+    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:label "concept History"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    rdfs:Comment "Collects the concept deltas of a concept (given in the subject of the triple)."@en .
 
 sh:prefLabelInsertion
     a owl:ObjectProperty ;

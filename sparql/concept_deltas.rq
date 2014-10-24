@@ -14,10 +14,11 @@ PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
 # http://answers.semanticweb.com/questions/20908/sparql-construct-without-distinct-produces-non-lean-output)
 
 CONSTRUCT {
-  ?concept sh:history ?conceptDelta .
-  ?conceptDelta
-    delta:deletion [ ?predicate ?deletion ] ;
-    delta:insertion [ ?predicate ?insertion ] .
+  ?concept sh:conceptHistory ?conceptDelta .
+  ?conceptDelta a sh:ConceptDelta ;
+      dcterms:isPartOf ?delta ;
+      delta:deletion [ ?predicate ?deletion ] ;
+      delta:insertion [ ?predicate ?insertion ] .
 }
 
 WHERE {
@@ -25,7 +26,7 @@ WHERE {
     GRAPH ?versionHistoryGraph
       {
         # use subquery to filter out duplicates
-        SELECT DISTINCT ?concept ?conceptDelta ?predicate ?deletion ?insertion
+        SELECT DISTINCT ?delta ?concept ?conceptDelta ?predicate ?deletion ?insertion 
         WHERE
         {
           ?vhr a dsv:VersionHistoryRecord .#
