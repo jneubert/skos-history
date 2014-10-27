@@ -2,11 +2,11 @@ Dataset-specific examples
 =========================
 
 This directory hold examples which use the proposed architecture for custom
-queries, which depend on the specifics of a certain dataset. E.g., the "Added
-descriptors by category" example ([query](stw/sparql/added_by_category.rq),
-[html result](https://rawgithub.com/jneubert/skos-history/master/examples/stw/sparql/added_by_category.html))
-depends on the subject categories structure of STW Thesaurus for Economics
-(current version v8.12).
+queries, which depend on the specifics of a certain dataset. E.g., the [Added
+descriptors by
+category](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/examples/stw/sparql/added_by_category.rq)
+query depends on the subject categories structure of STW Thesaurus for
+Economics (current version v8.12).
 
 So while the examples will not run with other datasets, they may show how
 value can be added by exploiting custom data structures, while at the same
