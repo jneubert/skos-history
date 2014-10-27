@@ -10,7 +10,7 @@ PREFIX  zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 
 # show all labels deleted in the current version
 
-SELECT  ?label
+SELECT  (str(?label) AS ?deletedLabel)
 WHERE
   { 
     GRAPH ?versionHistoryGraph

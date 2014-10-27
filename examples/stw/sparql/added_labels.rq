@@ -10,7 +10,7 @@ PREFIX  zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 
 # show all labels added in the current version
 
-SELECT  ?label ?concept
+SELECT  (str(?label) AS ?addedLabel) ?concept
 WHERE
   { 
     GRAPH ?versionHistoryGraph
