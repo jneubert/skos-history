@@ -8,7 +8,7 @@ PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX  zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 
-# show all labels added in the current version
+# show all labels deleted in the current version
 
 SELECT  ?label
 WHERE
@@ -21,7 +21,7 @@ WHERE
 
         # get the delta to the previous version
         ?currentVHR xhv:prev ?previousVHR .
-        ?previousVHR sh:usingNamedGraph/sd:name ?versionGraph .
+        ?previousVHR sh:usingNamedGraph/sd:name ?previousVersionGraph .
         ?delta sh:deltaTo ?currentVHR .
         ?delta sh:deltaFrom ?previousVHR .
 
@@ -43,7 +43,7 @@ WHERE
         { [] skos:prefLabel | skos:altLabel ?label }
     }
 
-    GRAPH ?versionGraph
+    GRAPH ?previousVersionGraph
       {
         # get concepts and restrict to descriptors
         ?concept skos:prefLabel | skos:altLabel ?label .
