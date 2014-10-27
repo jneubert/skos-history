@@ -19,8 +19,8 @@ BASEDIR=/tmp/stw_versions
 FILENAME=rdf/stw.nt
 
 # publicly available STW versions
-##VERSIONS=(8.04 8.06 8.08 8.10 8.12)
-VERSIONS=(8.08 8.10 8.12)
+VERSIONS=(8.04 8.06 8.08 8.10 8.12)
+##VERSIONS=(8.08 8.10 8.12)
 SCHEMEURI='http://zbw.eu/stw'
 
 # implementation-specific uris
