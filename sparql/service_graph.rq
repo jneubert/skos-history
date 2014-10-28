@@ -1,5 +1,4 @@
 PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
 
 # the service description (default) graph

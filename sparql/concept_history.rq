@@ -1,6 +1,5 @@
 PREFIX  dcterms: <http://purl.org/dc/terms/>
 PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
 PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
@@ -27,10 +26,10 @@ WHERE
 
         # identify insertions and deletions parts/graphs
         ?delta dcterms:hasPart ?insertions .
-        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions a sh:SchemeDeltaInsertions .
         ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
         ?delta dcterms:hasPart ?deletions .
-        ?deletions rdf:type sh:SchemeDeltaDeletions .
+        ?deletions a sh:SchemeDeltaDeletions .
         ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
 
         # for each version, work on insertions and deletions part

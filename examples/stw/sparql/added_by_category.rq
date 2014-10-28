@@ -1,7 +1,5 @@
 PREFIX  dcterms: <http://purl.org/dc/terms/>
 PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
-PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
 PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
 PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
@@ -32,10 +30,10 @@ WHERE
 
         # identify insertions and deletions parts/graphs
         ?delta dcterms:hasPart ?insertions .
-        ?insertions rdf:type sh:SchemeDeltaInsertions .
+        ?insertions a sh:SchemeDeltaInsertions .
         ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
         ?delta dcterms:hasPart ?deletions .
-        ?deletions rdf:type sh:SchemeDeltaDeletions .
+        ?deletions a sh:SchemeDeltaDeletions .
         ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
       }
 
@@ -54,7 +52,7 @@ WHERE
         # subject categories form a mono-hierarchy within STW
         ?concept skos:prefLabel ?prefLabel .
         ?concept skos:broader ?category .
-        ?category rdf:type zbwext:Thsys .
+        ?category a zbwext:Thsys .
         ?category skos:broader* ?topConcept .
         ?scheme skos:hasTopConcept ?topConcept .
 
