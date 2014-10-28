@@ -15,3 +15,13 @@ time making use of a common version history scheme.
 The dataset versioning approach is experimentally applied to a STW versions
 RDFa page at [stw/rdfa](stw/rdfa).
 
+
+STW
+---
+
+Query | Description
+------|------------
+[added_by_category](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/example/stw/sparql/added_by_category.rq) | Added STW concepts by second-level category
+[added_labels](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/example/stw/sparql/added_labels.rq) | Added descriptor labels (pref/altLabels)
+[deleted_labels](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/example/stw/sparql/deleted_labels.rq) | Deleted descriptor labels (pref/altLabels)
+
