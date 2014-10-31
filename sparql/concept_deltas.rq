@@ -1,81 +1,62 @@
-PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  delta: <http://www.w3.org/2004/delta#>
-PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
-PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
-PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
-PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
-
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX delta: <http://www.w3.org/2004/delta#>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+#
 # version deltas for a single concept
-
+#
 # TODO: remove empty blank nodes (see
 # http://answers.semanticweb.com/questions/20908/sparql-construct-without-distinct-produces-non-lean-output)
-
 CONSTRUCT {
   ?concept sh:conceptHistory ?conceptDelta .
   ?conceptDelta a sh:ConceptDelta ;
-      dcterms:isPartOf ?delta ;
-      delta:deletion [ ?predicate ?deletion ] ;
-      delta:insertion [ ?predicate ?insertion ] .
+    dcterms:isPartOf ?delta ;
+    delta:deletion [ ?predicate ?deletion ] ;
+    delta:insertion [ ?predicate ?insertion ] .
 }
-
 WHERE {
-  {
-    GRAPH ?versionHistoryGraph
+  # parameters
+  VALUES ( ?versionHistoryGraph ?concept ) {
+    ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> )
+  }
+  # alternate examples:
+  #   newly introduced thsys "B.04.02.01 Recruitment": <http://zbw.eu/stw/thsys/180783>
+  #   changes in "Welfare analyis": <http://zbw.eu/stw/descriptor/10112-4>
+  #   complete lifecycle of "Virtual community": <http://zbw.eu/stw/descriptor/27212-1>
+  GRAPH ?versionHistoryGraph {
+    # use subquery to filter out duplicates
+    SELECT DISTINCT ?delta ?concept ?conceptDelta ?predicate ?deletion ?insertion
+    WHERE {
+      ?vhr a dsv:VersionHistoryRecord .
+      #
+      ?vhr sh:hasDelta ?delta .
+      ?delta dcterms:hasPart ?part .
+      # identify insertions and deletions parts/graphs
+      ?delta dcterms:hasPart ?insertions .
+      ?insertions a sh:SchemeDeltaInsertions .
+      ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+      ?delta dcterms:hasPart ?deletions .
+      ?deletions a sh:SchemeDeltaDeletions .
+      ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+      # for each version, work on insertions and deletions part
       {
-        # use subquery to filter out duplicates
-        SELECT DISTINCT ?delta ?concept ?conceptDelta ?predicate ?deletion ?insertion 
-        WHERE
-        {
-          ?vhr a dsv:VersionHistoryRecord .#
-          ?vhr sh:hasDelta ?delta .
-          ?delta dcterms:hasPart ?part .
-
-          # identify insertions and deletions parts/graphs
-          ?delta dcterms:hasPart ?insertions .
-          ?insertions a sh:SchemeDeltaInsertions .
-          ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-          ?delta dcterms:hasPart ?deletions .
-          ?deletions a sh:SchemeDeltaDeletions .
-          ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
-
-
-          # for each version, work on insertions and deletions part
-            {
-              GRAPH ?deletionsGraph {
-                ?concept ?predicate ?deletion .
-              }
-            }
-          UNION
-            {
-              GRAPH ?insertionsGraph {
-                ?concept ?predicate ?insertion .
-              }
-            }
-
-        # for the clarity of the example, filter out some dataset-wide changes in STW
-        FILTER ( ?predicate NOT IN (<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>, <http://purl.org/ontology/gbv/gvkppn>) )
-
-        # build a uri to group the changes for a particular version
-        BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
+        GRAPH ?deletionsGraph {
+          ?concept ?predicate ?deletion .
+        }
+      } UNION {
+        GRAPH ?insertionsGraph {
+          ?concept ?predicate ?insertion .
+        }
       }
+      # for the clarity of the example, filter out some dataset-wide changes in STW
+      FILTER ( ?predicate NOT IN (<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>, <http://purl.org/ontology/gbv/gvkppn>) )
+      # build a uri to group the changes for a particular version
+      BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
     }
   }
 }
-
-# parameters
-VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> ) }
-
-# alternate examples:
-
-# newly introduced thsys "B.04.02.01 Recruitment"
-#VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/thsys/180783> ) }
-
-# changes in "Welfare analyis"
-#VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/10112-4> ) }
-
-# complete lifecycle of "Virtual community"
-#VALUES ( ?versionHistoryGraph ?concept ) { ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/27212-1> ) }
-

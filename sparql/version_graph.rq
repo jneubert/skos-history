@@ -1,20 +1,23 @@
-PREFIX  dc:   <http://purl.org/dc/elements/1.1/>
-PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
-PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
-PREFIX  void: <http://rdfs.org/ns/void#>
-PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
-PREFIX  xsd:  <http://www.w3.org/2001/XMLSchema#>
-
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX void: <http://rdfs.org/ns/void#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+#
 # the complete version history graph
-
-CONSTRUCT 
-  { ?s ?p ?o .}
-WHERE
-  { GRAPH ?versionHistoryGraph
-      { ?s ?p ?o }
+#
+CONSTRUCT {
+  ?s ?p ?o .
+}
+WHERE {
+  # parameters
+  VALUES ?versionHistoryGraph {
+    <http://zbw.eu/stw/version>
   }
-
-# parameters
-VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
+  GRAPH ?versionHistoryGraph {
+    ?s ?p ?o
+  }
+}

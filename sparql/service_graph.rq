@@ -1,10 +1,11 @@
-PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
-
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+#
 # the service description (default) graph
-
-CONSTRUCT 
-  { ?s ?p ?o .}
-WHERE
-  { ?s ?p ?o }
-
+#
+CONSTRUCT {
+  ?s ?p ?o .
+}
+WHERE {
+  ?s ?p ?o
+}

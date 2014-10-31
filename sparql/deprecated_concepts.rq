@@ -1,19 +1,22 @@
-PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  owl:  <http://www.w3.org/2002/07/owl#>
-PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
-PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
-PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 
 # identify concepts deprecated with a certain version
 
 SELECT  ?concept ?label ?replacedBy ?replacedByPrefLabel
-WHERE
-  { 
-    GRAPH ?versionHistoryGraph
-      {
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?language ) {
+    ( <http://zbw.eu/stw/version> "en" )
+  }
+
+    GRAPH ?versionHistoryGraph {
         # use the current version as default
         ?versionset dsv:currentVersionRecord ?currentVHR .
         ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
@@ -34,29 +37,23 @@ WHERE
       }
 
     # identify the deprecated concepts
-    GRAPH ?insertionsGraph
-      { ?concept owl:deprecated true }
+    GRAPH ?insertionsGraph { ?concept owl:deprecated true }
 
-    GRAPH ?versionGraph
-      {
+    GRAPH ?versionGraph {
         # different kinds of remaining labels should be supported
           { ?concept skos:prefLabel ?label }
         UNION
           { ?concept rdfs:label ?label }
-        
+
         # restrict output to a certain language
-        FILTER (lang(?label) = 'en')
+        FILTER (lang(?label) = ?language)
 
         # perhaps the deprecated concept was merged into another one
-        OPTIONAL
-          { ?concept dcterms:isReplacedBy ?replacedBy .
+        OPTIONAL { ?concept dcterms:isReplacedBy ?replacedBy .
             ?replacedBy skos:prefLabel ?replacedByPrefLabel
             FILTER (lang(?label) = lang(?replacedByPrefLabel))
           }
       }
   }
 ORDER BY ?concept
-
-# parameters
-VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
 

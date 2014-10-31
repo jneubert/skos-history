@@ -1,59 +1,52 @@
-PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
-PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
-PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
-PREFIX  zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
-
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
 # show all labels deleted in the current version
-
+#
 SELECT  (str(?label) AS ?deletedLabel)
-WHERE
-  { 
-    GRAPH ?versionHistoryGraph
-      {
-        # use the current version as default
-        ?versionset dsv:currentVersionRecord ?currentVHR .
-        ?currentVHR sh:hasDelta ?delta .
-
-        # get the delta to the previous version
-        ?currentVHR xhv:prev ?previousVHR .
-        ?previousVHR sh:usingNamedGraph/sd:name ?previousVersionGraph .
-        ?delta sh:deltaTo ?currentVHR .
-        ?delta sh:deltaFrom ?previousVHR .
-
-        # identify insertions and deletions parts/graphs
-        ?delta dcterms:hasPart ?insertions .
-        ?insertions a sh:SchemeDeltaInsertions .
-        ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-        ?delta dcterms:hasPart ?deletions .
-        ?deletions a sh:SchemeDeltaDeletions .
-        ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
-      }
-
-    # get all deleted labels
-    GRAPH ?deletionsGraph
-      { [] skos:prefLabel | skos:altLabel ?label }
-
-    # ... which were not attached to some (other) concept now
-    FILTER NOT EXISTS {GRAPH ?insertionsGraph
-        { [] skos:prefLabel | skos:altLabel ?label }
-    }
-
-    GRAPH ?previousVersionGraph
-      {
-        # get concepts and restrict to descriptors
-        ?concept skos:prefLabel | skos:altLabel ?label .
-        ?concept a zbwext:Descriptor .
-      }
-
-    # restrict output to a certain language
-    FILTER (lang(?label) = "en")
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor "de" )
   }
+  GRAPH ?versionHistoryGraph {
+    # use the current version as default
+    ?versionset dsv:currentVersionRecord ?currentVHR .
+    ?currentVHR sh:hasDelta ?delta .
+    # get the delta to the previous version
+    ?currentVHR xhv:prev ?previousVHR .
+    ?previousVHR sh:usingNamedGraph/sd:name ?previousVersionGraph .
+    ?delta sh:deltaTo ?currentVHR .
+    ?delta sh:deltaFrom ?previousVHR .
+    # identify insertions and deletions parts/graphs
+    ?delta dcterms:hasPart ?insertions .
+    ?insertions a sh:SchemeDeltaInsertions .
+    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?delta dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions .
+    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # get all deleted labels
+  GRAPH ?deletionsGraph {
+    [] skos:prefLabel | skos:altLabel ?label 
+  }
+  # ... which were not attached to some (other) concept now
+  FILTER NOT EXISTS {
+    GRAPH ?insertionsGraph {
+      [] skos:prefLabel | skos:altLabel ?label 
+    }
+  }
+  GRAPH ?previousVersionGraph {
+    # get concepts and restrict to descriptors
+    ?concept skos:prefLabel | skos:altLabel ?label .
+    ?concept a ?conceptType .
+  }
+  # restrict output to a certain language
+  FILTER (lang(?label) = ?language)
+}
 ORDER BY ?label
-
-# parameters
-VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
-
-

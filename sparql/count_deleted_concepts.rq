@@ -1,45 +1,40 @@
-PREFIX  dc:   <http://purl.org/dc/elements/1.1/>
-PREFIX  dcterms: <http://purl.org/dc/terms/>
-PREFIX  dsv:  <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX  sd:   <http://www.w3.org/ns/sparql-service-description#>
-PREFIX  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
-PREFIX  skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
-
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+#
 # count deleted concepts per version
-
-SELECT ?version (str(count(?concept)) as ?count)
-WHERE
-  { 
-    GRAPH ?versionHistoryGraph
-      {
-        ?delta a sh:SchemeDelta .
-        ?delta sh:deltaTo/dc:identifier ?version .
-
-        # identify insertions and deletions parts/graphs
-        ?delta dcterms:hasPart ?insertions .
-        ?insertions a sh:SchemeDeltaInsertions .
-        ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-        ?delta dcterms:hasPart ?deletions .
-        ?deletions a sh:SchemeDeltaDeletions .
-        ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
-      }
-
-    # for each deleted concept, a deleted prefLabel must exist ...
-    GRAPH ?deletionsGraph
-      { ?concept skos:prefLabel ?prefLabel }
-
-    # ... without anything remaining for this concept in the current version
-    FILTER NOT EXISTS { GRAPH ?insertionsGraph
-        { ?concept ?p [] }
-    }
-
-    # restrict output to a certain language
-    FILTER ( lang(?prefLabel) = 'en' )
+#
+SELECT ?version (str(count(distinct ?concept)) as ?count)
+WHERE {
+  # parameters
+  VALUES ?versionHistoryGraph {
+    <http://zbw.eu/stw/version>
   }
+  GRAPH ?versionHistoryGraph {
+    ?delta a sh:SchemeDelta .
+    ?delta sh:deltaTo/dc:identifier ?version .
+    # identify insertions and deletions parts/graphs
+    ?delta dcterms:hasPart ?insertions .
+    ?insertions a sh:SchemeDeltaInsertions .
+    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?delta dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions .
+    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # for each deleted concept, a deleted prefLabel must exist ...
+  GRAPH ?deletionsGraph {
+    ?concept skos:prefLabel ?prefLabel
+  }
+  # ... without anything remaining for this concept in the current version
+  FILTER NOT EXISTS {
+    GRAPH ?insertionsGraph {
+      ?concept ?p []
+    }
+  }
+}
 GROUP BY ?version
 ORDER BY ?version
-
-# parameters
-VALUES ?versionHistoryGraph { <http://zbw.eu/stw/version> }
-

@@ -14,6 +14,10 @@ PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
 SELECT  ?concept ?prefLabel
 WHERE
   { 
+  # parameters
+  VALUES ( ?versionHistoryGraph ?language ) {
+    ( <http://zbw.eu/stw/version> "en" )
+  }
     GRAPH ?versionHistoryGraph
       {
         # use the current version as default
@@ -45,7 +49,7 @@ WHERE
     }
 
     # restrict output to a certain language
-    FILTER (lang(?prefLabel) = 'en')
+    FILTER (lang(?prefLabel) = ?language)
   }
 ORDER BY ?concept
 
