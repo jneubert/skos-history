@@ -8,7 +8,7 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # count concepts inserted per version
 #
-SELECT ?version (str(count(distinct ?concept)) as ?count)
+SELECT ?version (str(count(distinct ?concept)) as ?addedConceptCount)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {

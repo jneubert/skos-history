@@ -8,7 +8,7 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # count deleted concepts per version
 #
-SELECT ?version (str(count(distinct ?concept)) as ?count)
+SELECT ?version (str(count(distinct ?concept)) as ?deletedConceptCount)
 WHERE {
   # parameters
   VALUES ?versionHistoryGraph {

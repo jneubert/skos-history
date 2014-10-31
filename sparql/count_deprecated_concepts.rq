@@ -9,7 +9,7 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # count deprecated concepts per version
 #
-SELECT ?version (str(count(?concept)) as ?count)
+SELECT ?version (str(count(?concept)) as ?deprecatedConceptCount)
 WHERE {
   # parameters
   VALUES ?versionHistoryGraph {

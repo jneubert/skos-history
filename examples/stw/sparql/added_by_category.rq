@@ -13,7 +13,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # level subject categories are the sub-thesauri. A descriptor
 # often belongs to more than one subject category.
 #
-SELECT  (str(?secondLevelLabel) AS ?categoryLabel) (str(?prefLabel) AS ?conceptLabel) ?concept
+SELECT  (str(?secondLevelLabel) AS ?categoryLabel) (str(?prefLabel) AS ?addedPrefLabel) (?concept AS ?addedConcept)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {

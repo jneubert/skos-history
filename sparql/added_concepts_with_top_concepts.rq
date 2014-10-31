@@ -7,7 +7,7 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # identify concepts inserted with a certain version, and show their top concepts
 #
-SELECT  (str(?topLabel) AS ?topConceptLabel) (str(?prefLabel) AS ?conceptLabel) ?concept
+SELECT  (str(?topLabel) AS ?topConceptLabel) (str(?addedPrefLabel) AS ?conceptLabel) (?concept AS ?addedConcept)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
