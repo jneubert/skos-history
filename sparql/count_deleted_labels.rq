@@ -35,6 +35,7 @@ WHERE {
       [] skos:prefLabel | skos:altLabel ?label
     }
   }
+  FILTER (lang(?label) = ?language)
 }
 GROUP BY ?version
 ORDER BY ?version
