@@ -30,6 +30,15 @@ __History of selected concepts__
 | [concept_deltas](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_deltas.rq) | All version deltas for the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) _(Explore other example concepts commented out at the end of the query.)_ |
 | [concept_history](http://zbw.eu/beta/sparql-gui/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq) | Early alternative approach for the history of the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) (changes in pref/altLabels only) |
 
+__Dataset-specific queries__
+
+More often than not, SKOS publications contain information specific to the dataset in question. Dataset-specific queries may exploit and expose this additional information.
+
+- [STW Thesaurus for Economics](stw).
+
+So while the examples will not run with other datasets, they may show how
+value can be added by exploiting custom data structures, while at the same
+time making use of a common version history scheme.
 
 __Technical background information__
 
