@@ -1,0 +1,314 @@
+/*
+Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 2.7.0
+*/
+/**
+ * YUI Base
+ * @module base
+ * @namespace yui-
+ * @requires reset, fonts
+*/
+
+/*
+body {
+	/* For breathing room between content and viewport. 
+	margin:10px; 
+}
+*/
+
+h1 {
+	/* 18px via YUI Fonts CSS foundation. */
+	font-size: 138.5%;
+}
+
+h2 {
+	/* 16px via YUI Fonts CSS foundation. */
+	font-size: 123.1%;
+}
+
+h3 {
+	/* 14px via YUI Fonts CSS foundation. */
+	font-size: 108%;
+}
+
+h1,h2,h3 {
+	/* Top & bottom margin based on font size. */
+	margin: 1em 0;
+}
+
+h1,h2,h3,h4,h5,h6,strong,dt {
+	/* Bringing boldness back to headers and the strong element. */
+	font-weight: bold;
+}
+optgroup {
+	font-weight:normal;
+}
+
+abbr,acronym {
+	/* Indicating to users that more info is available. */
+	border-bottom: 1px dotted #000;
+	cursor: help;
+}
+
+em {
+	/* Bringing italics back to the em element. */
+	font-style: italic;
+}
+
+del {
+	/* Striking deleted phrases. */
+	text-decoration: line-through;
+}
+
+blockquote,ul,ol,dl {
+	/* Giving blockquotes and lists room to breath. */
+	margin: 1em;
+}
+
+ol,ul,dl {
+	/* Bringing lists on to the page with breathing room. */
+	margin-left: 2em;
+}
+
+ol li {
+	/* Giving OL's LIs generated numbers. */
+	list-style: decimal outside;
+}
+
+/*
+ul li {
+	/* Giving UL's LIs generated disc markers. 
+	list-style: disc outside;
+}
+*/
+
+dl dd {
+	/* Giving UL's LIs generated numbers. */
+	margin-left: 1em;
+}
+
+th,td {
+	/* Borders and padding to make the table readable. */
+	border: 1px solid #000;
+	padding: .5em;
+}
+
+th {
+	/* Distinguishing table headers from data cells. */
+	font-weight: bold;
+	text-align: center;
+}
+
+caption {
+	/* Coordinated margin to match cell's padding. */
+	margin-bottom: .5em;
+	/* Centered so it doesn't blend in to other content. */
+	text-align: center;
+}
+
+sup {
+	/* to preserve line-height and selector appearance */
+	vertical-align: super;
+}
+
+sub {
+	/* to preserve line-height and selector appearance */
+	vertical-align: sub;
+}
+
+p,
+fieldset,
+table,
+pre {
+	/* So things don't run into each other. */
+	margin-bottom: 1em;
+}
+/* Opera requires 1px of passing to render with contemporary native chrome */
+button,
+input[type="checkbox"],
+input[type="radio"],
+input[type="reset"],
+input[type="submit"] {
+	padding:1px;
+}
+
+/* ########################### */
+
+#doc {
+  float: left; 
+  font-family: verdana,arial,helvetica,clean,sans-serif;
+}
+
+h4 {
+  margin-bottom: 0.5em;
+}
+
+a {
+  color: #005d95;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #005d95;
+  text-decoration: underline;
+}
+
+
+ul li {
+  list-style-position: outside;
+  list-style-image: url(../images/dot_5x5_blaugrau.gif);
+}
+
+tt, pre {
+  font-size: 85%;
+}
+
+#hd {
+  height: 101px;
+  margin-bottom: 20px;
+}
+
+.zbw-blue-line {
+  width: 100%;
+  height: 10px;
+}
+
+#lang-choise {
+  margin-top: 26px;
+  margin-right: 1em;
+  margin-bottom: 12px;
+  text-align: right;
+  font-size: 85%;
+}
+
+#suggest_form {
+  margin-bottom:1em;
+  margin-left: 4.5em;
+  margin-right: 1em;
+}
+
+#suggest_ac {
+  /* width:25em; /* set width here or else widget will expand to fit its container */
+}
+
+#bd {
+  margin-bottom: 1em;
+  background-repeat: no-repeat;
+  background-position:  0px 0px;
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+}
+
+/* more indent */
+#bd #yui-main .yui-b .yui-g {
+  padding-left: 1em;
+  padding-right: 1.5em;
+}
+
+#menu {
+  margin-bottom: 2em;
+  padding-top: 1em;
+  padding-left: 34px;
+  font-size: 85%;
+}
+
+#menu ul {
+  margin-left: 0;
+}
+
+#menu ul li {
+  list-style: none;
+}
+
+/* padding-left for optical alignment of the entry text
+   with the 34px left border of www.zbw.eu */
+#thsys_tree {
+  font-size: 85%;
+  margin-right: 1em;
+  padding-left: 15px; 
+  padding-right: 0.5em; 
+}
+
+/* rollover effect for treeview */
+.ygtvlabel:hover  {
+  text-decoration:underline;
+}
+
+/* TODO 
+  no rollover for sprites in treeview 
+
+  this doesn't work!!
+*/
+.ygtvcell {
+  text-decoration:none !important;
+}
+
+#ft {
+  margin-left: 34px;
+  font-size: 85%;
+}
+
+#license_left {
+  float: left;
+  width: 190px;
+}
+
+.note_small {
+  font-size: 77%;
+}
+
+.inline_icon {
+  border: 0px;
+  height: 1em;
+  vertical-align: bottom;
+}
+
+/* temporary, for adapting to size of new econbiz logo */
+.inline_icon2 {
+  border: 0px;
+  height: 0.88em;
+  vertical-align: bottom;
+}
+
+.mapping_link_table {
+  margin-left: 0.5em;
+}
+
+table.mapping_link_table td {
+  border: 0px;
+  padding: 0em;
+  padding-left:0.5em;
+  vertical-align: top;
+}
+
+table.mapping_description_table td {
+  border: 0px;
+  padding: 0.3em 0.5em 0.3em 0em;
+  vertical-align: top;
+}
+
+table.statistics_table {
+  margin-bottom: 0em;
+}
+
+table.statistics_table td {
+  border: 0px;
+  padding: 0em;
+  padding-right: 0.5em;
+  vertical-align: top;
+}
+
+/* necessary for YUI history functions */
+#yui-history-iframe {
+  position:absolute;
+  top:0; left:0;
+  width:1px; height:1px;
+  visibility:hidden;
+}
+
+#saved_descriptors {
+  font-size:85%;
+  visibility:hidden;
+}
