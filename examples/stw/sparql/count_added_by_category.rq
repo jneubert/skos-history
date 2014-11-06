@@ -1,0 +1,68 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Identify concepts inserted with a certain version,
+# ordered by the second level subject category.
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
+#
+SELECT (str(count(?secondLevelLabel)) as ?countAddedConcepts) (str(?secondLevelLabel) AS ?categoryLabel) (max(?secondLevelConcept) as ?categoryUri)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?language ) {
+    ( <http://zbw.eu/stw/version> "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # use current version as default
+    ?versionset dsv:currentVersionRecord ?currentVHR .
+    ?currentVHR sh:hasDelta ?delta .
+    ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
+    # get the delta to the previous version
+    ?currentVHR xhv:prev ?previousVHR .
+    ?delta sh:deltaTo ?currentVHR .
+    ?delta sh:deltaFrom ?previousVHR .
+    # identify insertions and deletions parts/graphs
+    ?delta dcterms:hasPart ?insertions .
+    ?insertions a sh:SchemeDeltaInsertions .
+    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?delta dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions .
+    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # for each inserted concept, a (newly inserted) prefLabel must exist ...
+  GRAPH ?insertionsGraph {
+    ?concept skos:prefLabel ?prefLabel
+  }
+  # ... without any prefLabel deleted for this concept
+  FILTER NOT EXISTS {
+    GRAPH ?deletionsGraph {
+      ?concept skos:prefLabel []
+    }
+  }
+  GRAPH ?versionGraph {
+    # get the top subject category (concept of subclass Thsys)
+    # subject categories form a mono-hierarchy within STW
+    ?concept skos:prefLabel ?prefLabel .
+    ?concept skos:broader ?category .
+    ?category a zbwext:Thsys .
+    ?category skos:broader* ?topConcept .
+    ?scheme skos:hasTopConcept ?topConcept .
+    #
+    # get the second level category
+    ?topConcept skos:narrower ?secondLevelConcept .
+    ?category skos:broader+ ?secondLevelConcept .
+    #
+    # get the label of the second level category
+    ?secondLevelConcept skos:prefLabel ?secondLevelLabel
+  }
+  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language)
+}
+GROUP BY ?secondLevelLabel
+ORDER BY ?secondLevelLabel ?prefLabel
