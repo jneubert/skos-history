@@ -13,26 +13,37 @@ use lib qw(lib);
 
 use Data::Dumper;
 use File::Slurp;
-use File::Spec;
+use RDF::Query::Client;
+use String::Util qw/unquote/;
 use URI::file;
-use RDF::Query;
+
+our $endpoint = 'http://zbw.eu/beta/sparql/stwv/query';
+
+# List of version and data structure for results
+
+my @row_headers = qw / 8.06 8.08 8.10 8.12 8.14a /;
+my %data = map { $_ => {} } @row_headers;
 
 # List of queries and parameters for each statistics column
 
 my @column_definitions = (
   {
+    column     => 'added_labels_en',
     header     => 'Added labels (en)',
     query_file => '../sparql/count_added_labels.rq',
     replace    => {
       '?language' => '"en"',
     },
+    result_variable => 'addedLabelCount',
   },
   {
+    column     => 'added_labels_de',
     header     => 'Added labels (de)',
     query_file => '../sparql/count_added_labels.rq',
     replace    => {
       '?language' => '"de"',
     },
+    result_variable => 'addedLabelCount',
   },
 );
 
@@ -40,39 +51,52 @@ my @column_definitions = (
 
 # for each query, get column data and add to csv table
 
-foreach my $column_definition_ref (@column_definitions) {
-  my $column_ref = get_column($column_definition_ref);
-
-  # add to csv table
+foreach my $columndef_ref (@column_definitions) {
+  get_column( $columndef_ref, \%data );
 }
 
+# add to csv table
+
 # output resulting table
+
+print Dumper \%data;
 
 #######################
 
 sub get_column {
-  my %columndef = %{ shift() } or die "param missing\n";
+  my $columndef_ref = shift or die "param missing\n";
+  my $data_ref      = shift or die "param missing\n";
 
   # read query from file (by command line argument)
-  my $query = read_file( $columndef{query_file} ) or die "Can't read $!\n";
+  my $query = read_file( $$columndef_ref{query_file} ) or die "Can't read $!\n";
 
-  # parse VALUES clause
-  my ( $variables_ref, $value_ref ) = parse_values($query);
+  # do replacements, if defined
+  if ( $$columndef_ref{replace} ) {
 
-  # replace values
-  foreach my $variable ( keys %$value_ref ) {
-    if ( defined( $columndef{replace}{$variable} ) ) {
-      $$value_ref{$variable} = $columndef{replace}{$variable};
+    # parse VALUES clause
+    my ( $variables_ref, $value_ref ) = parse_values($query);
+
+    # replace values
+    foreach my $variable ( keys %$value_ref ) {
+      if ( defined( $$columndef_ref{replace}{$variable} ) ) {
+        $$value_ref{$variable} = $$columndef_ref{replace}{$variable};
+      }
     }
+    $query = insert_modified_values( $query, $variables_ref, $value_ref );
   }
-  $query = insert_modified_values( $query, $variables_ref, $value_ref );
 
   # execute query
+  my $q        = RDF::Query::Client->new($query);
+  my $iterator = $q->execute($endpoint);
 
-  print "$query\n";
-
-  # parse results
-
+  # parse and add results
+  while ( my $row = $iterator->next ) {
+    my $version = unquote( $row->{version}->as_string );
+    if ( defined $$data_ref{$version} ) {
+      $$data_ref{$version}{ $$columndef_ref{column} } =
+        unquote($row->{ $$columndef_ref{result_variable} }->as_string);
+    }
+  }
 }
 
 sub parse_values {
