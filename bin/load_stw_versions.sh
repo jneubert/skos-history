@@ -79,13 +79,13 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
 # create a SPARQL service description in the default graph
 SERVICE_URI=$BASEURI/sparql-service
-SERVICE_DDDURI=$SERVICE_URI/ddd
+SERVICE_DDURI=$SERVICE_URI/dd
 statement="
 $PREFIXES
 insert {
 <$SERVICE_URI> a sd:Service;
-    sd:url <$QUERY_URI>;
-    sd:defaultDatasetDescription <$SERVICE_DDDURI> .
+    sd:endpoint <$QUERY_URI>;
+    sd:defaultDataset <$SERVICE_DDURI> .
 <$SERVICE_DDDURI> a sd:Dataset;
     dcterms:title \"STW Versions SPARQL Service\";
     sd:defaultGraph [
