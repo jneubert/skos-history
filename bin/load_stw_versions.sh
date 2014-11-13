@@ -19,7 +19,7 @@ BASEDIR=/tmp/stw_versions
 FILENAME=rdf/stw.nt
 
 # publicly available STW versions
-VERSIONS=(8.04 8.06 8.08 8.10 8.12)
+VERSIONS=(8.04 8.06 8.08 8.10 8.12 "8.14b")
 ##VERSIONS=(8.08 8.10 8.12)
 SCHEMEURI='http://zbw.eu/stw'
 
@@ -60,7 +60,7 @@ if [ "${SCHEMEURI: -1}" == "/" ]; then
 else
   BASEURI=$SCHEMEURI/version
 fi
-SPARQL_DDDURI=$BASEURI/sparq-service/ddd
+SPARQL_DDURI=$BASEURI/sparq-service/dd
 
 PREFIXES="
 prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
@@ -86,7 +86,7 @@ insert {
 <$SERVICE_URI> a sd:Service;
     sd:endpoint <$QUERY_URI>;
     sd:defaultDataset <$SERVICE_DDURI> .
-<$SERVICE_DDDURI> a sd:Dataset;
+<$SERVICE_DDURI> a sd:Dataset;
     dcterms:title \"STW Versions SPARQL Service\";
     sd:defaultGraph [
         a sd:Graph;
@@ -138,7 +138,7 @@ sparql_update "$statement"
 statement="
 $PREFIXES
 insert {
-  <$SERVICE_DDDURI> sd:namedGraph <$BASEURI/ng> .
+  <$SERVICE_DDURI> sd:namedGraph <$BASEURI/ng> .
   <$BASEURI/ng> a sd:NamedGraph ;
       sd:name <$BASEURI> .
 }
@@ -201,7 +201,7 @@ where {
   statement="
 $PREFIXES
 insert {
-  <$SERVICE_DDDURI> sd:namedGraph <$BASEURI/$old/ng> .
+  <$SERVICE_DDURI> sd:namedGraph <$BASEURI/$old/ng> .
   <$BASEURI/$old/ng> a sd:NamedGraph ;
       sd:name <$BASEURI/$old> .
 }
@@ -278,7 +278,7 @@ where {}
       statement="
 $PREFIXES
 insert {
-  <$SERVICE_DDDURI> sd:namedGraph <$delta_uri/$op/ng> .
+  <$SERVICE_DDURI> sd:namedGraph <$delta_uri/$op/ng> .
   <$delta_uri/$op/ng> a sd:NamedGraph ;
       sd:name <$delta_uri/$op> .
 }
