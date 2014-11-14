@@ -37,7 +37,7 @@ else
 fi
 
 PREFIXES="
-prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+prefix : <http://purl.org/skos-history/>
 prefix dc: <http://purl.org/dc/elements/1.1/>
 prefix dcterms: <http://purl.org/dc/terms/>
 prefix owl: <http://www.w3.org/2002/07/owl#>

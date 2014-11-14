@@ -63,7 +63,7 @@ fi
 SPARQL_DDURI=$BASEURI/sparq-service/dd
 
 PREFIXES="
-prefix : <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+prefix : <http://purl.org/skos-history/>
 prefix dc: <http://purl.org/dc/elements/1.1/>
 prefix dcterms: <http://purl.org/dc/terms/>
 prefix dsv: <http://purl.org/iso25964/DataSet/Versioning#>

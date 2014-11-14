@@ -2,7 +2,7 @@ PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
-PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX sh: <http://purl.org/skos-history/>
 PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>

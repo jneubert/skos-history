@@ -2,7 +2,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
-PREFIX sh: <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+PREFIX sh: <http://purl.org/skos-history/>
 #
 # history of a single concept
 # (currently restricted to changes of skos:prefLabel/altLabel)
