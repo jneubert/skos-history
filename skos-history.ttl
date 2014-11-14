@@ -1,4 +1,4 @@
-@prefix  sh:   <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/> .
+@prefix  sh:   <http://purl.org/skos-history/> .
 @prefix  dc:   <http://purl.org/dc/elements/1.1/> .
 @prefix  dcterms: <http://purl.org/dc/terms/> .
 @prefix  dsv:  <http://purl.org/iso25964/DataSet/Versioning#> .
@@ -11,13 +11,13 @@
 
 # Ontology
 
-<http://raw.github.com/jneubert/skos-history/master/skos-history.ttl/>
+<http://purl.org/skos-history/>
     a owl:Ontology ;
     dc:creator "Joachim Neubert" ;
     dc:title "skos-history - Ontology for expressing version deltas of SKOS files"@en ;
     dcterms:created "2013-09-02"^^xsd:date ;
-    dcterms:modified "2014-10-24"^^xsd:date ;
-    dc:date "2014-10-24" ;
+    dcterms:modified "2014-11-14"^^xsd:date ;
+    dc:date "2014-11-14" ;
     rdfs:comment """This ontology proposal is meant to support comparisons between versions of SKOS vocabularies, both on the level of single concepts and on the level of aggregations of certain types of changes. The version deltas are expressed as graphs of insertions and deletions.
 The ontology may be used in conjunction with the proposed dataset versioning ontology (http://purl.org/iso25964/DataSet/Versioning#) for addressing the versions of a (SKOS) dataset via their related version history records."""@en .
 
@@ -25,7 +25,7 @@ The ontology may be used in conjunction with the proposed dataset versioning ont
 
 sh:SchemeDelta
     a rdfs:Class ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "Scheme Delta"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
     rdfs:comment "The delta of two versions of a SKOS concept scheme."@en .
@@ -33,7 +33,7 @@ sh:SchemeDelta
 sh:SchemeDeltaInsertions
     a rdfs:Class ;
     rdfs:comment """Should be related to the delta by dcterms:isPartOf."""@en ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "Scheme Delta Insertions"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
     rdfs:comment "The statements to insert into one version of a SKOS concept scheme to create another version (in addition to deletions)."@en .
@@ -41,7 +41,7 @@ sh:SchemeDeltaInsertions
 sh:SchemeDeltaDeletions
     a rdfs:Class ;
     rdfs:comment """Should be related to the delta by dcterms:isPartOf."""@en ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "Scheme Delta Deletions"@en ;
     rdfs:subClassOf skos:ConceptScheme ;
     rdfs:comment "The statements to delete from one version of a SKOS concept scheme to create another version (in addition to insertions)."@en .
@@ -51,14 +51,14 @@ sh:SchemeDeltaDeletions
 sh:ConceptVersion
     a rdfs:Class ;
     rdfs:comment """Should be related to the concept by dcterms:isVersionOf."""@en ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "Concept Version"@en ;
     rdfs:subClassOf skos:Concept ;
     rdfs:comment "(???) A version of a SKOS concept."@en .
 
 sh:ConceptDelta
     a rdfs:Class ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "Concept Delta"@en ;
     # TODO that's not true!
     # rdfs:subClassOf skos:Concept ;
@@ -68,7 +68,7 @@ sh:ConceptDelta
 
 sh:usingNamedGraph
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "using Named Graph"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
@@ -77,7 +77,7 @@ sh:usingNamedGraph
 
 sh:deltaFrom
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "delta From"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
@@ -86,7 +86,7 @@ sh:deltaFrom
 
 sh:deltaTo
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "delta To"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
@@ -95,7 +95,7 @@ sh:deltaTo
 
 sh:hasDelta
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "has Delta"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
@@ -106,7 +106,7 @@ sh:hasDelta
 
 sh:concepthistory
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "concept History"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
@@ -114,7 +114,7 @@ sh:concepthistory
 
 sh:prefLabelInsertion
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "prefLabel Insertion"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
@@ -122,7 +122,7 @@ sh:prefLabelInsertion
 
 sh:prefLabelDeletion
     a owl:ObjectProperty ;
-    rdfs:isDefinedBy <http://raw.github.com/jneubert/skos-history/master/skos-history.ttl> ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
     rdfs:label "prefLabel Deletion"@en ;
     # TODO
     #rdfs:subPropertyOf <???> ;
