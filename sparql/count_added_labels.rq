@@ -6,7 +6,7 @@ PREFIX sh: <http://purl.org/skos-history/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
-# Count labels in a certain language inserted per version
+# Count added labels in a certain language per version
 #
 SELECT ?version (str(count(distinct ?label)) AS ?addedLabelCount)
 WHERE {
@@ -25,11 +25,11 @@ WHERE {
     ?deletions a sh:SchemeDeltaDeletions .
     ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
-  # for each inserted concept, a (newly inserted) prefLabel must exist ...
+  # for each inserted label ...
   GRAPH ?insertionsGraph {
     [] skos:prefLabel | skos:altLabel ?label
   }
-  # ... without any prefLabel deleted for this concept
+  # ... which was not attached to some (other) concept before
   FILTER NOT EXISTS {
     GRAPH ?deletionsGraph {
       [] skos:prefLabel | skos:altLabel ?label

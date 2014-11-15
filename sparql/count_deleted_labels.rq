@@ -11,7 +11,7 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 SELECT ?version (str(count(distinct ?label)) as ?deletedLabelCount)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?language) {
+  VALUES ( ?versionHistoryGraph ?language ) {
     ( <http://zbw.eu/stw/version> "en" )
   }
   GRAPH ?versionHistoryGraph {
@@ -25,11 +25,11 @@ WHERE {
     ?deletions a sh:SchemeDeltaDeletions .
     ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
-  # for each deleted concept, a deleted prefLabel must exist ...
+  # for each deleted label ...
   GRAPH ?deletionsGraph {
     [] skos:prefLabel | skos:altLabel ?label
   }
-  # ... without anything remaining for this concept in the current version
+  # ... without being inserted otherwise (for another concept or property)
   FILTER NOT EXISTS {
     GRAPH ?insertionsGraph {
       [] skos:prefLabel | skos:altLabel ?label
