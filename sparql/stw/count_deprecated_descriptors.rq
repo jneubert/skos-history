@@ -1,0 +1,41 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# count deprecated concepts per version
+#
+SELECT ?version (str(count(?concept)) as ?deprecatedConceptCount)
+WHERE {
+  # parameters (currently does not work on conceptType zbwext:Thsys)
+  VALUES ( ?versionHistoryGraph ?conceptType ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor )
+  }
+  GRAPH ?versionHistoryGraph {
+    ?delta a sh:SchemeDelta .
+    ?delta sh:deltaTo/dc:identifier ?version .
+    ?delta sh:deltaTo/sh:usingNamedGraph/sd:name ?versionGraph .
+    # identify insertions and deletions parts/graphs
+    ?delta dcterms:hasPart ?insertions .
+    ?insertions a sh:SchemeDeltaInsertions .
+    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?delta dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions .
+    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # identify the deprecated concepts
+  GRAPH ?insertionsGraph {
+    ?concept owl:deprecated true
+  }
+  # filter on concept type
+  GRAPH ?versionGraph {
+    ?concept a ?conceptType .
+  }
+}
+GROUP BY ?version
+ORDER BY ?version

@@ -23,24 +23,66 @@ our $endpoint = 'http://zbw.eu/beta/sparql/stwv/query';
 # List of version and data structure for results
 
 my @row_headers = qw/ 8.06 8.08 8.10 8.12 8.14b /;
-my %data = map { $_ => { version => $_ } } @row_headers;
+my %data = map { $_ => { version => "v $_" } } @row_headers;
 
 # List of queries and parameters for each statistics column
 
 my @column_definitions = (
   {
+    column          => 'added_concepts',
+    header          => 'Added concepts',
+    query_file      => '../sparql/stw/count_added_concepts.rq',
+    replace         => { '?conceptType' => 'skos:Concept', },
+    result_variable => 'addedConceptCount',
+  },
+  {
+    column          => 'added_thsys',
+    header          => 'Added thsys',
+    query_file      => '../sparql/stw/count_added_concepts.rq',
+    replace         => { '?conceptType' => 'zbwext:Thsys', },
+    result_variable => 'addedConceptCount',
+  },
+  {
+    column          => 'added_descriptors',
+    header          => 'Added descriptors',
+    query_file      => '../sparql/stw/count_added_concepts.rq',
+    replace         => { '?conceptType' => 'zbwext:Descriptor', },
+    result_variable => 'addedConceptCount',
+  },
+  {
+    column          => 'deprecated_descriptors',
+    header          => 'Deprecated descriptors',
+    query_file      => '../sparql/stw/count_deprecated_concepts.rq',
+    replace         => { '?conceptType' => 'zbwext:Descriptor', },
+    result_variable => 'deprecatedConceptCount',
+  },
+  {
     column          => 'added_labels_en',
     header          => 'Added labels (en)',
-    query_file      => '../sparql/count_added_labels.rq',
+    query_file      => '../sparql/stw/count_added_labels.rq',
     replace         => { '?language' => '"en"', },
     result_variable => 'addedLabelCount',
   },
   {
+    column          => 'deleted_labels_en',
+    header          => 'Deleted labels (en)',
+    query_file      => '../sparql/stw/count_deleted_labels.rq',
+    replace         => { '?language' => '"en"', },
+    result_variable => 'deletedLabelCount',
+  },
+  {
     column          => 'added_labels_de',
     header          => 'Added labels (de)',
-    query_file      => '../sparql/count_added_labels.rq',
+    query_file      => '../sparql/stw/count_added_labels.rq',
     replace         => { '?language' => '"de"', },
     result_variable => 'addedLabelCount',
+  },
+  {
+    column          => 'deleted_labels_de',
+    header          => 'Deleted labels (de)',
+    query_file      => '../sparql/stw/count_deleted_labels.rq',
+    replace         => { '?language' => '"de"', },
+    result_variable => 'deletedLabelCount',
   },
 );
 
