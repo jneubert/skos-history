@@ -11,6 +11,7 @@ use strict;
 use warnings;
 use lib qw(lib);
 
+use Class::CSV;
 use Data::Dumper;
 use File::Slurp;
 use RDF::Query::Client;
@@ -21,28 +22,24 @@ our $endpoint = 'http://zbw.eu/beta/sparql/stwv/query';
 
 # List of version and data structure for results
 
-my @row_headers = qw / 8.06 8.08 8.10 8.12 8.14a /;
-my %data = map { $_ => {} } @row_headers;
+my @row_headers = qw/ 8.06 8.08 8.10 8.12 8.14b /;
+my %data = map { $_ => { version => $_ } } @row_headers;
 
 # List of queries and parameters for each statistics column
 
 my @column_definitions = (
   {
-    column     => 'added_labels_en',
-    header     => 'Added labels (en)',
-    query_file => '../sparql/count_added_labels.rq',
-    replace    => {
-      '?language' => '"en"',
-    },
+    column          => 'added_labels_en',
+    header          => 'Added labels (en)',
+    query_file      => '../sparql/count_added_labels.rq',
+    replace         => { '?language' => '"en"', },
     result_variable => 'addedLabelCount',
   },
   {
-    column     => 'added_labels_de',
-    header     => 'Added labels (de)',
-    query_file => '../sparql/count_added_labels.rq',
-    replace    => {
-      '?language' => '"de"',
-    },
+    column          => 'added_labels_de',
+    header          => 'Added labels (de)',
+    query_file      => '../sparql/count_added_labels.rq',
+    replace         => { '?language' => '"de"', },
     result_variable => 'addedLabelCount',
   },
 );
@@ -55,11 +52,23 @@ foreach my $columndef_ref (@column_definitions) {
   get_column( $columndef_ref, \%data );
 }
 
-# add to csv table
+# initialize csv table with column names and headers
+my @columns        = ('version');
+my @column_headers = ('Version');
+foreach my $column_ref (@column_definitions) {
+  push( @columns,        $$column_ref{column} );
+  push( @column_headers, $$column_ref{header} );
+}
+my $csv = Class::CSV->new( fields => \@columns );
+$csv->add_line( \@column_headers );
+
+# add rows
+foreach my $row (@row_headers) {
+  $csv->add_line( $data{$row} );
+}
 
 # output resulting table
-
-print Dumper \%data;
+$csv->print;
 
 #######################
 
@@ -94,7 +103,7 @@ sub get_column {
     my $version = unquote( $row->{version}->as_string );
     if ( defined $$data_ref{$version} ) {
       $$data_ref{$version}{ $$columndef_ref{column} } =
-        unquote($row->{ $$columndef_ref{result_variable} }->as_string);
+        unquote( $row->{ $$columndef_ref{result_variable} }->as_string );
     }
   }
 }
