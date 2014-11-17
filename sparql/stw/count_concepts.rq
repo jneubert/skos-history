@@ -1,0 +1,36 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Count concepts of a certain type
+#
+SELECT  ?version (str(count(?concept)) as ?conceptCount)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?type ) {
+    ( <http://zbw.eu/stw/version> "Descriptor" )
+  }
+  GRAPH ?versionHistoryGraph {
+    ?vhr dsv:hasVersionHistorySet ?vhs .
+    ?vhr dc:identifier ?version .
+    ?vhr sh:usingNamedGraph/sd:name ?versionGraph .
+  }
+  GRAPH ?versionGraph {
+    # STW 8.04 used a different custom namespace URI
+    BIND (uri(concat("http://zbw.eu/namespaces/skos-extensions/", ?type)) as ?oldConceptType)
+    BIND (uri(concat("http://zbw.eu/namespaces/zbw-extensions/", ?type)) as ?conceptType)
+    {
+      ?concept a ?oldConceptType 
+    } UNION {
+      ?concept a ?conceptType
+    }
+    FILTER NOT EXISTS {
+      ?concept owl:deprecated true 
+    }
+  }
+}
+GROUP BY ?version
+ORDER BY ?version
