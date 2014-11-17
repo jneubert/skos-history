@@ -10,7 +10,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # count deprecated concepts per version
 #
-SELECT ?version (str(count(?concept)) as ?deprecatedConceptCount)
+SELECT ?version (str(count(?concept)) as ?deprecatedConceptCount) (str(count(?replacedByConcept)) as ?replacedByConceptCount)
 WHERE {
   # parameters (currently does not work on conceptType zbwext:Thsys)
   VALUES ( ?versionHistoryGraph ?conceptType ) {
@@ -35,6 +35,9 @@ WHERE {
   # filter on concept type
   GRAPH ?versionGraph {
     ?concept a ?conceptType .
+    OPTIONAL {
+      ?concept dcterms:isReplacedBy ?replacedByConcept 
+    }
   }
 }
 GROUP BY ?version
