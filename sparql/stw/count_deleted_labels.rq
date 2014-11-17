@@ -12,8 +12,8 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT ?version (str(count(distinct ?label)) as ?deletedLabelCount)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
+  VALUES ( ?versionHistoryGraph ?type ?language ) {
+    ( <http://zbw.eu/stw/version> "Descriptor" "en" )
   }
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta .
@@ -39,7 +39,14 @@ WHERE {
   }
   # filter on concept type
   GRAPH ?oldVersionGraph {
-    ?concept a ?conceptType .
+    # STW 8.04 used a different custom namespace URI
+    BIND (uri(concat("http://zbw.eu/namespaces/skos-extensions/", ?type)) as ?oldConceptType)
+    BIND (uri(concat("http://zbw.eu/namespaces/zbw-extensions/", ?type)) as ?conceptType)
+    {
+      ?concept a ?oldConceptType 
+    } UNION {
+      ?concept a ?conceptType
+    }
   }
   FILTER (lang(?label) = ?language)
 }

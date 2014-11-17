@@ -11,8 +11,8 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT  (str(?label) AS ?deletedLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor "de" )
+  VALUES ( ?versionHistoryGraph ?type ?language ) {
+    ( <http://zbw.eu/stw/version> "Descriptor" "de" )
   }
   GRAPH ?versionHistoryGraph {
     # use the current version as default
@@ -44,7 +44,14 @@ WHERE {
   GRAPH ?previousVersionGraph {
     # get concepts and restrict to descriptors
     ?concept skos:prefLabel | skos:altLabel ?label .
-    ?concept a ?conceptType .
+    # STW 8.04 used a different custom namespace URI
+    BIND (uri(concat("http://zbw.eu/namespaces/skos-extensions/", ?type)) as ?oldConceptType)
+    BIND (uri(concat("http://zbw.eu/namespaces/zbw-extensions/", ?type)) as ?conceptType)
+    {
+      ?concept a ?oldConceptType 
+    } UNION {
+      ?concept a ?conceptType
+    }
   }
   # restrict output to a certain language
   FILTER (lang(?label) = ?language)
