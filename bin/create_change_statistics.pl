@@ -4,7 +4,11 @@
 # Creates a csv table of change statistics
 # for a set of skos file versions via sparql queries
 
-# query parsing is based on whitespace recognition, minimal:
+# Each query must return a result variable "?version" with
+# the version indentifier, plus at least one other column with
+# the aggregated values for each version
+
+# Query parsing is based on whitespace recognition, minimal:
 #   values ( ... ) { ( ... ) }
 
 use strict;
@@ -98,6 +102,7 @@ my @column_definitions = (
 # for each query, get column data and add to csv table
 
 foreach my $columndef_ref (@column_definitions) {
+  print "  $$columndef_ref{column}\n";
   get_column( $columndef_ref, \%data );
 }
 
@@ -145,12 +150,16 @@ sub get_column {
 
   # execute query
   my $q        = RDF::Query::Client->new($query);
-  my $iterator = $q->execute($endpoint) or die "Can't execute $$columndef_ref{query_file}\n";
+  my $iterator = $q->execute($endpoint)
+    or die "Can't execute $$columndef_ref{query_file}\n";
 
   # parse and add results
   while ( my $row = $iterator->next ) {
     my $version = unquote( $row->{version}->as_string );
     if ( defined $$data_ref{$version} ) {
+      die 'Result variable ', $$columndef_ref{result_variable},
+        ' is not defined in ', $$columndef_ref{query_file}, "\n"
+        unless $row->{ $$columndef_ref{result_variable} };
       $$data_ref{$version}{ $$columndef_ref{column} } =
         unquote( $row->{ $$columndef_ref{result_variable} }->as_string );
     }
