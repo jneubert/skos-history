@@ -31,7 +31,10 @@ WHERE {
   }
   # for each inserted concept, a (newly inserted) prefLabel must exist ...
   GRAPH ?insertionsGraph {
-    ?concept skos:prefLabel ?prefLabel
+    ?concept skos:prefLabel ?prefLabel .
+    # since in STW English some thsys prefLabels have been added
+    # not before v8.06, we ask for German ones particularly
+    FILTER (lang(?prefLabel) = "de")
   }
   # ... without any prefLabel deleted for this concept
   FILTER NOT EXISTS {
