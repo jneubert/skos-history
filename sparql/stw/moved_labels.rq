@@ -1,0 +1,64 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# show all labels added in the current version
+#
+SELECT  (str(?label) AS ?movedLabel) ?oldLabelType (str(?oldPrefLabel) as ?oldConceptPrefLabel) ?oldConcept
+?newLabelType (str(?newPrefLabel) as ?newConceptPrefLabel) ?newConcept
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # use the current version as default
+    ?versionset dsv:currentVersionRecord ?currentVHR .
+    ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
+    ?currentVHR sh:hasDelta ?delta .
+    # get the delta to the previous version
+    ?currentVHR xhv:prev ?previousVHR .
+    ?delta sh:deltaTo ?currentVHR .
+    ?delta sh:deltaFrom ?previousVHR .
+    ?previousVHR sh:usingNamedGraph/sd:name ?previousVersionGraph .
+    # identify insertions and deletions parts/graphs
+    ?delta dcterms:hasPart ?insertions .
+    ?insertions a sh:SchemeDeltaInsertions .
+    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?delta dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions .
+    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # get deleted labels (in all languages) ...
+  GRAPH ?deletionsGraph {
+    ?oldConcept skos:prefLabel | skos:altLabel ?label .
+    ?oldConcept ?oldLabelType ?label .
+  }
+  # ... which have been moved to another concept (or perhaps have got another labelType)
+  GRAPH ?insertionsGraph {
+    ?newConcept skos:prefLabel | skos:altLabel ?label .
+    ?newConcept ?newLabelType ?label .
+  }
+  # restrict to a certain concept type and get additional information
+  GRAPH ?previousVersionGraph {
+    ?oldConcept skos:prefLabel | skos:altLabel ?label .
+    ?oldConcept a ?conceptType .
+    ?oldConcept skos:prefLabel ?oldPrefLabel .
+  }
+  GRAPH ?versionGraph {
+    ?newConcept skos:prefLabel | skos:altLabel ?label .
+    ?newConcept a ?conceptType .
+    ?newConcept skos:prefLabel ?newPrefLabel .
+    #    OPTIONAL {
+    #      ?oldConcept owl:deprecated ?deprecated
+    #    } .
+  }
+  FILTER (lang(?oldPrefLabel) = ?language)
+  FILTER (lang(?newPrefLabel) = ?language)
+}
+ORDER BY ?oldPrefLabel ?label
