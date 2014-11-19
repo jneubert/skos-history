@@ -69,7 +69,7 @@ my @column_definitions = (
   },
   {
     column          => 'deprecated_descriptors_replaced',
-    header          => 'Deprecated descriptors (replaced)',
+    header          => 'Redirected descriptors',
     query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
     replace         => { '?conceptType' => 'zbwext:Descriptor', },
     result_variable => 'replacedByConceptCount',
