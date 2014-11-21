@@ -8,7 +8,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # show all labels added in the current version
 #
-SELECT  (str(?label) AS ?addedLabel) ?concept
+SELECT  (str(?label) AS ?addedLabel) ?concept (str(?prefLabel) as ?conceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
@@ -45,8 +45,11 @@ WHERE {
     # get concepts and restrict to descriptors
     ?concept skos:prefLabel | skos:altLabel ?label .
     ?concept a ?conceptType .
+    ?concept skos:prefLabel ?prefLabel .
   }
   # restrict output to a certain language
   FILTER (lang(?label) = ?language)
+  FILTER (lang(?prefLabel) = ?language)
 }
 ORDER BY ?label
+

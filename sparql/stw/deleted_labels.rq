@@ -1,5 +1,6 @@
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sh: <http://purl.org/skos-history/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -8,7 +9,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # show all labels deleted in the current version
 #
-SELECT  (str(?label) AS ?deletedLabel)
+SELECT  (str(?label) AS ?deletedLabel) ?previousConcept (str(?prefLabel) AS ?previousConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?type ?language ) {
@@ -18,6 +19,7 @@ WHERE {
     # use the current version as default
     ?versionset dsv:currentVersionRecord ?currentVHR .
     ?currentVHR sh:hasDelta ?delta .
+    ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
     # get the delta to the previous version
     ?currentVHR xhv:prev ?previousVHR .
     ?previousVHR sh:usingNamedGraph/sd:name ?previousVersionGraph .
@@ -43,17 +45,19 @@ WHERE {
   }
   GRAPH ?previousVersionGraph {
     # get concepts and restrict to descriptors
-    ?concept skos:prefLabel | skos:altLabel ?label .
+    ?previousConcept skos:prefLabel | skos:altLabel ?label .
+    ?previousConcept skos:prefLabel ?prefLabel .
     # STW 8.04 used a different custom namespace URI
     BIND (uri(concat("http://zbw.eu/namespaces/skos-extensions/", ?type)) as ?oldConceptType)
     BIND (uri(concat("http://zbw.eu/namespaces/zbw-extensions/", ?type)) as ?conceptType)
     {
-      ?concept a ?oldConceptType 
+      ?previousConcept a ?oldConceptType 
     } UNION {
-      ?concept a ?conceptType
+      ?previousConcept a ?conceptType
     }
   }
   # restrict output to a certain language
   FILTER (lang(?label) = ?language)
+  FILTER (lang(?prefLabel) = ?language)
 }
 ORDER BY ?label
