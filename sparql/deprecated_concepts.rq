@@ -9,7 +9,8 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # identify concepts deprecated with a certain version
 #
-SELECT (str(?label) AS ?deprecatedLabel) (?concept AS ?deprecatedConcept) (str(?replacedByPrefL) AS ?replacedByPrefLabel) (?replacedBy as ?replacedByConcept)
+SELECT (?concept AS ?deprecatedConcept) (str(?label) AS ?deprecatedConceptLabel)
+(?replacedBy as ?replacedByConcept) (str(?replacedByPrefLabel) AS ?replacedByConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
@@ -48,8 +49,8 @@ WHERE {
     # perhaps the deprecated concept was merged into another one
     OPTIONAL {
       ?concept dcterms:isReplacedBy ?replacedBy .
-      ?replacedBy skos:prefLabel ?replacedByPrefL .
-      FILTER (lang(?label) = lang(?replacedByPrefL))
+      ?replacedBy skos:prefLabel ?replacedByPrefLabel .
+      FILTER (lang(?label) = lang(?replacedByPrefLabel))
     }
   }
   # restrict output to a certain language

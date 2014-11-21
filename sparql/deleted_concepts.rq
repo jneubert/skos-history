@@ -11,7 +11,7 @@ PREFIX  xhv:  <http://www.w3.org/1999/xhtml/vocab#>
 # as bad practice, because they still may be referenced elsewhere.
 # Cosider using owl:deprecated instead)
 #
-SELECT (?concept AS ?deletedConcept) (str(?prefLabel) AS ?deletedPrefLabel)
+SELECT (str(?concept) AS ?deletedConcept) (str(?prefLabel) AS ?deletedConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {

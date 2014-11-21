@@ -9,8 +9,8 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # show all labels added in the current version
 #
-SELECT  (str(?label) AS ?movedLabel) ?oldLabelType (str(?oldPrefLabel) as ?oldConceptPrefLabel) ?oldConcept
-?newLabelType (str(?newPrefLabel) as ?newConceptPrefLabel) ?newConcept
+SELECT  (str(?label) AS ?movedLabel) ?oldLabelType ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel)
+?newLabelType ?newConcept (str(?newPrefLabel) as ?newConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
