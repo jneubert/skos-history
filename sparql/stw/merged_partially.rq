@@ -1,0 +1,66 @@
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# show all labels added in the current version
+#
+SELECT  (str(?label) AS ?movedLabel) ?oldLabelType ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel)
+?newLabelType ?newConcept (str(?newPrefLabel) as ?newConceptLabel)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    ?versionset dsv:currentVersionRecord ?newVHR .
+    ?newVHR a dsv:VersionHistoryRecord ;
+      xhv:prev ?oldVHR ;
+      sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      sh:hasDelta ?delta .
+    ?oldVHR a dsv:VersionHistoryRecord ;
+      sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:hasDelta ?delta .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom ?oldVHR ;
+      sh:deltaTo ?newVHR ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # get deleted labels (in all languages) ...
+  GRAPH ?deletionsGraph {
+    ?oldConcept skos:prefLabel | skos:altLabel ?label .
+    ?oldConcept ?oldLabelType ?label .
+  }
+  # ... which have been moved to another concept (or perhaps have got another labelType)
+  GRAPH ?insertionsGraph {
+    ?newConcept skos:prefLabel | skos:altLabel ?label .
+    ?newConcept ?newLabelType ?label .
+  }
+  # restrict to a certain concept type and get additional information
+  GRAPH ?oldVersionGraph {
+    ?oldConcept skos:prefLabel | skos:altLabel ?label .
+    ?oldConcept a ?conceptType .
+    ?oldConcept skos:prefLabel ?oldPrefLabel .
+  }
+  GRAPH ?newVersionGraph {
+    ?newConcept skos:prefLabel | skos:altLabel ?label .
+    ?newConcept a ?conceptType .
+    ?newConcept skos:prefLabel ?newPrefLabel .
+    #    OPTIONAL {
+    #      ?oldConcept owl:deprecated ?deprecated
+    #    } .
+  }
+  FILTER (?oldConcept != $newConcept)
+  FILTER (lang(?oldPrefLabel) = ?language)
+  FILTER (lang(?newPrefLabel) = ?language)
+}
+ORDER BY ?oldPrefLabel ?label
