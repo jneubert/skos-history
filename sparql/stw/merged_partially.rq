@@ -7,10 +7,10 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
-# show all labels added in the current version
+# Partially merged deprecated concepts
 #
-SELECT  (str(?label) AS ?movedLabel) ?oldLabelType ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel)
-?newLabelType ?newConcept (str(?newPrefLabel) as ?newConceptLabel)
+SELECT (?oldConcept AS ?deprecatedConcept) (str(?label) AS ?movedLabel) (str(?oldPrefLabel) as ?deprecatedConceptLabel)
+?newConcept (str(?newPrefLabel) as ?newConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
@@ -37,8 +37,8 @@ WHERE {
   }
   # get deleted labels (in all languages) ...
   GRAPH ?deletionsGraph {
-    ?oldConcept skos:prefLabel | skos:altLabel ?label .
-    ?oldConcept ?oldLabelType ?label .
+    ?oldConcept skos:prefLabel | skos:altLabel ?label ;
+      ?oldLabelType ?label .
   }
   # ... which have been moved to another concept (or perhaps have got another labelType)
   GRAPH ?insertionsGraph {
@@ -47,19 +47,21 @@ WHERE {
   }
   # restrict to a certain concept type and get additional information
   GRAPH ?oldVersionGraph {
-    ?oldConcept skos:prefLabel | skos:altLabel ?label .
-    ?oldConcept a ?conceptType .
-    ?oldConcept skos:prefLabel ?oldPrefLabel .
+    ?oldConcept a ?conceptType ;
+      skos:prefLabel | skos:altLabel ?label ;
+      skos:prefLabel ?oldPrefLabel .
   }
   GRAPH ?newVersionGraph {
-    ?newConcept skos:prefLabel | skos:altLabel ?label .
-    ?newConcept a ?conceptType .
-    ?newConcept skos:prefLabel ?newPrefLabel .
-    #    OPTIONAL {
-    #      ?oldConcept owl:deprecated ?deprecated
-    #    } .
+    ?oldConcept owl:deprecated ?deprecated .
+    OPTIONAL {
+      ?oldConcept dcterms:isReplacedBy ?replacedByConcept
+    }
+    ?newConcept a ?conceptType ;
+      skos:prefLabel | skos:altLabel ?label ;
+      skos:prefLabel ?newPrefLabel .
   }
-  FILTER (?oldConcept != $newConcept)
+  # only look at concepts which are not completely merged
+  FILTER (?newConcept != ?replacedByConcept)
   FILTER (lang(?oldPrefLabel) = ?language)
   FILTER (lang(?newPrefLabel) = ?language)
 }
