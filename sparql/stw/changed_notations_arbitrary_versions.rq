@@ -1,0 +1,57 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Show thsys where notation changed (display prefLabel, because
+# these may have changed too)
+#
+SELECT (str(?oldPrefLabel) AS ?old) (str(?newPrefLabel) AS ?new) ?concept
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> "8.10" "8.12" "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    ?newVHR a dsv:VersionHistoryRecord ;
+      dc:identifier ?newVersion ;
+      sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      sh:hasDelta ?delta .
+    ?oldVHR a dsv:VersionHistoryRecord ;
+      dc:identifier ?oldVersion ;
+      sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:hasDelta ?delta .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom ?oldVHR ;
+      sh:deltaTo ?newVHR ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # get deleted concept/notations
+  GRAPH ?deletionsGraph {
+    ?concept skos:notation ?oldNotation .
+  }
+  # ... which have been re-inserted with another notation
+  GRAPH ?insertionsGraph {
+    ?concept skos:notation ?newNotation .
+  }
+  # get additional information
+  GRAPH ?oldVersionGraph {
+    ?concept skos:prefLabel ?oldPrefLabel .
+  }
+  GRAPH ?newVersionGraph {
+    ?concept skos:prefLabel ?newPrefLabel .
+  }
+  FILTER (lang(?oldPrefLabel) = ?language)
+  FILTER (lang(?newPrefLabel) = ?language)
+}
+ORDER BY ?oldPrefLabel
