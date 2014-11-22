@@ -16,20 +16,19 @@ WHERE {
     ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
   }
   GRAPH ?versionHistoryGraph {
-    ?delta a sh:SchemeDelta .
-    ?delta sh:deltaTo/dc:identifier ?version .
-    ?delta sh:deltaTo/sh:usingNamedGraph/sd:name ?versionGraph .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaTo/dc:identifier ?version ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # for each inserted label ...
   GRAPH ?insertionsGraph {
-    ?concept skos:prefLabel | skos:altLabel ?label
+    [] skos:prefLabel | skos:altLabel ?label
   }
   # ... which was not attached to some (other) concept before
   FILTER NOT EXISTS {
@@ -37,11 +36,12 @@ WHERE {
       [] skos:prefLabel | skos:altLabel ?label
     }
   }
+  FILTER (lang(?label) = ?language)
   # filter on concept type
-  GRAPH ?versionGraph {
+  GRAPH ?newVersionGraph {
+    ?concept skos:prefLabel | skos:altLabel ?label .
     ?concept a ?conceptType .
   }
-  FILTER (lang(?label) = ?language)
 }
 GROUP BY ?version
 ORDER BY ?version

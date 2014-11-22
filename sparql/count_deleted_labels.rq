@@ -15,15 +15,14 @@ WHERE {
     ( <http://zbw.eu/stw/version> "en" )
   }
   GRAPH ?versionHistoryGraph {
-    ?delta a sh:SchemeDelta .
-    ?delta sh:deltaTo/dc:identifier ?version .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaTo/dc:identifier ?version ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # for each deleted label ...
   GRAPH ?deletionsGraph {

@@ -1,3 +1,4 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -16,22 +17,20 @@ WHERE {
     ( <http://zbw.eu/stw/version> "Descriptor" "de" )
   }
   GRAPH ?versionHistoryGraph {
-    # use the current version as default
-    ?versionset dsv:currentVersionRecord ?currentVHR .
-    ?currentVHR sh:hasDelta ?delta .
-    ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
-    # get the delta to the previous version
-    ?currentVHR xhv:prev ?previousVHR .
-    ?previousVHR sh:usingNamedGraph/sd:name ?previousVersionGraph .
-    ?delta sh:deltaTo ?currentVHR .
-    ?delta sh:deltaFrom ?previousVHR .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    # the compared versions default to the current and the previous one
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?oldVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?newVersion .
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersion ;
+      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # get all deleted labels
   GRAPH ?deletionsGraph {
@@ -43,10 +42,11 @@ WHERE {
       [] skos:prefLabel | skos:altLabel ?label 
     }
   }
-  GRAPH ?previousVersionGraph {
+  FILTER (lang(?label) = ?language)
+  GRAPH ?oldVersionGraph {
     # get concepts and restrict to descriptors
-    ?previousConcept skos:prefLabel | skos:altLabel ?label .
-    ?previousConcept skos:prefLabel ?prefLabel .
+    ?previousConcept skos:prefLabel | skos:altLabel ?label ;
+      skos:prefLabel ?prefLabel .
     # STW 8.04 used a different custom namespace URI
     BIND (uri(concat("http://zbw.eu/namespaces/skos-extensions/", ?type)) as ?oldConceptType)
     BIND (uri(concat("http://zbw.eu/namespaces/zbw-extensions/", ?type)) as ?conceptType)
@@ -57,7 +57,6 @@ WHERE {
     }
   }
   # restrict output to a certain language
-  FILTER (lang(?label) = ?language)
   FILTER (lang(?prefLabel) = ?language)
 }
 ORDER BY ?label

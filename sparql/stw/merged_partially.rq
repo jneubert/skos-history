@@ -1,3 +1,4 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -17,17 +18,15 @@ WHERE {
     ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
   }
   GRAPH ?versionHistoryGraph {
-    ?versionset dsv:currentVersionRecord ?newVHR .
-    ?newVHR a dsv:VersionHistoryRecord ;
-      xhv:prev ?oldVHR ;
-      sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      sh:hasDelta ?delta .
-    ?oldVHR a dsv:VersionHistoryRecord ;
-      sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      sh:hasDelta ?delta .
+    # the compared versions default to the current and the previous one
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?oldVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?newVersion .
+    # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom ?oldVHR ;
-      sh:deltaTo ?newVHR ;
+      sh:deltaFrom/dc:identifier ?oldVersion ;
+      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
     ?insertions a sh:SchemeDeltaInsertions ;
@@ -51,6 +50,7 @@ WHERE {
       skos:prefLabel | skos:altLabel ?label ;
       skos:prefLabel ?oldPrefLabel .
   }
+  FILTER (lang(?oldPrefLabel) = ?language)
   GRAPH ?newVersionGraph {
     ?oldConcept owl:deprecated ?deprecated .
     OPTIONAL {
@@ -60,9 +60,8 @@ WHERE {
       skos:prefLabel | skos:altLabel ?label ;
       skos:prefLabel ?newPrefLabel .
   }
+  FILTER (lang(?newPrefLabel) = ?language)
   # only look at concepts which are not completely merged
   FILTER (?newConcept != ?replacedByConcept)
-  FILTER (lang(?oldPrefLabel) = ?language)
-  FILTER (lang(?newPrefLabel) = ?language)
 }
 ORDER BY ?oldPrefLabel ?label

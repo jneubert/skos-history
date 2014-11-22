@@ -13,23 +13,22 @@ SELECT ?version (str(count(distinct ?label)) as ?deletedLabelCount)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?type ?language ) {
-    ( <http://zbw.eu/stw/version> "Descriptor" "en" )
+    ( <http://zbw.eu/stw/version> "Descriptor" "de" )
   }
   GRAPH ?versionHistoryGraph {
-    ?delta a sh:SchemeDelta .
-    ?delta sh:deltaTo/dc:identifier ?version .
-    ?delta sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaTo/dc:identifier ?version ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # for each deleted label ...
   GRAPH ?deletionsGraph {
-    ?concept skos:prefLabel | skos:altLabel ?label
+    [] skos:prefLabel | skos:altLabel ?label
   }
   # ... without being inserted otherwise (for another concept or property)
   FILTER NOT EXISTS {
@@ -37,8 +36,10 @@ WHERE {
       [] skos:prefLabel | skos:altLabel ?label
     }
   }
+  FILTER (lang(?label) = ?language)
   # filter on concept type
   GRAPH ?oldVersionGraph {
+    ?concept skos:prefLabel | skos:altLabel ?label .
     # STW 8.04 used a different custom namespace URI
     BIND (uri(concat("http://zbw.eu/namespaces/skos-extensions/", ?type)) as ?oldConceptType)
     BIND (uri(concat("http://zbw.eu/namespaces/zbw-extensions/", ?type)) as ?conceptType)
@@ -48,7 +49,6 @@ WHERE {
       ?concept a ?conceptType
     }
   }
-  FILTER (lang(?label) = ?language)
 }
 GROUP BY ?version
 ORDER BY ?version
