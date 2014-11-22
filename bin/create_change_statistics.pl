@@ -87,6 +87,18 @@ my @column_definitions = (
     result_variable => 'replacedByConceptCount',
   },
   {
+    column          => 'added_labels',
+    header          => 'Added labels (total)',
+    query_file      => '../sparql/count_added_labels.rq',
+    result_variable => 'addedLabelCount',
+  },
+  {
+    column          => 'deleted_labels',
+    header          => 'Deleted labels (total)',
+    query_file      => '../sparql/count_deleted_labels.rq',
+    result_variable => 'deletedLabelCount',
+  },
+  {
     column          => 'added_labels_en',
     header          => 'Added labels (en)',
     query_file      => '../sparql/stw/count_added_labels.rq',
