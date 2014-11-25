@@ -12,8 +12,8 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 SELECT ?version (str(count(distinct ?concept)) as ?deletedConceptCount)
 WHERE {
   # parameters
-  VALUES ?versionHistoryGraph {
-    <http://zbw.eu/stw/version>
+  VALUES ( ?versionHistoryGraph ) {
+    ( <http://zbw.eu/stw/version> )
   }
   # get deletiions and insertions graph for every version
   GRAPH ?versionHistoryGraph {

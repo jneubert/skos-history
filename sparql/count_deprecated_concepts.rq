@@ -12,8 +12,8 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 SELECT ?version (str(count(?concept)) as ?deprecatedConceptCount)
 WHERE {
   # parameters
-  VALUES ?versionHistoryGraph {
-    <http://zbw.eu/stw/version>
+  VALUES ( ?versionHistoryGraph ) {
+    ( <http://zbw.eu/stw/version> )
   }
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta .

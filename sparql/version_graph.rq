@@ -14,8 +14,8 @@ CONSTRUCT {
 }
 WHERE {
   # parameters
-  VALUES ?versionHistoryGraph {
-    <http://zbw.eu/stw/version>
+  VALUES ( ?versionHistoryGraph ) {
+    ( <http://zbw.eu/stw/version> )
   }
   GRAPH ?versionHistoryGraph {
     ?s ?p ?o
