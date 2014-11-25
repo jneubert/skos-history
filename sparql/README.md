@@ -22,7 +22,7 @@ __Lists of concepts__
 | [added_concepts_with_top_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/added_concepts_with_top_concepts.rq) | Identify all concepts inserted in the current version with their top concepts |
 | [deprecated_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deprecated_concepts.rq)  | Identify all concepts deprecated with the current version  |
 | [deleted_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq)  | Identify all concepts deleted with the current version  |
-[changed_notations](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/changed_notations.rq) | Show thsys where notation changed (display prefLabels, because these may have changed too)
+[changed_notations](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/changed_notations.rq) | For a classification (in this case the subject categories of STW), show which notation has changed
 
 __History of selected concepts__
 

@@ -47,4 +47,4 @@ WHERE {
   }
   FILTER (lang(?newPrefLabel) = ?language)
 }
-ORDER BY ?oldPrefLabel
+ORDER BY ?oldNotation
