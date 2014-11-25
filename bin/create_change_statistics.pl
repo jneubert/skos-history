@@ -22,154 +22,204 @@ use RDF::Query::Client;
 use String::Util qw/unquote/;
 use URI::file;
 
-our $endpoint = 'http://zbw.eu/beta/sparql/stwv/query';
+my $dataset = $ARGV[0] || 'stw';
+my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 
 # List of version and data structure for results
 
-my @row_headers = qw/ 8.04 8.06 8.08 8.10 8.12 8.14 /;
-
 # List of queries and parameters for each statistics column
 
-my @table_definitions = (
-  {
-    title              => 'Concept changes',
-    column_definitions => [
+my %definition = (
+  'stw' => {
+    version_history_set => '<http://zbw.eu/stw/version>',
+    versions            => [qw/ 8.04 8.06 8.08 8.10 8.12 8.14 /],
+    tables              => [
       {
-        column          => 'total_thsys',
-        header          => 'Total thsys',
-        query_file      => '../sparql/stw/count_concepts.rq',
-        replace         => { '?type' => '"Thsys"', },
-        result_variable => 'conceptCount',
+        title              => 'Concept changes',
+        column_definitions => [
+          {
+            column          => 'version_date',
+            header          => 'Date',
+            query_file      => '../sparql/version_overview.rq',
+            result_variable => 'date',
+          },
+          {
+            column          => 'total_thsys',
+            header          => 'Total thsys',
+            query_file      => '../sparql/stw/count_concepts.rq',
+            replace         => { '?type' => '"Thsys"', },
+            result_variable => 'conceptCount',
+          },
+          {
+            column          => 'total_descriptors',
+            header          => 'Total descriptors',
+            query_file      => '../sparql/stw/count_concepts.rq',
+            replace         => { '?type' => '"Descriptor"', },
+            result_variable => 'conceptCount',
+          },
+          {
+            column          => 'added_thsys',
+            header          => 'Added thsys',
+            query_file      => '../sparql/stw/count_added_concepts.rq',
+            replace         => { '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'addedConceptCount',
+          },
+          {
+            column          => 'deprecated_concepts',
+            header          => 'Deprecated concepts',
+            query_file      => '../sparql/count_deprecated_concepts.rq',
+            result_variable => 'deprecatedConceptCount',
+          },
+          {
+            column          => 'deleted_concepts',
+            header          => 'Deleted concepts',
+            query_file      => '../sparql/count_deleted_concepts.rq',
+            result_variable => 'deletedConceptCount',
+          },
+          {
+            column          => 'added_descriptors',
+            header          => 'Added descriptors',
+            query_file      => '../sparql/stw/count_added_concepts.rq',
+            replace         => { '?conceptType' => 'zbwext:Descriptor', },
+            result_variable => 'addedConceptCount',
+          },
+          {
+            column          => 'deprecated_descriptors',
+            header          => 'Deprecated descriptors',
+            query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
+            replace         => { '?conceptType' => 'zbwext:Descriptor', },
+            result_variable => 'deprecatedConceptCount',
+          },
+          {
+            column          => 'deprecated_descriptors_replaced',
+            header          => 'Redirected descriptors',
+            query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
+            replace         => { '?conceptType' => 'zbwext:Descriptor', },
+            result_variable => 'replacedByConceptCount',
+          },
+        ],
       },
       {
-        column          => 'total_descriptors',
-        header          => 'Total descriptors',
-        query_file      => '../sparql/stw/count_concepts.rq',
-        replace         => { '?type' => '"Descriptor"', },
-        result_variable => 'conceptCount',
-      },
-      {
-        column          => 'added_thsys',
-        header          => 'Added thsys',
-        query_file      => '../sparql/stw/count_added_concepts.rq',
-        replace         => { '?conceptType' => 'zbwext:Thsys', },
-        result_variable => 'addedConceptCount',
-      },
-      {
-        column          => 'deprecated_concepts',
-        header          => 'Deprecated concepts',
-        query_file      => '../sparql/count_deprecated_concepts.rq',
-        result_variable => 'deprecatedConceptCount',
-      },
-      {
-        column          => 'deleted_concepts',
-        header          => 'Deleted concepts',
-        query_file      => '../sparql/count_deleted_concepts.rq',
-        result_variable => 'deletedConceptCount',
-      },
-      {
-        column          => 'added_descriptors',
-        header          => 'Added descriptors',
-        query_file      => '../sparql/stw/count_added_concepts.rq',
-        replace         => { '?conceptType' => 'zbwext:Descriptor', },
-        result_variable => 'addedConceptCount',
-      },
-      {
-        column          => 'deprecated_descriptors',
-        header          => 'Deprecated descriptors',
-        query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
-        replace         => { '?conceptType' => 'zbwext:Descriptor', },
-        result_variable => 'deprecatedConceptCount',
-      },
-      {
-        column          => 'deprecated_descriptors_replaced',
-        header          => 'Redirected descriptors',
-        query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
-        replace         => { '?conceptType' => 'zbwext:Descriptor', },
-        result_variable => 'replacedByConceptCount',
+        title              => 'Label changes',
+        column_definitions => [
+          {
+            column          => 'added_labels',
+            header          => 'Added labels (total en)',
+            query_file      => '../sparql/count_added_labels.rq',
+            result_variable => 'addedLabelCount',
+          },
+          {
+            column          => 'deleted_labels',
+            header          => 'Deleted labels (total en)',
+            query_file      => '../sparql/count_deleted_labels.rq',
+            result_variable => 'deletedLabelCount',
+          },
+          {
+            column     => 'added_des_labels_en',
+            header     => 'Added descriptor labels (en)',
+            query_file => '../sparql/stw/count_added_labels.rq',
+            replace =>
+              { '?language' => '"en"', '?conceptType' => 'zbwext:Descriptor', },
+            result_variable => 'addedLabelCount',
+          },
+          {
+            column     => 'deleted_des_labels_en',
+            header     => 'Deleted descriptor labels (en)',
+            query_file => '../sparql/stw/count_deleted_labels.rq',
+            replace    => { '?language' => '"en"', '?type' => '"Descriptor"', },
+            result_variable => 'deletedLabelCount',
+          },
+          {
+            column     => 'added_des_labels_de',
+            header     => 'Added descriptor labels (de)',
+            query_file => '../sparql/stw/count_added_labels.rq',
+            replace =>
+              { '?language' => '"de"', '?conceptType' => 'zbwext:Descriptor', },
+            result_variable => 'addedLabelCount',
+          },
+          {
+            column     => 'deleted_des_labels_de',
+            header     => 'Deleted descriptor labels (de)',
+            query_file => '../sparql/stw/count_deleted_labels.rq',
+            replace    => { '?language' => '"de"', '?type' => '"Descriptor"', },
+            result_variable => 'deletedLabelCount',
+          },
+          {
+            column     => 'added_sys_labels_en',
+            header     => 'Added thsys labels (en)',
+            query_file => '../sparql/stw/count_added_labels.rq',
+            replace =>
+              { '?language' => '"en"', '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'addedLabelCount',
+          },
+          {
+            column          => 'deleted_sys_labels_en',
+            header          => 'Deleted thsys labels (en)',
+            query_file      => '../sparql/stw/count_deleted_labels.rq',
+            replace         => { '?language' => '"en"', '?type' => '"Thsys"', },
+            result_variable => 'deletedLabelCount',
+          },
+          {
+            column     => 'added_sys_labels_de',
+            header     => 'Added thsys labels (de)',
+            query_file => '../sparql/stw/count_added_labels.rq',
+            replace =>
+              { '?language' => '"de"', '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'addedLabelCount',
+          },
+          {
+            column          => 'deleted_sys_labels_de',
+            header          => 'Deleted thsys labels (de)',
+            query_file      => '../sparql/stw/count_deleted_labels.rq',
+            replace         => { '?language' => '"de"', '?type' => '"Thsys"', },
+            result_variable => 'deletedLabelCount',
+          },
+        ],
       },
     ],
   },
-  {
-    title              => 'Label changes',
-    column_definitions => [
+  'thesoz' => {
+    version_history_set => '<http://lod.gesis.org/thesoz/version>',
+    versions            => [qw/ 0.7 0.86 0.91 0.92 0.93 /],
+    tables              => [
       {
-        column          => 'added_labels',
-        header          => 'Added labels (total en)',
-        query_file      => '../sparql/count_added_labels.rq',
-        result_variable => 'addedLabelCount',
-      },
-      {
-        column          => 'deleted_labels',
-        header          => 'Deleted labels (total en)',
-        query_file      => '../sparql/count_deleted_labels.rq',
-        result_variable => 'deletedLabelCount',
-      },
-      {
-        column     => 'added_des_labels_en',
-        header     => 'Added descriptor labels (en)',
-        query_file => '../sparql/stw/count_added_labels.rq',
-        replace =>
-          { '?language' => '"en"', '?conceptType' => 'zbwext:Descriptor', },
-        result_variable => 'addedLabelCount',
-      },
-      {
-        column     => 'deleted_des_labels_en',
-        header     => 'Deleted descriptor labels (en)',
-        query_file => '../sparql/stw/count_deleted_labels.rq',
-        replace    => { '?language' => '"en"', '?type' => '"Descriptor"', },
-        result_variable => 'deletedLabelCount',
-      },
-      {
-        column     => 'added_des_labels_de',
-        header     => 'Added descriptor labels (de)',
-        query_file => '../sparql/stw/count_added_labels.rq',
-        replace =>
-          { '?language' => '"de"', '?conceptType' => 'zbwext:Descriptor', },
-        result_variable => 'addedLabelCount',
-      },
-      {
-        column     => 'deleted_des_labels_de',
-        header     => 'Deleted descriptor labels (de)',
-        query_file => '../sparql/stw/count_deleted_labels.rq',
-        replace    => { '?language' => '"de"', '?type' => '"Descriptor"', },
-        result_variable => 'deletedLabelCount',
-      },
-      {
-        column     => 'added_sys_labels_en',
-        header     => 'Added thsys labels (en)',
-        query_file => '../sparql/stw/count_added_labels.rq',
-        replace => { '?language' => '"en"', '?conceptType' => 'zbwext:Thsys', },
-        result_variable => 'addedLabelCount',
-      },
-      {
-        column          => 'deleted_sys_labels_en',
-        header          => 'Deleted thsys labels (en)',
-        query_file      => '../sparql/stw/count_deleted_labels.rq',
-        replace         => { '?language' => '"en"', '?type' => '"Thsys"', },
-        result_variable => 'deletedLabelCount',
-      },
-      {
-        column     => 'added_sys_labels_de',
-        header     => 'Added thsys labels (de)',
-        query_file => '../sparql/stw/count_added_labels.rq',
-        replace => { '?language' => '"de"', '?conceptType' => 'zbwext:Thsys', },
-        result_variable => 'addedLabelCount',
-      },
-      {
-        column          => 'deleted_sys_labels_de',
-        header          => 'Deleted thsys labels (de)',
-        query_file      => '../sparql/stw/count_deleted_labels.rq',
-        replace         => { '?language' => '"de"', '?type' => '"Thsys"', },
-        result_variable => 'deletedLabelCount',
+        title              => 'Concept changes',
+        column_definitions => [
+          {
+            column          => 'version_date',
+            header          => 'Date',
+            query_file      => '../sparql/version_overview.rq',
+            result_variable => 'date',
+          },
+          {
+            column          => 'added_concepts',
+            header          => 'Added concepts',
+            query_file      => '../sparql/count_added_concepts.rq',
+            result_variable => 'addedConceptCount',
+          },
+          {
+            column          => 'added_descriptors',
+            header          => 'Added descriptors',
+            query_file      => '../sparql/stw/count_added_concepts.rq',
+            replace         => { '?conceptType' => '<http://lod.gesis.org/thesoz/ext/Descriptor>', },
+            result_variable => 'addedConceptCount',
+          },
+          {
+            column          => 'deleted_concepts',
+            header          => 'Deleted concepts',
+            query_file      => '../sparql/count_deleted_concepts.rq',
+            result_variable => 'deletedConceptCount',
+          },
+        ],
       },
     ],
   },
 );
 
-foreach my $table_ref (@table_definitions) {
+foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   my @column_definitions = @{ $$table_ref{column_definitions} };
-  my %data = map { $_ => { version => "v $_" } } @row_headers;
+  my %data =
+    map { $_ => { version => "v $_" } } @{ $definition{$dataset}{versions} };
 
   # Initialize csv table
 
@@ -191,7 +241,7 @@ foreach my $table_ref (@table_definitions) {
   $csv->add_line( \@column_headers );
 
   # add rows
-  foreach my $row (@row_headers) {
+  foreach my $row ( @{ $definition{$dataset}{versions} } ) {
     $csv->add_line( $data{$row} );
   }
 
@@ -211,20 +261,20 @@ sub get_column {
   # read query from file (by command line argument)
   my $query = read_file( $$columndef_ref{query_file} ) or die "Can't read $!\n";
 
-  # do replacements, if defined
-  if ( $$columndef_ref{replace} ) {
+  # add standard replacement for ?versionHistorySet
+  $$columndef_ref{replace}{'?versionHistoryGraph'} =
+    $definition{$dataset}{version_history_set};
 
-    # parse VALUES clause
-    my ( $variables_ref, $value_ref ) = parse_values($query);
+  # parse VALUES clause
+  my ( $variables_ref, $value_ref ) = parse_values($query);
 
-    # replace values
-    foreach my $variable ( keys %$value_ref ) {
-      if ( defined( $$columndef_ref{replace}{$variable} ) ) {
-        $$value_ref{$variable} = $$columndef_ref{replace}{$variable};
-      }
+  # replace values
+  foreach my $variable ( keys %$value_ref ) {
+    if ( defined( $$columndef_ref{replace}{$variable} ) ) {
+      $$value_ref{$variable} = $$columndef_ref{replace}{$variable};
     }
-    $query = insert_modified_values( $query, $variables_ref, $value_ref );
   }
+  $query = insert_modified_values( $query, $variables_ref, $value_ref );
 
   # execute query
   my $q        = RDF::Query::Client->new($query);
