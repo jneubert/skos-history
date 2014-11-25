@@ -36,10 +36,10 @@ WHERE {
   GRAPH ?insertionsGraph {
     ?concept skosxl:prefLabel | skos:prefLabel []
   }
-  # ... without any prefLabel deleted for this concept
+  # ... which did not exist in the old version
   FILTER NOT EXISTS {
-    GRAPH ?deletionsGraph {
-      ?concept skosxl:prefLabel | skos:prefLabel []
+    GRAPH ?oldVersionGraph {
+      ?concept ?p []
     }
   }
   # get the label

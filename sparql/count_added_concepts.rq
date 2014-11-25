@@ -19,6 +19,7 @@ WHERE {
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta ;
       sh:deltaTo/dc:identifier ?version ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
     ?insertions a sh:SchemeDeltaInsertions ;
@@ -30,10 +31,10 @@ WHERE {
   GRAPH ?insertionsGraph {
     ?concept skosxl:prefLabel|skos:prefLabel ?prefLabel
   }
-  # ... without any prefLabel deleted for this concept
+  # ... which did not exist in the old version
   FILTER NOT EXISTS {
-    GRAPH ?deletionsGraph {
-      ?concept skosxl:prefLabel|skos:prefLabel []
+    GRAPH ?oldVersionGraph {
+      ?concept ?p []
     }
   }
 }

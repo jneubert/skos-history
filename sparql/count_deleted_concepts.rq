@@ -19,6 +19,7 @@ WHERE {
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta ;
       sh:deltaTo/dc:identifier ?version ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
     ?insertions a sh:SchemeDeltaInsertions ;
@@ -32,7 +33,7 @@ WHERE {
   }
   # ... without anything remaining for this concept in the current version
   FILTER NOT EXISTS {
-    GRAPH ?insertionsGraph {
+    GRAPH ?newVersionGraph {
       ?concept ?p []
     }
   }
