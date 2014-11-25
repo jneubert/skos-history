@@ -32,7 +32,7 @@ elif [ $DATASET == "thesoz" ]; then
   FILENAME=rdf/thesoz.nt
 
   # publicly available TheSoz versions
-  VERSIONS=(0.7 0.91 0.92 0.93)
+  VERSIONS=(0.7 0.85 0.86 0.91 0.92 0.93)
   SCHEMEURI='http://lod.gesis.org/thesoz/'
 
 else
@@ -312,6 +312,6 @@ where {}
     done
 
     # cleanup
-##    /bin/rm $filebase*
+    /bin/rm $filebase*
   fi
 done
