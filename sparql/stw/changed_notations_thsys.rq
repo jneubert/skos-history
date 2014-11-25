@@ -8,27 +8,22 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
-# Show thsys where notation changed (display prefLabel, because
-# these may have changed too)
+# Show thsys where notation changed, and link to RDFa pages accordingly
 #
-SELECT (str(?oldPrefLabel) AS ?old) (str(?newPrefLabel) AS ?new) ?concept
+# (display prefLabel, because these may have changed too)
+#
+SELECT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?newLabel) ?new
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
     ( <http://zbw.eu/stw/version> "8.10" "8.12" "en" )
   }
   GRAPH ?versionHistoryGraph {
-    ?newVHR a dsv:VersionHistoryRecord ;
-      dc:identifier ?newVersion ;
-      sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      sh:hasDelta ?delta .
-    ?oldVHR a dsv:VersionHistoryRecord ;
-      dc:identifier ?oldVersion ;
-      sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      sh:hasDelta ?delta .
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom ?oldVHR ;
-      sh:deltaTo ?newVHR ;
+      sh:deltaFrom/dc:identifier ?oldVersion ;
+      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
     ?insertions a sh:SchemeDeltaInsertions ;
@@ -51,6 +46,10 @@ WHERE {
   GRAPH ?newVersionGraph {
     ?concept skos:prefLabel ?newPrefLabel .
   }
+  # create links to the RDFa pages of the different versions
+  BIND (uri(concat("http://zbw.eu/stw/versions/", ?oldVersion, "/", substr(str(?concept), 19), "/about")) AS ?old)
+  BIND (uri(concat("http://zbw.eu/stw/versions/", ?newVersion, "/", substr(str(?concept), 19), "/about")) AS ?new)
+  #
   FILTER (lang(?oldPrefLabel) = ?language)
   FILTER (lang(?newPrefLabel) = ?language)
 }

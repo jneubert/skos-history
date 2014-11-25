@@ -26,5 +26,5 @@ Query | Description
 [deleted_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/deleted_labels.rq) | Deleted descriptor labels (pref/altLabels)
 [moved_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/moved_labels.rq) | Moved pref/altLabels
 [merged_partially](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/merged_partially.rq) | Partially merged deprecated concepts
-[changed_notations_arbitrary_versions](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/changed_notations_arbitrary_versions.rq) | Show thsys where notation changed (display prefLabels, because these may have changed too) between arbitrary versions
+[changed_notations_thsys](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/changed_notations_thsys.rq) | Show thsys where notation changed, and link to RDFa pages accordingly (use prefLabel as labels - may have changed too)
 
