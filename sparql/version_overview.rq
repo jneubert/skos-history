@@ -3,7 +3,7 @@ PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 #
 # list all available scheme versions
 #
-SELECT  (?vhr AS ?versionHistoryRecord) ?identifier (str(?vhrDate) AS ?date) ?current
+SELECT  (?vhr AS ?versionHistoryRecord) (?identifier AS ?version) (str(?vhrDate) AS ?date) ?current
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {
