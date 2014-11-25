@@ -4,6 +4,7 @@ PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sh: <http://purl.org/skos-history/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX skosxl: <http://www.w3.org/2008/05/skos-xl#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # count concepts inserted per version
@@ -14,25 +15,25 @@ WHERE {
   VALUES ( ?versionHistoryGraph ) {
     ( <http://zbw.eu/stw/version> )
   }
+  # get deletiions and insertions graph for every version
   GRAPH ?versionHistoryGraph {
-    ?delta a sh:SchemeDelta .
-    ?delta sh:deltaTo/dc:identifier ?version .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaTo/dc:identifier ?version ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # for each inserted concept, a (newly inserted) prefLabel must exist ...
   GRAPH ?insertionsGraph {
-    ?concept skos:prefLabel ?prefLabel
+    ?concept skosxl:prefLabel|skos:prefLabel ?prefLabel
   }
   # ... without any prefLabel deleted for this concept
   FILTER NOT EXISTS {
     GRAPH ?deletionsGraph {
-      ?concept skos:prefLabel []
+      ?concept skosxl:prefLabel|skos:prefLabel []
     }
   }
 }
