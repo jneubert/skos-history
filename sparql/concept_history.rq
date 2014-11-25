@@ -55,4 +55,4 @@ WHERE {
   }
   # build a uri to group the changes for a particular version
   BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
-}:
+}
