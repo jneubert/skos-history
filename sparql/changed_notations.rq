@@ -11,24 +11,21 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # Show thsys where notation changed (display prefLabel, because
 # these may have changed too)
 #
-SELECT (str(?oldPrefLabel) AS ?old) (str(?newPrefLabel) AS ?new) ?concept
+SELECT (str(?oldNotation) AS ?old) (str(?newNotation) AS ?new) ?concept (str(?newPrefLabel) AS ?conceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
     ( <http://zbw.eu/stw/version> "en" )
   }
   GRAPH ?versionHistoryGraph {
-    ?versionset dsv:currentVersionRecord ?newVHR .
-    ?newVHR a dsv:VersionHistoryRecord ;
-      xhv:prev ?oldVHR ;
-      sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      sh:hasDelta ?delta .
-    ?oldVHR a dsv:VersionHistoryRecord ;
-      sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      sh:hasDelta ?delta .
+    # the compared versions default to the current and the previous one
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?oldVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?newVersion .
+    # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom ?oldVHR ;
-      sh:deltaTo ?newVHR ;
+      sh:deltaFrom/dc:identifier ?oldVersion ;
+      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
     ?insertions a sh:SchemeDeltaInsertions ;
@@ -45,13 +42,9 @@ WHERE {
     ?concept skos:notation ?newNotation .
   }
   # get additional information
-  GRAPH ?oldVersionGraph {
-    ?concept skos:prefLabel ?oldPrefLabel .
-  }
   GRAPH ?newVersionGraph {
     ?concept skos:prefLabel ?newPrefLabel .
   }
-  FILTER (lang(?oldPrefLabel) = ?language)
   FILTER (lang(?newPrefLabel) = ?language)
 }
 ORDER BY ?oldPrefLabel
