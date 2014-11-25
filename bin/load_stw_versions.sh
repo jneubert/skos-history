@@ -11,31 +11,48 @@
 
 # START CONFIGURATION
 
-DATASET=stwv
+DATASET=thesoz
 
-# is used to store the SKOS files locally
-#BASEDIR=/opt/thes/var/stw
-BASEDIR=/tmp/stw_versions
-FILENAME=rdf/stw.nt
+if [ $DATASET == "stw" ]; then
 
-# publicly available STW versions
-VERSIONS=(8.04 8.06 8.08 8.10 8.12 8.14)
-##VERSIONS=(8.08 8.10 8.12)
-SCHEMEURI='http://zbw.eu/stw'
+  # is used to store the SKOS files locally
+  #BASEDIR=/opt/thes/var/stw
+  BASEDIR=/tmp/stw_versions
+  FILENAME=rdf/stw.nt
+
+  # publicly available STW versions
+  VERSIONS=(8.04 8.06 8.08 8.10 8.12 8.14)
+  ##VERSIONS=(8.08 8.10 8.12)
+  SCHEMEURI='http://zbw.eu/stw'
+
+elif [ $DATASET == "thesoz" ]; then
+
+  # thesoz versions must be present locally
+  BASEDIR=/opt/thes/var/thesoz
+  FILENAME=rdf/thesoz.nt
+
+  # publicly available TheSoz versions
+  VERSIONS=(0.7 0.91 0.92 0.93)
+  SCHEMEURI='http://lod.gesis.org/thesoz/'
+
+else
+  echo dataset $DATASET not defined
+  exit
+fi
 
 # implementation-specific uris
 #IMPL='sesame'
 IMPL='fuseki'
 if [ $IMPL == "sesame" ]; then
-  ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/$DATASET
+  ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/${DATASET}v
   PUT_URI=$ENDPOINT/rdf-graphs/service
   UPDATE_URI=$ENDPOINT/statements
   QUERY_URI=$ENDPOINT
 elif [ $IMPL == "fuseki" ]; then
-  ENDPOINT=http://localhost:3030/$DATASET
+  ENDPOINT=http://localhost:3030/${DATASET}v
   PUT_URI=$ENDPOINT/data
   UPDATE_URI=$ENDPOINT/update
-  QUERY_URI=http://zbw.eu/beta/sparql/stwv/query
+  QUERY_URI=http://zbw.eu/beta/sparql/${DATASET}v/query
 else
   echo implementation $IMPL not defined
   exit
@@ -87,10 +104,10 @@ insert {
     sd:endpoint <$QUERY_URI>;
     sd:defaultDataset <$SERVICE_DDURI> .
 <$SERVICE_DDURI> a sd:Dataset;
-    dcterms:title \"STW Versions SPARQL Service\";
+    dcterms:title \"$DATASET Versions SPARQL Service\";
     sd:defaultGraph [
         a sd:Graph;
-        dcterms:title \"STW Versions SPARQL Service Description\";
+        dcterms:title \"$DATASET Versions SPARQL Service Description\";
     ] .
 }
 where {}
@@ -170,7 +187,7 @@ where {}
   sparql_update "$statement"
 
   # add triples to the version history graph
-  # (fix invalid string date format for older stw versions)
+  # (fix invalid string date format for thesoz and for older stw versions)
   statement="
 $PREFIXES
 with <$BASEURI>
@@ -178,8 +195,8 @@ insert {
   <${BASEURI}record/$old>
       a dsv:VersionHistoryRecord ;
       dsv:hasVersionHistorySet <${BASEURI}> ;
-      dsv:isVersionRecordOf <$BASEURI/$old/download/stw.rdf.zip> ;
-      dsv:isVersionRecordOf <$BASEURI/$old/download/stw.ttl.zip> ;
+      dsv:isVersionRecordOf <$BASEURI/$old/download/$DATASET.rdf.zip> ;
+      dsv:isVersionRecordOf <$BASEURI/$old/download/$DATASET.ttl.zip> ;
       dsv:isVersionRecordOf <$BASEURI/$old/ng> ;
       :usingNamedGraph <$BASEURI/$old/ng> ;
       dc:date ?fixeddate;
@@ -189,9 +206,15 @@ insert {
 }
 where {
   GRAPH <$BASEURI/$old> {
-    <$SCHEMEURI> dcterms:issued ?date ;
-        owl:versionInfo ?identifier .
-    BIND(coalesce(strdt(?date, xsd:date), ?date) as ?fixeddate)
+    # stw and recent thesoz version property
+    OPTIONAL { <$SCHEMEURI> owl:versionInfo ?identifier } .
+    # old thesoz version prpoperty
+    OPTIONAL { <$SCHEMEURI> dcterms:hasVersion ?identifier } .
+    # stw uses dcterms:issued
+    OPTIONAL { <$SCHEMEURI> dcterms:issued ?date }
+    # thesoz uses dcterms:modified (plus dcterms:issued for created date)
+    OPTIONAL { <$SCHEMEURI> dcterms:modified ?modified }
+    BIND(coalesce(strdt(?modified, xsd:date), strdt(?date, xsd:date), ?date) as ?fixeddate)
   }
 }
 "
@@ -289,6 +312,6 @@ where {}
     done
 
     # cleanup
-    /bin/rm $filebase*
+##    /bin/rm $filebase*
   fi
 done
