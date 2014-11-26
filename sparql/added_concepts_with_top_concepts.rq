@@ -13,7 +13,7 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 # as a subsection of the thesaurus; a concept may have
 # multiple top concepts.
 #
-# For TheSoz, as of v0.93, no top concepts are defined.
+# For TheSoz, as of v0.93, skos:hasTopConcept is not used.
 #
 SELECT distinct ?topConcept (str(?topLabel) AS ?topConceptLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
@@ -40,7 +40,7 @@ WHERE {
   }
   # for each inserted concept, a (newly inserted) prefLabel must exist ...
   GRAPH ?insertionsGraph {
-    ?concept skos:prefLabel []
+    ?concept skosxl:prefLabel | skos:prefLabel []
   }
   # ... which did not exist in the old version
   FILTER NOT EXISTS {
@@ -52,7 +52,9 @@ WHERE {
     ?concept skosxl:prefLabel/skosxl:literalForm | skos:prefLabel ?prefLabel .
     # get the top concept(s)
     ?concept skos:broader+ ?topConcept .
-    ?scheme skos:hasTopConcept ?topConcept .
+    FILTER NOT EXISTS {
+      ?topConcept skos:broader [] .
+    }
     ?topConcept skosxl:prefLabel/skosxl:literalForm | skos:prefLabel ?topLabel .
   }
   # restrict output to a certain language
