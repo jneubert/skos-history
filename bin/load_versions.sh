@@ -8,10 +8,18 @@
 
 # Redland's rapper and rdf.sh`s rdf command should be in $PATH
 
-
 # START CONFIGURATION
 
-DATASET=thesoz
+DATASET=$1
+VALID_DATASETS=(stw thesoz)
+
+if [ -z "$DATASET" ]; then
+  echo "No dataset supplied (valid: ${VALID_DATASETS[*]})"
+  exit
+elif [[ ! ${VALID_DATASETS[*]} =~ $DATASET ]]; then
+  echo "Wrong dataset $DATASET spezified (valid: ${VALID_DATASETS[*]})"
+  exit
+fi
 
 if [ $DATASET == "stw" ]; then
 
@@ -21,7 +29,7 @@ if [ $DATASET == "stw" ]; then
   FILENAME=rdf/stw.nt
 
   # publicly available STW versions
-  VERSIONS=(8.04 8.06 8.08 8.10 8.12 8.14)
+  VERSIONS=(8.04 8.06 8.08 8.10 8.12)
   ##VERSIONS=(8.08 8.10 8.12)
   SCHEMEURI='http://zbw.eu/stw'
 
@@ -35,9 +43,6 @@ elif [ $DATASET == "thesoz" ]; then
   VERSIONS=(0.7 0.86 0.91 0.92 0.93)
   SCHEMEURI='http://lod.gesis.org/thesoz/'
 
-else
-  echo dataset $DATASET not defined
-  exit
 fi
 
 # implementation-specific uris
@@ -250,6 +255,7 @@ do
     diff=$filebase.diff
 
     # create the diff
+    # (rdf diff converts to sorted n-triples and by default uses /usr/bin/diff)
     rdf diff $BASEDIR/$old/$FILENAME $BASEDIR/$new/$FILENAME > $diff
 
     # split into delete and insert files (filtering out blank nodes)
