@@ -24,27 +24,19 @@ WHERE {
       sh:deltaFrom/dc:identifier ?oldVersion ;
       sh:deltaTo/dc:identifier ?newVersion ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      dcterms:hasPart ?insertions ;
-      dcterms:hasPart ?deletions .
+      dcterms:hasPart ?insertions .
     ?insertions a sh:SchemeDeltaInsertions ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?deletions a sh:SchemeDeltaDeletions ;
-      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
-  # for each inserted concept, a (newly inserted) prefLabel must exist ...
+  # for each inserted concept, a newly inserted prefLabel must exist ...
   GRAPH ?insertionsGraph {
-    ?concept skosxl:prefLabel | skos:prefLabel []
+    ?concept skosxl:prefLabel/skosxl:literalForm | skos:prefLabel ?prefLabel
   }
-  # ... which did not exist in the old version
+  # ... and the concept must not exist in the old version
   FILTER NOT EXISTS {
     GRAPH ?oldVersionGraph {
       ?concept ?p []
     }
-  }
-  # get the label
-  GRAPH ?newVersionGraph {
-    ?concept skosxl:prefLabel/skosxl:literalForm | skos:prefLabel ?prefLabel
   }
   # restrict output to a certain language
   FILTER ( lang(?prefLabel) = ?language )
