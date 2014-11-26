@@ -65,18 +65,6 @@ my %definition = (
             result_variable => 'addedConceptCount',
           },
           {
-            column          => 'deprecated_concepts',
-            header          => 'Deprecated concepts',
-            query_file      => '../sparql/count_deprecated_concepts.rq',
-            result_variable => 'deprecatedConceptCount',
-          },
-          {
-            column          => 'deleted_concepts',
-            header          => 'Deleted concepts',
-            query_file      => '../sparql/count_deleted_concepts.rq',
-            result_variable => 'deletedConceptCount',
-          },
-          {
             column          => 'added_descriptors',
             header          => 'Added descriptors',
             query_file      => '../sparql/stw/count_added_concepts.rq',
