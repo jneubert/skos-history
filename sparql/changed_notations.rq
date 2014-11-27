@@ -11,7 +11,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # Show thsys where notation changed (display prefLabel, because
 # these may have changed too)
 #
-SELECT (str(?oldNotation) AS ?old) (str(?newNotation) AS ?new) ?concept (str(?newPrefLabel) AS ?conceptLabel)
+SELECT (str(?oldNotation) AS ?old) (str(?newNotation) AS ?new) ?concept
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
@@ -41,10 +41,5 @@ WHERE {
   GRAPH ?insertionsGraph {
     ?concept skos:notation ?newNotation .
   }
-  # get additional information
-  GRAPH ?newVersionGraph {
-    ?concept skos:prefLabel ?newPrefLabel .
-  }
-  FILTER (lang(?newPrefLabel) = ?language)
 }
 ORDER BY ?oldNotation
