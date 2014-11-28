@@ -1,13 +1,13 @@
 SPARQL query examples
 =====================
 
-The queries in this directory can be executed via an [interactive SPARQL GUI](http://zbw.eu/labs/en/blog/publishing-sparql-queries-live) against an [example endpoint](http://zbw.eu/beta/sparql/stwv/query) with diffent versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
+The queries in this directory can be executed via an [interactive SPARQL GUI](http://zbw.eu/labs/en/blog/publishing-sparql-queries-live) against an [example endpoint](http://zbw.eu/beta/sparql/stwv/query) with different versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
 
 __Overview__
 
 | Query | Description |
 |-------|-------------|
-| [version_overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | All available scheme versions |
+| [version_overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | The available scheme versions with their publication dates|
 
 __Lists of concepts__
 
@@ -22,6 +22,8 @@ __Lists of concepts__
 
 __Aggregated information about versions__
 
+| Query | Description |
+|-------|-------------|
 | [count_added_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_concepts.rq) | Count concepts inserted per version |
 | [count_deleted_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_concepts.rq) | Count concepts deleted per version |
 | [count_deprecated_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deprecated_concepts.rq) | Count concepts deprecated per version |
