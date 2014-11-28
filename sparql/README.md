@@ -1,18 +1,13 @@
 SPARQL query examples
 =====================
 
-The queries in this directory can be executed via an <strong>interactive SPARQL GUI</strong> (powered by <a href="http://yasqe.yasgui.org">YASQUE</a> and <a href="http://yasr.yasgui.org/">YASR</a>) against an <a href="http://zbw.eu/beta/sparql/stwv/query">example endpoint</a> with diffent versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
+The queries in this directory can be executed via an [interactive SPARQL GUI](http://zbw.eu/labs/en/blog/publishing-sparql-queries-live) against an [example endpoint](http://zbw.eu/beta/sparql/stwv/query) with diffent versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
 
-__Aggregated information about versions__
+__Overview__
 
 | Query | Description |
 |-------|-------------|
 | [version_overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | All available scheme versions |
-| [count_added_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_concepts.rq) | Count concepts inserted per version |
-| [count_deleted_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_concepts.rq) | Count concepts deleted per version |
-| [count_deprecated_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deprecated_concepts.rq) | Count concepts deprecated per version |
-| [count_added_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_labels.rq) | Count added alt/prefLabels in a certain language per version (may include formal changes, e.g. re capitalization) |
-| [count_deleted_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_labels.rq) | Count deleted alt/prefLabels in a certain language per version (may include formal changes, e.g. re capitalization) |
 
 __Lists of concepts__
 
@@ -24,6 +19,14 @@ __Lists of concepts__
 [deprecated_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deprecated_concepts.rq)  | Identify all concepts deprecated with the current version
 [deleted_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq)  | Identify all concepts deleted with the current version
 [changed_notations](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/changed_notations.rq) | For a classification (in this case the subject categories of STW), show which notation has changed
+
+__Aggregated information about versions__
+
+| [count_added_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_concepts.rq) | Count concepts inserted per version |
+| [count_deleted_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_concepts.rq) | Count concepts deleted per version |
+| [count_deprecated_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deprecated_concepts.rq) | Count concepts deprecated per version |
+| [count_added_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_added_labels.rq) | Count added alt/prefLabels in a certain language per version (may include formal changes, e.g. re capitalization) |
+| [count_deleted_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/count_deleted_labels.rq) | Count deleted alt/prefLabels in a certain language per version (may include formal changes, e.g. re capitalization) |
 
 __History of selected concepts__
 
