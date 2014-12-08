@@ -7,13 +7,14 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Identify concepts inserted with a certain version,
-# ordered by the second level subject category.
+# ordered by the subject categories (down to the third level).
+#
 # Subject categories have a different concept type (subclass of
 # skos:Concept) and form mono-hierarchies within STW. The top
 # level subject categories are the sub-thesauri. A descriptor
 # often belongs to more than one subject category.
 #
-SELECT  ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)  (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
+SELECT  ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)  ?thirdLevelCategory (str(?thirdLevelLabel) AS ?thirdLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
@@ -54,14 +55,26 @@ WHERE {
     ?category a zbwext:Thsys .
     ?category skos:broader* ?topCategory .
     ?scheme skos:hasTopConcept ?topCategory .
+    ?topCategory skos:prefLabel ?topLabel .
     #
-    # get the second level category
+    # get the second level category and it's label
     ?topCategory skos:narrower ?secondLevelCategory .
     ?category skos:broader+ ?secondLevelCategory .
+    ?secondLevelCategory skos:prefLabel ?secondLevelLabel .
     #
-    # get the label of the second level category
-    ?secondLevelCategory skos:prefLabel ?secondLevelLabel
+    # get the third level category and it's label
+    OPTIONAL {
+      ?secondLevelCategory skos:narrower ?thirdLevelCategory .
+      ?category skos:broader+ ?thirdLevelCategory .
+      ?thirdLevelCategory skos:prefLabel ?thirdLevelLabel .
+    }
+    # get the fourth level category and it's label
+    #    OPTIONAL {
+    #      ?thirdLevelCategory skos:narrower ?fourthLevelCategory .
+    #      ?category skos:broader+ ?fourthLevelCategory .
+    #      ?fourthLevelCategory skos:prefLabel ?fourthLevelLabel .
+    #    }
   }
-  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language)
+  FILTER (lang(?prefLabel) = ?language && lang(?thirdLevelLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
 }
-ORDER BY ?secondLevelLabel ?prefLabel
+ORDER BY ?thirdLevelLabel ?prefLabel
