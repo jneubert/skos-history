@@ -14,7 +14,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # level subject categories are the sub-thesauri. A descriptor
 # often belongs to more than one subject category.
 #
-SELECT  ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)  ?thirdLevelCategory (str(?thirdLevelLabel) AS ?thirdLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
+SELECT  ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)  ?thirdLevelCategory (coalesce(str(?thirdLevelLabel), "") AS ?thirdLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
@@ -68,13 +68,8 @@ WHERE {
       ?category skos:broader+ ?thirdLevelCategory .
       ?thirdLevelCategory skos:prefLabel ?thirdLevelLabel .
     }
-    # get the fourth level category and it's label
-    #    OPTIONAL {
-    #      ?thirdLevelCategory skos:narrower ?fourthLevelCategory .
-    #      ?category skos:broader+ ?fourthLevelCategory .
-    #      ?fourthLevelCategory skos:prefLabel ?fourthLevelLabel .
-    #    }
   }
-  FILTER (lang(?prefLabel) = ?language && lang(?thirdLevelLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
+  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
+  FILTER (!bound(?thirdLevelLabel) || lang(?thirdLevelLabel) = ?language)
 }
-ORDER BY ?thirdLevelLabel ?prefLabel
+ORDER BY ?secondLevelCategoryLabel ?thirdLevelCategoryLabel ?prefLabel
