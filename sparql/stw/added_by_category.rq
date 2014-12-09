@@ -1,3 +1,4 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
@@ -17,25 +18,25 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT  ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)  ?thirdLevelCategory (coalesce(str(?thirdLevelLabel), "") AS ?thirdLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?language ) {
-    ( <http://zbw.eu/stw/version> "en" )
+  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
-    # use current version as default
-    ?versionset dsv:currentVersionRecord ?currentVHR .
-    ?currentVHR sh:hasDelta ?delta .
-    ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
-    # get the delta to the previous version
-    ?currentVHR xhv:prev ?previousVHR .
-    ?delta sh:deltaTo ?currentVHR .
-    ?delta sh:deltaFrom ?previousVHR .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelect)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelect)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelect ;
+      sh:deltaTo/dc:identifier ?newVersionSelect ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
   # for each inserted concept, a (newly inserted) prefLabel must exist ...
   GRAPH ?insertionsGraph {
@@ -43,11 +44,11 @@ WHERE {
   }
   # ... without any prefLabel deleted for this concept
   FILTER NOT EXISTS {
-    GRAPH ?deletionsGraph {
-      ?concept skos:prefLabel []
+    GRAPH ?oldVersionGraph {
+      ?concept ?p []
     }
   }
-  GRAPH ?versionGraph {
+  GRAPH ?newVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
     ?concept skos:prefLabel ?prefLabel .
