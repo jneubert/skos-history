@@ -154,7 +154,7 @@ insert {
 }
 where {}
 "
-echo $statement
+echo "$statement"
 sparql_update "$statement"
 
 # complement service description
@@ -186,7 +186,7 @@ with <$BASEURI/$old>
 insert {
   <$BASEURI/$old> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <$SCHEMEURI> .
   <$SCHEMEURI> dsv:hasVersionRecord <${BASEURI}record/$latest> ;
-      :hasVersionHistory <$BASEURI> .
+      :hasVersionHistorySet <$BASEURI> .
 }
 where {}
 "
