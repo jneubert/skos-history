@@ -8,9 +8,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
-# Show thsys where notation changed, and link to RDFa pages accordingly
-#
-# (display prefLabel, because these may have changed too)
+# Show concepts where the preferred label changed, and link to RDFa pages accordingly
 #
 SELECT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?newLabel) ?new
 WHERE {
