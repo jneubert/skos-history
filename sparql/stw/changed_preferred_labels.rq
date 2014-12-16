@@ -1,0 +1,59 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Show thsys where notation changed, and link to RDFa pages accordingly
+#
+# (display prefLabel, because these may have changed too)
+#
+SELECT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?newLabel) ?new
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelect)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelect)
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelect ;
+      sh:deltaTo/dc:identifier ?newVersionSelect ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # get deleted concept/notations
+  GRAPH ?deletionsGraph {
+    ?concept skos:prefLabel ?oldPrefLabel .
+  }
+  # ... which have been re-inserted with another notation
+  GRAPH ?insertionsGraph {
+    ?concept skos:prefLabel ?newPrefLabel .
+  }
+  # restrict to conceptType
+  GRAPH ?newVersionGraph {
+    ?concept a ?conceptType .
+  }
+  # create links to the RDFa pages of the different versions
+  BIND (uri(concat("http://zbw.eu/stw/versions/", ?oldVersionSelect, "/", substr(str(?concept), 19), "/about")) AS ?old)
+  BIND (uri(concat("http://zbw.eu/stw/versions/", ?newVersionSelect, "/", substr(str(?concept), 19), "/about")) AS ?new)
+  #
+  FILTER (lang(?oldPrefLabel) = ?language)
+  FILTER (lang(?newPrefLabel) = ?language)
+}
+ORDER BY ?oldPrefLabel
