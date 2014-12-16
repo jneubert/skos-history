@@ -18,8 +18,8 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> undef undef "en" )
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # get the current and the previous version as default versions
@@ -51,7 +51,7 @@ WHERE {
   GRAPH ?newVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
-    ?concept a zbwext:Descriptor .
+    ?concept a ?conceptType .
     ?concept skos:prefLabel ?prefLabel .
     ?concept skos:broader ?category .
     ?category a zbwext:Thsys .

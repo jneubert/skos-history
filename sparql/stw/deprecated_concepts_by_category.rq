@@ -23,8 +23,8 @@ SELECT DISTINCT ?topCategory (str(?topLabel) AS ?topCategoryLabel)
 (?replacedBy as ?replacedByConcept) (str(?replacedByPrefLabel) AS ?replacedByConceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> undef undef "en" )
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # get the current and the previous version as default versions
@@ -49,7 +49,7 @@ WHERE {
   }
   # get the replaced information
   GRAPH ?newVersionGraph {
-    ?concept a zbwext:Descriptor .
+    ?concept a ?conceptType .
     ?concept rdfs:label ?label .
     ?concept dcterms:isReplacedBy ?replacedBy .
     ?replacedBy skos:prefLabel ?replacedByPrefLabel .
