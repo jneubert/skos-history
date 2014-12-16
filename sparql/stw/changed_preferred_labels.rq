@@ -35,15 +35,15 @@ WHERE {
     ?deletions a sh:SchemeDeltaDeletions ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
-  # get deleted concept/notations
+  # get deleted concept/prefLabel
   GRAPH ?deletionsGraph {
     ?concept skos:prefLabel ?oldPrefLabel .
   }
-  # ... which have been re-inserted with another notation
+  # ... which have been re-inserted with another prefLabel
   GRAPH ?insertionsGraph {
     ?concept skos:prefLabel ?newPrefLabel .
   }
-  # restrict to conceptType
+  # restrict by conceptType
   GRAPH ?newVersionGraph {
     ?concept a ?conceptType .
   }
