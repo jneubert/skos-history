@@ -19,7 +19,7 @@ SELECT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:descriptor undef undef "en" )
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # get the current and the previous version as default versions
