@@ -51,9 +51,11 @@ WHERE {
   GRAPH ?newVersionGraph {
     ?concept a ?conceptType .
     ?concept rdfs:label ?label .
-    ?concept dcterms:isReplacedBy ?replacedBy .
-    ?replacedBy skos:prefLabel ?replacedByPrefLabel .
-    FILTER (lang(?label) = lang(?replacedByPrefLabel))
+    OPTIONAL {
+      ?concept dcterms:isReplacedBy ?replacedBy .
+      ?replacedBy skos:prefLabel ?replacedByPrefLabel .
+      FILTER (lang(?label) = lang(?replacedByPrefLabel))
+    }
   }
   # get categories
   GRAPH ?oldVersionGraph {
