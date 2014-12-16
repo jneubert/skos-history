@@ -8,7 +8,8 @@ __Lists of individual changes__
 
 Query | Description
 ------|------------
-[added_descriptors_by_category](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/added_descriptors_by_category.rq) | Added STW concepts by second-level category
+[added_concepts_by_category](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/added_concepts_by_category.rq) | Added STW concepts (by default: descriptors) by second-level category
+[deprecated_concepts_by_category](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/deprecated_concepts_by_category.rq) | Deprecated STW concepts (by default: descriptors) by second-level category
 [added_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/added_labels.rq) | Added descriptor labels (pref/altLabels)
 [deleted_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/deleted_labels.rq) | Deleted descriptor labels (pref/altLabels)
 [moved_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/moved_labels.rq) | Moved pref/altLabels
