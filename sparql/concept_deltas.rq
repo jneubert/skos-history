@@ -32,17 +32,16 @@ WHERE {
     # use subquery to filter out duplicates
     SELECT DISTINCT ?delta ?concept ?conceptDelta ?predicate ?deletion ?insertion
     WHERE {
-      ?vhr a dsv:VersionHistoryRecord .
-      #
-      ?vhr sh:hasDelta ?delta .
-      ?delta dcterms:hasPart ?part .
+      ?vhr a dsv:VersionHistoryRecord ;
+        sh:hasDelta ?delta .
       # identify insertions and deletions parts/graphs
       ?delta dcterms:hasPart ?insertions .
-      ?insertions a sh:SchemeDeltaInsertions .
-      ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
+      ?insertions a sh:SchemeDeltaInsertions ;
+        sh:usingNamedGraph/sd:name ?insertionsGraph .
       ?delta dcterms:hasPart ?deletions .
-      ?deletions a sh:SchemeDeltaDeletions .
-      ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+      ?deletions a sh:SchemeDeltaDeletions ;
+        sh:usingNamedGraph/sd:name ?deletionsGraph .
+      #
       # for each version, work on insertions and deletions part
       {
         GRAPH ?deletionsGraph {
