@@ -154,7 +154,6 @@ insert {
 }
 where {}
 "
-echo "$statement"
 sparql_update "$statement"
 
 # complement service description
@@ -169,7 +168,7 @@ where {}
 "
 sparql_update "$statement"
 
-# iterate over the versions, create and load the deltas
+# iterate over the versions, load them and add metadata to the version graph
 for index in ${!VERSIONS[*]}
 do
   old=${VERSIONS[$index]}
@@ -240,6 +239,7 @@ where {}
 
 done
 
+# iterate over the versions, create and load adjecent deltas + metadata
 # do a second pass, to avoid triples being overridden by version loading
 for index in ${!VERSIONS[*]}
 do
