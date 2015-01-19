@@ -342,15 +342,22 @@ do
   load_version $version
 done
 
-# iterate over the versions, create and load adjecent deltas + metadata
-# do a second pass, to avoid triples being overridden by version loading
+# iterate over the versions, create and load deltas + metadata
+# (in a second pass, to avoid triples being overridden by version loading)
 for index in ${!VERSIONS[*]}
 do
   old=${VERSIONS[$index]}
   new=${VERSIONS[$index+1]}
+  latest=${VERSIONS[${#VERSIONS[@]} - 1]}
+  penultimate=${VERSIONS[${#VERSIONS[@]} - 2]}
 
-  # skip deltas, if no new version exists
-  if [ $new ]; then
+  # load delta to the next version
+  if [ "$old" != "$latest" ]; then
     load_delta $old $new
+  fi
+
+  # load delta to the latest version
+  if [ "$old" != "$penultimate" ] && [ "$old" != "$latest" ]; then
+    load_delta $old $latest
   fi
 done
