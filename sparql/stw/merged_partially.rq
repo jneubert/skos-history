@@ -10,29 +10,32 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Partially merged deprecated concepts
 #
-SELECT (?oldConcept AS ?deprecatedConcept) (str(?label) AS ?movedLabel) (str(?oldPrefLabel) as ?deprecatedConceptLabel)
+SELECT DISTINCT (?oldConcept AS ?deprecatedConcept) (str(?label) AS ?movedLabel) (str(?oldPrefLabel) as ?deprecatedConceptLabel)
 ?newConcept (str(?newPrefLabel) as ?newConceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
-    # the compared versions default to the current and the previous one
-    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?oldVersion .
-    ?versionset dsv:currentVersionRecord/dc:identifier ?newVersion .
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
     # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom/dc:identifier ?oldVersion ;
-      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
-    ?insertions a sh:SchemeDeltaInsertions ;
-      sh:usingNamedGraph/sd:name ?insertionsGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
   # get deleted labels (in all languages) ...
   GRAPH ?deletionsGraph {
@@ -46,9 +49,15 @@ WHERE {
   }
   # restrict to a certain concept type and get additional information
   GRAPH ?oldVersionGraph {
-    ?oldConcept a ?conceptType ;
-      skos:prefLabel | skos:altLabel ?label ;
+    ?oldConcept skos:prefLabel | skos:altLabel ?label ;
       skos:prefLabel ?oldPrefLabel .
+    # ugly fix for a different custom namespace URI used in STW 8.04
+    BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
+    {
+      ?oldConcept a ?obsoleteConceptType 
+    } UNION {
+      ?oldConcept a ?conceptType
+    }
   }
   FILTER (lang(?oldPrefLabel) = ?language)
   GRAPH ?newVersionGraph {
@@ -56,6 +65,7 @@ WHERE {
     OPTIONAL {
       ?oldConcept dcterms:isReplacedBy ?replacedByConcept
     }
+    # (no variant for type URI since newVersion 8.06)
     ?newConcept a ?conceptType ;
       skos:prefLabel | skos:altLabel ?label ;
       skos:prefLabel ?newPrefLabel .

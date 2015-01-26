@@ -9,27 +9,31 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Show all labels added in the current version
 #
-SELECT  (str(?label) AS ?addedLabel) ?concept (str(?prefLabel) as ?conceptLabel)
+SELECT DISTINCT (str(?label) AS ?addedLabel) ?concept (str(?prefLabel) as ?conceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
-    # the compared versions default to the current and the previous one
-    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?oldVersion .
-    ?versionset dsv:currentVersionRecord/dc:identifier ?newVersion .
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
     # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom/dc:identifier ?oldVersion ;
-      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
-    ?insertions a sh:SchemeDeltaInsertions ;
-      sh:usingNamedGraph/sd:name ?insertionsGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
   # get all labels
   GRAPH ?insertionsGraph {
@@ -43,7 +47,8 @@ WHERE {
   }
   FILTER (lang(?label) = ?language)
   GRAPH ?newVersionGraph {
-    # get concepts and restrict to descriptors
+    # get concepts and restrict to conceptType
+    # (no variant for type URI since newVersion 8.06)
     ?concept skos:prefLabel | skos:altLabel ?label ;
       a ?conceptType ;
       skos:prefLabel ?prefLabel .

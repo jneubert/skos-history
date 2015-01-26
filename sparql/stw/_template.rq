@@ -1,16 +1,15 @@
+# (Template for STW version queries)
+#
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sh: <http://purl.org/skos-history/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
-# show all labels deleted in the current version
-#
-SELECT DISTINCT (str(?label) AS ?deletedLabel) ?oldConcept (str(?prefLabel) AS ?oldConceptLabel)
+SELECT DISTINCT *
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -36,30 +35,7 @@ WHERE {
     ?insertions a sh:SchemeDeltaInsertions ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
-  # get all deleted labels
-  GRAPH ?deletionsGraph {
-    [] skos:prefLabel | skos:altLabel ?label
-  }
-  # ... which were not attached to some (other) concept now
-  FILTER NOT EXISTS {
-    GRAPH ?insertionsGraph {
-      [] skos:prefLabel | skos:altLabel ?label
-    }
-  }
-  FILTER (lang(?label) = ?language)
-  # restrict to a certain concept type and get additional information
-  GRAPH ?oldVersionGraph {
-    ?oldConcept skos:prefLabel | skos:altLabel ?label ;
-      skos:prefLabel ?prefLabel .
-    # ugly fix for a different custom namespace URI used in STW 8.04
-    BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
-    {
-      ?oldConcept a ?obsoleteConceptType
-    } UNION {
-      ?oldConcept a ?conceptType
-    }
-  }
-  # restrict output to a certain language
-  FILTER (lang(?prefLabel) = ?language)
+
+  # ...
+
 }
-ORDER BY ?label

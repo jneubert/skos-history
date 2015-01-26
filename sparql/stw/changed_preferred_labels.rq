@@ -10,7 +10,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Show concepts where the preferred label changed, and link to RDFa pages accordingly
 #
-SELECT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?newLabel) ?new
+SELECT DISTINCT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?newLabel) ?new
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -21,19 +21,20 @@ WHERE {
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
     # select the versions to actually use
-    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelect)
-    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelect)
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom/dc:identifier ?oldVersionSelect ;
-      sh:deltaTo/dc:identifier ?newVersionSelect ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
-    ?insertions a sh:SchemeDeltaInsertions ;
-      sh:usingNamedGraph/sd:name ?insertionsGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
   # get deleted concept/prefLabel
   GRAPH ?deletionsGraph {
@@ -44,6 +45,7 @@ WHERE {
     ?concept skos:prefLabel ?newPrefLabel .
   }
   # restrict by conceptType
+  # (no variant for type URI since newVersion 8.06)
   GRAPH ?newVersionGraph {
     ?concept a ?conceptType .
   }

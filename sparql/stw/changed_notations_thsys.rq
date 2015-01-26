@@ -15,21 +15,28 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?newLabel) ?new
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> "8.10" "8.12" "en" )
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Thsys undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom/dc:identifier ?oldVersion ;
-      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
-    ?insertions a sh:SchemeDeltaInsertions ;
-      sh:usingNamedGraph/sd:name ?insertionsGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
   # get deleted concept/notations
   GRAPH ?deletionsGraph {

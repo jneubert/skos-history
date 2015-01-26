@@ -15,7 +15,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # level subject categories are the sub-thesauri. A descriptor
 # often belongs to more than one subject category.
 #
-SELECT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
+SELECT DISTINCT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -26,15 +26,18 @@ WHERE {
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
     # select the versions to actually use
-    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelect)
-    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelect)
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
     # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom/dc:identifier ?oldVersionSelect ;
-      sh:deltaTo/dc:identifier ?newVersionSelect ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      dcterms:hasPart ?insertions .
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
     ?insertions a sh:SchemeDeltaInsertions ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
