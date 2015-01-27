@@ -50,8 +50,8 @@ WHERE {
     ?concept a ?conceptType .
   }
   # create links to the RDFa pages of the different versions
-  BIND (uri(concat("http://zbw.eu/stw/versions/", ?oldVersionSelect, "/", substr(str(?concept), 19), "/about")) AS ?old)
-  BIND (uri(concat("http://zbw.eu/stw/versions/", ?newVersionSelect, "/", substr(str(?concept), 19), "/about")) AS ?new)
+  BIND (uri(concat("http://zbw.eu/stw/versions/", ?oldVersionSelected, "/", substr(str(?concept), 19), "/about")) AS ?old)
+  BIND (uri(concat("http://zbw.eu/stw/versions/", ?newVersionSelected, "/", substr(str(?concept), 19), "/about")) AS ?new)
   #
   FILTER (lang(?oldPrefLabel) = ?language)
   FILTER (lang(?newPrefLabel) = ?language)
