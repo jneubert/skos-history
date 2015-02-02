@@ -85,6 +85,7 @@ load_version () {
   # parameter check
   if [ -z "$1" ]; then
     echo "function must be called with \$version parameter"
+    exit
   else
     version=$1
   fi
@@ -185,8 +186,7 @@ $PREFIXES
 with <$BASEURI>
 insert {
   <${BASEURI}record/$old> :hasDelta <$delta_uri> .
-  <${BASEURI}record/$new> :hasDelta <$delta_uri> ;
-      xhv:prev <${BASEURI}record/$old> .
+  <${BASEURI}record/$new> :hasDelta <$delta_uri> .
   <$delta_uri> a :SchemeDelta ;
       :deltaFrom <${BASEURI}record/$old> ;
       :deltaTo <${BASEURI}record/$new> .
@@ -304,7 +304,7 @@ do
   fi
 done
 
-# load latest version to the version history  graph
+# load latest version to the version history graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
 echo Creating version history
 statement="
@@ -354,6 +354,17 @@ do
   # load delta to the next version
   if [ "$old" != "$latest" ]; then
     load_delta $old $new
+
+    # load a xhv:prev statement for immediately following versions
+    statement="
+$PREFIXES
+with <$BASEURI>
+insert {
+  <${BASEURI}record/$new> xhv:prev <${BASEURI}record/$old> .
+}
+where {}
+"
+    sparql_update "$statement"
   fi
 
   # load delta to the latest version
