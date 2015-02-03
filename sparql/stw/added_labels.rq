@@ -9,7 +9,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Show all labels added in the current version
 #
-SELECT DISTINCT (str(?label) AS ?addedLabel) ?concept (str(?prefLabel) as ?conceptLabel)
+SELECT DISTINCT ?concept (str(?prefLabel) as ?conceptLabel) (str(?label) AS ?addedLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {

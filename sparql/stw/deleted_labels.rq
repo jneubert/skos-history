@@ -10,7 +10,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # show all labels deleted in the current version
 #
-SELECT DISTINCT (str(?label) AS ?deletedLabel) ?oldConcept (str(?prefLabel) AS ?oldConceptLabel)
+SELECT DISTINCT (?oldConcept AS ?concept) (str(?prefLabel) AS ?conceptLabel) (str(?label) AS ?deletedLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
