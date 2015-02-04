@@ -274,7 +274,6 @@ insert {
 <$SERVICE_URI> a sd:Service;
     sd:endpoint <$QUERY_URI>;
     sd:defaultDataset <$SERVICE_DDURI> .
-r
 <$SERVICE_DDURI> a sd:Dataset;
     dcterms:title \"$DATASET Versions SPARQL Service\";
     sd:defaultGraph [
@@ -309,15 +308,17 @@ latest=${VERSIONS[${#VERSIONS[@]} - 1]}
 echo Creating version history
 statement="
 $PREFIXES
-with <$BASEURI>
 insert {
-  <$BASEURI> a dsv:VersionHistorySet ;
-      :isVersionHistoryOf <$SCHEMEURI> ;
-      dsv:currentVersionRecord <${BASEURI}record/$latest> ;
-      void:sparqlEndpoint <$QUERY_URI> ;
-      :usingNamedGraph <$BASEURI/ng> .
-  <$BASEURI/ng> a sd:NamedGraph ;
-      sd:name <$BASEURI> .
+  # Strangely, WITH syntax does not work here!!
+  graph <$BASEURI> {
+    <$BASEURI> a dsv:VersionHistorySet ;
+        :isVersionHistoryOf <$SCHEMEURI> ;
+        dsv:currentVersionRecord <${BASEURI}record/$latest> ;
+        void:sparqlEndpoint <$QUERY_URI> ;
+        :usingNamedGraph <$BASEURI/ng> .
+    <$BASEURI/ng> a sd:NamedGraph ;
+        sd:name <$BASEURI> .
+    }
 }
 where {}
 "
