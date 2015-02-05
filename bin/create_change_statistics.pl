@@ -2,11 +2,10 @@
 # nbt, 6.11.2014
 
 # Creates a csv table of change statistics
-# for a set of skos file versions via sparql queries
 
-# Each query must return a result variable "?version" with
-# the version indentifier, plus at least one other column with
-# the aggregated values for each version
+# Each query must return a result variable with the name given
+# in row_head_name (e.g. 'version', or 'category'), plus at least one
+# other column with the aggregated values for each row_head.
 
 # Query parsing is based on whitespace recognition, minimal:
 #   values ( ... ) { ( ... ) }
@@ -28,15 +27,22 @@ my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 # List of version and data structure for results
 
 # List of queries and parameters for each statistics column
+# (the first column for each table must return the row_head values).
 
 my %definition = (
   'stw' => {
     version_history_set => '<http://zbw.eu/stw/version>',
-    versions            => [qw/ 8.04 8.06 8.08 8.10 8.12 8.14 /],
     tables              => [
       {
         title              => 'Concept changes',
+        row_head_name      => 'version',
         column_definitions => [
+          {
+            column          => 'version',
+            header          => 'Version',
+            query_file      => '../sparql/version_overview.rq',
+            result_variable => 'version',
+          },
           {
             column          => 'version_date',
             header          => 'Date',
@@ -89,7 +95,14 @@ my %definition = (
       },
       {
         title              => 'Label changes',
+        row_head_name      => 'version',
         column_definitions => [
+          {
+            column          => 'version',
+            header          => 'Version',
+            query_file      => '../sparql/version_overview.rq',
+            result_variable => 'version',
+          },
           {
             column          => 'added_labels',
             header          => 'Added labels (total en)',
@@ -168,11 +181,17 @@ my %definition = (
   },
   'thesoz' => {
     version_history_set => '<http://lod.gesis.org/thesoz/version>',
-    versions            => [qw/ 0.7 0.86 0.91 0.92 0.93 /],
     tables              => [
       {
         title              => 'Concept changes',
+        row_head_name      => 'version',
         column_definitions => [
+          {
+            column          => 'version',
+            header          => 'Version',
+            query_file      => '../sparql/version_overview.rq',
+            result_variable => 'version',
+          },
           {
             column          => 'version_date',
             header          => 'Date',
@@ -186,10 +205,12 @@ my %definition = (
             result_variable => 'addedConceptCount',
           },
           {
-            column          => 'added_descriptors',
-            header          => 'Added descriptors',
-            query_file      => '../sparql/stw/count_added_concepts.rq',
-            replace         => { '?conceptType' => '<http://lod.gesis.org/thesoz/ext/Descriptor>', },
+            column     => 'added_descriptors',
+            header     => 'Added descriptors',
+            query_file => '../sparql/stw/count_added_concepts.rq',
+            replace    => {
+              '?conceptType' => '<http://lod.gesis.org/thesoz/ext/Descriptor>',
+            },
             result_variable => 'addedConceptCount',
           },
           {
@@ -206,21 +227,17 @@ my %definition = (
 
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   my @column_definitions = @{ $$table_ref{column_definitions} };
-  my %data =
-    map { $_ => { version => "v $_" } } @{ $definition{$dataset}{versions} };
+  my ( @row_heads, %data );
 
-  # Initialize csv table
-
-  # for each query, get column data and add to csv table
-
+  # for each column (query), get column data
   foreach my $columndef_ref (@column_definitions) {
     print "  $$columndef_ref{column}\n";
-    get_column( $columndef_ref, \%data );
+    get_column( $$table_ref{row_head_name},
+      $columndef_ref, \@row_heads, \%data );
   }
 
   # initialize csv table with column names and headers
-  my @columns        = ('version');
-  my @column_headers = ('Version');
+  my ( @columns, @column_headers );
   foreach my $column_ref (@column_definitions) {
     push( @columns,        $$column_ref{column} );
     push( @column_headers, $$column_ref{header} );
@@ -229,7 +246,7 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   $csv->add_line( \@column_headers );
 
   # add rows
-  foreach my $row ( @{ $definition{$dataset}{versions} } ) {
+  foreach my $row (@row_heads) {
     $csv->add_line( $data{$row} );
   }
 
@@ -243,8 +260,13 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
 #######################
 
 sub get_column {
+  my $row_head_name = shift or die "param missing\n";
   my $columndef_ref = shift or die "param missing\n";
+  my $row_head_ref  = shift or die "param missing\n";
   my $data_ref      = shift or die "param missing\n";
+
+  # when $data_ref is empty, treat column differently
+  my $first_column = %{$data_ref} ? undef : 1;
 
   # read query from file (by command line argument)
   my $query = read_file( $$columndef_ref{query_file} ) or die "Can't read $!\n";
@@ -271,13 +293,18 @@ sub get_column {
 
   # parse and add results
   while ( my $row = $iterator->next ) {
-    my $version = unquote( $row->{version}->as_string );
-    if ( defined $$data_ref{$version} ) {
+    my $row_head = unquote( $row->{$row_head_name}->as_string );
+
+    if ( defined $$data_ref{$row_head} or $first_column ) {
       die 'Result variable ', $$columndef_ref{result_variable},
         ' is not defined in ', $$columndef_ref{query_file}, "\n"
         unless $row->{ $$columndef_ref{result_variable} };
-      $$data_ref{$version}{ $$columndef_ref{column} } =
+      $$data_ref{$row_head}{ $$columndef_ref{column} } =
         unquote( $row->{ $$columndef_ref{result_variable} }->as_string );
+      # the list of row headings is dynamically created here
+      if ($first_column) {
+        push( @{$row_head_ref}, $row_head );
+      }
     }
   }
 }
