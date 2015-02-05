@@ -22,6 +22,8 @@ use String::Util qw/unquote/;
 use URI::file;
 
 my $dataset = $ARGV[0] || 'stw';
+my $table = $ARGV[1];
+
 my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 
 # List of version and data structure for results
@@ -34,7 +36,7 @@ my %definition = (
     version_history_set => '<http://zbw.eu/stw/version>',
     tables              => [
       {
-        title              => 'Concept changes',
+        title              => 'Concept changes by version',
         row_head_name      => 'version',
         column_definitions => [
           {
@@ -94,7 +96,7 @@ my %definition = (
         ],
       },
       {
-        title              => 'Label changes',
+        title              => 'Label changes by version',
         row_head_name      => 'version',
         column_definitions => [
           {
@@ -183,7 +185,7 @@ my %definition = (
     version_history_set => '<http://lod.gesis.org/thesoz/version>',
     tables              => [
       {
-        title              => 'Concept changes',
+        title              => 'Concept changes by version',
         row_head_name      => 'version',
         column_definitions => [
           {
@@ -226,6 +228,10 @@ my %definition = (
 );
 
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
+  # If a table parameter is give, skip everything else
+  if ($table and $$table_ref{title} ne $table) {
+    next;
+  }
   my @column_definitions = @{ $$table_ref{column_definitions} };
   my ( @row_heads, %data );
 
