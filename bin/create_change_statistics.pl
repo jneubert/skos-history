@@ -179,6 +179,26 @@ my %definition = (
           },
         ],
       },
+      {
+        title              => 'Concept changes by category',
+        row_head_name      => 'category',
+        column_definitions => [
+          {
+            column          => 'category',
+            header          => 'Second level category',
+            query_file      => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace         => { '?language' => '"de"', },
+            result_variable => 'categoryLabel',
+          },
+          {
+            column          => 'total_descriptors',
+            header          => 'Total descriptors',
+            query_file      => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace         => { '?language' => '"de"', },
+            result_variable => 'totalConcepts',
+          },
+        ],
+      },
     ],
   },
   'thesoz' => {
