@@ -1,0 +1,50 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Identify concepts inserted with a certain version,
+# ordered by the second level subject category.
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
+#
+SELECT distinct (str(count(distinct ?concept)) as ?totalConcepts) (?secondLevelConcept as ?category)
+(str(max(?secondLevelLabel)) AS ?categoryLabel)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?version ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?version, ?latestVersion) AS ?versionSelected)
+    # get the delta and via that the relevant graphs
+    ?vhr a dsv:VersionHistoryRecord;
+      dc:identifier $version ;
+      sh:usingNamedGraph/sd:name ?versionGraph .
+  }
+  GRAPH ?versionGraph {
+    # get the top subject category (concept of subclass Thsys)
+    # subject categories form a mono-hierarchy within STW
+    ?scheme skos:hasTopConcept ?topConcept .
+    #
+    # get the second level category
+    ?topConcept skos:narrower ?secondLevelConcept .
+    ?secondLevelConcept skos:narrower* ?concept .
+    ?concept a ?conceptType .
+    #
+    # get the label of the second level category
+    ?secondLevelConcept skos:prefLabel ?secondLevelLabel
+  }
+  FILTER (lang(?secondLevelLabel) = ?language)
+}
+GROUP BY ?secondLevelConcept
+ORDER BY max(?secondLevelLabel)
