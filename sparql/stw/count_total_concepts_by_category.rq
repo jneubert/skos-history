@@ -19,30 +19,28 @@ SELECT distinct (str(count(distinct ?concept)) as ?totalConcepts) (?secondLevelC
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?version ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef "en" )
+    ( <http://zbw.eu/stw/version> undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
-    # get the current and the previous version as default versions
+    # get the current version as default version
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
     # select the versions to actually use
     BIND(coalesce(?version, ?latestVersion) AS ?versionSelected)
     # get the delta and via that the relevant graphs
     ?vhr a dsv:VersionHistoryRecord;
-      dc:identifier $version ;
+      dc:identifier $versionSelected ;
       sh:usingNamedGraph/sd:name ?versionGraph .
   }
   GRAPH ?versionGraph {
-    # get the top subject category (concept of subclass Thsys)
-    # subject categories form a mono-hierarchy within STW
     ?scheme skos:hasTopConcept ?topConcept .
-    #
-    # get the second level category
     ?topConcept skos:narrower ?secondLevelConcept .
-    ?secondLevelConcept skos:narrower* ?concept .
-    ?concept a ?conceptType .
-    #
-    # get the label of the second level category
-    ?secondLevelConcept skos:prefLabel ?secondLevelLabel
+    ?secondLevelConcept a zbwext:Thsys ;
+      skos:prefLabel ?secondLevelLabel ;
+      skos:narrower* ?thsys .
+    ?thsys a zbwext:Thsys ;
+      skos:narrower ?concept .
+    # does not work for zbwext:Thsys
+    ?concept a zbwext:Descriptor .
   }
   FILTER (lang(?secondLevelLabel) = ?language)
 }
