@@ -9,6 +9,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Identify concepts inserted with a certain version,
 # ordered by the second level subject category.
+#
 # Subject categories have a different concept type (subclass of
 # skos:Concept) and form mono-hierarchies within STW. The top
 # level subject categories are the sub-thesauri. A descriptor
@@ -51,7 +52,7 @@ WHERE {
       ?concept skos:prefLabel []
     }
   }
-  GRAPH ?versionGraph {
+  GRAPH ?newVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
     ?concept a zbwext:Descriptor ;
@@ -67,7 +68,7 @@ WHERE {
     # get the label of the second level category
     ?secondLevelCategory skos:prefLabel ?secondLevelLabel
   }
-  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language)
+  FILTER (lang(?secondLevelLabel) = ?language)
 }
 GROUP BY ?secondLevelCategory
 ORDER BY ?secondLevelCategoryLabel
