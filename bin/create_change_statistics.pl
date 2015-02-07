@@ -207,7 +207,7 @@ my %definition = (
           {
             column          => 'added_descriptors',
             header          => 'Added descriptors',
-            query_file      => '../sparql/stw/count_added_by_category.rq',
+            query_file      => '../sparql/stw/count_added_concepts_by_category.rq',
             replace         => { '?language' => '"de"', '?oldVersion' => '"8.06"', '?newVersion' => '"8.14"', },
             result_variable => 'addedConcepts',
           },
