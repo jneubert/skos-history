@@ -11,7 +11,7 @@
 # START CONFIGURATION
 
 DATASET=$1
-VALID_DATASETS=(stw thesoz)
+VALID_DATASETS=(stw thesoz yso)
 
 if [ -z "$DATASET" ]; then
   echo "No dataset supplied (valid: ${VALID_DATASETS[*]})"
@@ -42,6 +42,16 @@ elif [ $DATASET == "thesoz" ]; then
   # publicly available TheSoz versions
   VERSIONS=(0.7 0.86 0.91 0.92 0.93)
   SCHEMEURI='http://lod.gesis.org/thesoz/'
+
+elif [ $DATASET == "yso" ]; then
+
+  # thesoz versions must be present locally
+  BASEDIR=/opt/thes/var/yso
+  FILENAME=rdf/yso.nt
+
+  # publicly available TheSoz versions
+  VERSIONS=(20150102 20150128 20150129)
+  SCHEMEURI='http://www.yso.fi/onto/yso/'
 
 fi
 
