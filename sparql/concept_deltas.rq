@@ -59,7 +59,10 @@ WHERE {
       # for the clarity of the example, filter out some dataset-wide changes in STW
       FILTER ( ?predicate NOT IN (<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>, <http://purl.org/ontology/gbv/gvkppn>) )
       # build a uri to group the changes for a particular version
-      BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"))) AS ?conceptDelta)
+      # the general expression:
+      #BIND (uri(concat(str(?concept), '/version', strafter(str(?delta), str(?versionHistoryGraph)))) AS ?conceptDelta)
+      # does not work, so q+d we use an enumeration:
+      BIND (uri(concat(str(?concept), strafter(str(?delta), "/stw"), strafter(str(?delta), "onto/yso"))) AS ?conceptDelta)
     }
   }
 }
