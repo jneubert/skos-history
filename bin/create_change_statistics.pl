@@ -21,11 +21,6 @@ use RDF::Query::Client;
 use String::Util qw/unquote/;
 use URI::file;
 
-my $dataset = $ARGV[0] || 'stw';
-my $table = $ARGV[1];
-
-my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
-
 # List of version and data structure for results
 
 # List of queries and parameters for each statistics column
@@ -268,6 +263,16 @@ my %definition = (
   },
 );
 
+my $dataset = $ARGV[0];
+my $table = $ARGV[1];
+
+if (not ($dataset and $definition{$dataset})) {
+  print_usage();
+  exit;
+}
+
+my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
+
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   # If a table parameter is give, skip everything else
   if ($table and $$table_ref{title} ne $table) {
@@ -305,6 +310,18 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
 }
 
 #######################
+
+sub print_usage {
+  print "\nUsage: $0 dataset [table]\n";
+  print "\nAvailable datasets and tables:\n";
+  foreach my $dataset (sort keys %definition) {
+    print "  $dataset\n";
+    foreach my $table_ref (@{$definition{$dataset}{tables}}) {
+      print "    $$table_ref{title}\n";
+    }
+  }
+  print "\n";
+}
 
 sub get_column {
   my $row_head_name = shift or die "param missing\n";
