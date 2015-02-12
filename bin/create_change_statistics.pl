@@ -182,7 +182,7 @@ my %definition = (
             column          => 'secondLevelCategory',
             header          => 'Second level category',
             query_file      => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace         => { '?language' => '"de"', },
+            replace         => { '?language' => '"en"', },
             result_variable => 'secondLevelCategoryLabel',
           },
           {
@@ -307,6 +307,8 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   $csv->print;
   print "\n";
 
+  # special output for changed categories
+  print_chart_data($csv);
 }
 
 #######################
@@ -409,3 +411,44 @@ sub insert_modified_values {
 
   return $query;
 }
+
+# Prints data formatted for insertion into a
+# highcharts.com bar-negative-stack chart
+sub print_chart_data {
+  my $csv = shift or die "param missing\n";
+
+  # all but the first line, which contains column headers
+  my @lines = @{$csv->lines}[1..$#{$csv->lines}];
+  my @values;
+
+  # categories
+  print "\n\n  var categories = [ ";
+  foreach my $line (@lines) {
+    push (@values, $line->{secondLevelCategory});
+  }
+  print "'", join("', '", @values), "'";
+  print " ];\n\n";
+
+  print "      series: [{\n";
+
+  print "        name: 'Deprecated Descriptors',\n        data: [ ";
+  @values = ();
+  foreach my $line (@lines) {
+    push (@values, $line->{deprecated_descriptors} || 0);
+  }
+  print join(", -", @values);
+  print "]\n";
+  
+  print "      }, {\n";
+
+  print "        name: 'Added Descriptors',\n        data: [ ";
+  @values = ();
+  foreach my $line (@lines) {
+    push (@values, $line->{added_descriptors} || 0);
+  }
+  print join(", ", @values);
+  print " ]\n";
+
+  print "      }]\n\n";
+}
+
