@@ -1,0 +1,72 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Identify concepts deprecated with a certain version,
+# ordered by the second level subject category.
+#
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
+#
+SELECT distinct ?secondLevelCategory (str(max(?secondLevelLabel)) AS ?secondLevelCategoryLabel)
+(str(count(distinct ?concept)) as ?deprecatedConcepts)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+  }
+  # identify the deprecated concepts
+  GRAPH ?insertionsGraph {
+    ?concept owl:deprecated true
+  }
+  # Compute, for each level of the old hiearchy, the concepts
+  # which got deprecated beyond that category
+  GRAPH ?oldVersionGraph {
+    ?concept skos:broader ?category .
+    ?category a zbwext:Thsys .
+  }
+  GRAPH ?newVersionGraph {
+    # get the top subject category (concept of subclass Thsys)
+    # subject categories form a mono-hierarchy within STW
+    ?scheme skos:hasTopConcept ?topConcept .
+    #
+    # get the second level category
+    ?topConcept skos:narrower ?secondLevelCategory .
+    ?category a zbwext:Thsys ;
+      skos:broader* ?secondLevelCategory .
+    #
+    # get the label of the second level category
+    ?secondLevelCategory skos:prefLabel ?secondLevelLabel
+  }
+  FILTER (lang(?secondLevelLabel) = ?language)
+}
+GROUP BY ?secondLevelCategory
+ORDER BY ?secondLevelCategoryLabel

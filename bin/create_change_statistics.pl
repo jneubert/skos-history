@@ -211,6 +211,13 @@ my %definition = (
             replace         => { '?language' => '"de"', '?oldVersion' => '"8.06"', '?newVersion' => '"8.14"', },
             result_variable => 'addedConcepts',
           },
+          {
+            column          => 'deprecated_descriptors',
+            header          => 'Deprecated descriptors',
+            query_file      => '../sparql/stw/count_deprecated_concepts_by_category.rq',
+            replace         => { '?language' => '"de"', '?oldVersion' => '"8.06"', '?newVersion' => '"8.14"', },
+            result_variable => 'deprecatedConcepts',
+          },
         ],
       },
     ],
