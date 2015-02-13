@@ -15,6 +15,7 @@ Query | Description
 [moved_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/moved_labels.rq) | Moved pref/altLabels
 [merged_partially](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/merged_partially.rq) | Partially merged deprecated concepts
 [changed_preferred_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/changed_preferred_labels.rq) | Show concepts (by default:descriptors) where the preferred labels has changed, and link to RDFa pages accordingly (for thsys, this includes notation changes)
+[moved_category_to_other_subthes](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/moved_category_to_other_subthes.rq) | Show categories which have been moved to another sub-thesaurus (skos:topConcept)
 
 
 __Aggregated information about versions__

@@ -1,0 +1,56 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Identify categories which has been moved to another sub-thesaurus (topConcept)
+#
+SELECT distinct (str(?oldLabel) AS ?oldCategoryLabel) ?category (str(?newLabel) AS ?categoryLabel)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+  }
+  # get all secondLevelConcepts from the old version
+  GRAPH ?oldVersionGraph {
+    ?scheme skos:hasTopConcept ?oldTopConcept .
+    ?category a zbwext:Thsys ;
+      skos:broader+ ?oldTopConcept ;
+      skos:prefLabel ?oldLabel .
+  }
+  # identify categories with a different top concept
+  GRAPH ?newVersionGraph {
+    ?category skos:prefLabel ?newLabel ;
+      skos:broader+ ?newTopConcept .
+    ?scheme skos:hasTopConcept ?newTopConcept .
+  }
+  FILTER (?oldTopConcept != ?newTopConcept)
+  FILTER (lang(?oldLabel) = ?language && lang(?newLabel) = ?language)
+}
+ORDER BY ?newLabel
+
