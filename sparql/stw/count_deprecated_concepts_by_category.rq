@@ -8,8 +8,8 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
-# Identify concepts deprecated with a certain version,
-# ordered by the second level subject category.
+# Count concepts deprecated with a certain version
+# by the second level subject category (of the new version!).
 #
 # Subject categories have a different concept type (subclass of
 # skos:Concept) and form mono-hierarchies within STW. The top
@@ -53,6 +53,7 @@ WHERE {
     ?concept skos:broader ?category .
     ?category a zbwext:Thsys .
   }
+  # Aggregate according to the hierarchy of the new (!) version
   GRAPH ?newVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
