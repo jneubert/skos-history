@@ -56,5 +56,5 @@ __Technical background information__
 
 __Extension to SKOS-XL__
 
-Some of the example queries have been adapted to work against a [second example endpoint](http://zbw.eu/beta/sparql/thesozv/query) with multiple versions of [Thesaurus for the Social Sciences (TheSoz)](http://www.gesis.org/en/services/research/thesauri-und-klassifikationen/social-science-thesaurus/), which uses [SKOS-XL](http://www.w3.org/TR/skos-reference/skos-xl.html). The queries can be directed to the thesoz example endpoint by adding `&endpoint=http://zbw.eu/beta/sparql/thesozv/query` to the URL and by replacing the VALUES parameter ?versionHistoryGraph with `<http://lod.gesis.org/thesoz/version>`.
+Some of the example queries have been adapted to work against a [second example endpoint](http://zbw.eu/beta/sparql/thesozv/query) with multiple versions of [Thesaurus for the Social Sciences (TheSoz)](http://www.gesis.org/en/services/research/thesauri-und-klassifikationen/social-science-thesaurus/), which uses [SKOS-XL](http://www.w3.org/TR/skos-reference/skos-xl.html). The queries can be directed to the thesoz example endpoint by adding `&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version` to the URL.
 
