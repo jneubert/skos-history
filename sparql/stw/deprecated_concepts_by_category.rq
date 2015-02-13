@@ -2,7 +2,6 @@ PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
 PREFIX sh: <http://purl.org/skos-history/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -10,7 +9,8 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Identify descriptors deprecated with a certain version,
-# ordered by the subject categories (first and second level).
+# ordered by the subject categories (first and second level)
+# of the old version.
 #
 # Subject categories have a different concept type (subclass of
 # skos:Concept) and form mono-hierarchies within STW. The top
@@ -19,7 +19,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 SELECT DISTINCT ?topCategory (str(?topLabel) AS ?topCategoryLabel)
 ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)
-(?concept AS ?deprecatedConcept) (str(?label) AS ?deprecatedConceptLabel)
+(?concept AS ?deprecatedConcept) (str(?prefLabel) AS ?deprecatedConceptLabel)
 (?replacedBy as ?replacedByConcept) (str(?replacedByPrefLabel) AS ?replacedByConceptLabel)
 WHERE {
   # parameters
@@ -50,26 +50,24 @@ WHERE {
   GRAPH ?insertionsGraph {
     ?concept owl:deprecated true
   }
-  # get the replaced information
+  # get the replacedBy information
   GRAPH ?newVersionGraph {
     # get concepts and restrict to conceptType
     # (no variant for type URI since newVersion 8.06)
     ?concept a ?conceptType .
-    ?concept rdfs:label ?label .
     OPTIONAL {
       ?concept dcterms:isReplacedBy ?replacedBy .
       ?replacedBy skos:prefLabel ?replacedByPrefLabel .
-      FILTER (lang(?label) = lang(?replacedByPrefLabel))
     }
   }
   # get categories
   GRAPH ?oldVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
-    ?concept skos:prefLabel ?prefLabel .
-    ?concept skos:broader ?category .
-    ?category a zbwext:Thsys .
-    ?category skos:broader* ?topCategory .
+    ?concept skos:prefLabel ?prefLabel ;
+      skos:broader ?category .
+    ?category a zbwext:Thsys ;
+      skos:broader* ?topCategory .
     ?scheme skos:hasTopConcept ?topCategory .
     ?topCategory skos:prefLabel ?topLabel .
     #
@@ -78,6 +76,8 @@ WHERE {
     ?category skos:broader+ ?secondLevelCategory .
     ?secondLevelCategory skos:prefLabel ?secondLevelLabel .
   }
-  FILTER (lang(?label) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
+  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
+  FILTER (!bound(?replacedByPrefLabel) || lang(?replacedByPrefLabel) = ?language)
 }
-ORDER BY ?secondLevelCategoryLabel ?label
+ORDER BY ?secondLevelCategoryLabel ?prefLabel
+
