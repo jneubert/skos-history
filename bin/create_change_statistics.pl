@@ -179,38 +179,135 @@ my %definition = (
         row_head_name      => 'secondLevelCategory',
         column_definitions => [
           {
-            column          => 'secondLevelCategory',
-            header          => 'Second level category',
-            query_file      => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace         => { '?language' => '"en"', },
+            column     => 'secondLevelCategory',
+            header     => 'Second level category',
+            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace    => { '?language' => '"en"', },
             result_variable => 'secondLevelCategoryLabel',
           },
           {
-            column          => 'total_descriptors_8.06',
-            header          => 'Total 8.06',
-            query_file      => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace         => { '?language' => '"de"', '?version' => '"8.06"', },
+            column     => 'total_descriptors_8.06',
+            header     => 'Total 8.06',
+            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace    => { '?language' => '"de"', '?version' => '"8.06"', },
             result_variable => 'totalConcepts',
           },
           {
-            column          => 'total_descriptors_8.14',
-            header          => 'Total 8.14',
-            query_file      => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace         => { '?language' => '"de"', '?version' => '"8.14"', },
+            column     => 'total_descriptors_8.14',
+            header     => 'Total 8.14',
+            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace    => { '?language' => '"de"', '?version' => '"8.14"', },
             result_variable => 'totalConcepts',
           },
           {
-            column          => 'added_descriptors',
-            header          => 'Added descriptors',
-            query_file      => '../sparql/stw/count_added_concepts_by_category.rq',
-            replace         => { '?language' => '"de"', '?oldVersion' => '"8.06"', '?newVersion' => '"8.14"', },
+            column     => 'added_descriptors',
+            header     => 'Added descriptors',
+            query_file => '../sparql/stw/count_added_concepts_by_category.rq',
+            replace    => {
+              '?language'   => '"de"',
+              '?oldVersion' => '"8.06"',
+              '?newVersion' => '"8.14"',
+            },
             result_variable => 'addedConcepts',
           },
           {
-            column          => 'deprecated_descriptors',
-            header          => 'Deprecated descriptors',
-            query_file      => '../sparql/stw/count_deprecated_concepts_by_category.rq',
-            replace         => { '?language' => '"de"', '?oldVersion' => '"8.06"', '?newVersion' => '"8.14"', },
+            column => 'deprecated_descriptors',
+            header => 'Deprecated descriptors',
+            query_file =>
+              '../sparql/stw/count_deprecated_concepts_by_category.rq',
+            replace => {
+              '?language'   => '"de"',
+              '?oldVersion' => '"8.06"',
+              '?newVersion' => '"8.14"',
+            },
+            result_variable => 'deprecatedConcepts',
+          },
+        ],
+      },
+      {
+        title              => 'Descriptor changes by sub-thesaurus',
+        row_head_name      => 'topConcept',
+        chart_data         => [ [ 3, 2 ], [ 1, 4 ], ],
+        column_definitions => [
+          {
+            column          => 'topConcept',
+            header          => 'Sub-thesaurus',
+            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace         => { '?language' => '"en"', },
+            result_variable => 'topConceptLabel',
+          },
+          {
+            column     => 'total_descriptors_8.06',
+            header     => 'Total 8.06',
+            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace    => { '?language' => '"de"', '?newVersion' => '"8.06"', },
+            result_variable => 'totalConcepts',
+          },
+          {
+            column     => 'added_descriptors',
+            header     => 'Added descriptors',
+            query_file => '../sparql/stw/count_added_concepts_by_top.rq',
+            replace    => {
+              '?language'   => '"de"',
+              '?oldVersion' => '"8.06"',
+              '?newVersion' => '"8.14"',
+            },
+            result_variable => 'addedConcepts',
+          },
+          {
+            column     => 'deprecated_descriptors',
+            header     => 'Deprecated descriptors',
+            query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
+            replace    => {
+              '?language'   => '"de"',
+              '?oldVersion' => '"8.06"',
+              '?newVersion' => '"8.14"',
+            },
+            result_variable => 'deprecatedConcepts',
+          },
+          {
+            column     => 'total_descriptors_8.14',
+            header     => 'Total 8.14',
+            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace    => { '?language' => '"de"', '?newVersion' => '"8.14"', },
+            result_variable => 'totalConcepts',
+          },
+        ],
+      },
+      {
+        title              => 'Thsys changes by sub-thesaurus',
+        row_head_name      => 'topConcept',
+        chart_data         => [ [ 2, 1 ], ],
+        column_definitions => [
+          {
+            column          => 'topConcept',
+            header          => 'Sub-thesaurus',
+            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace         => { '?language' => '"en"', },
+            result_variable => 'topConceptLabel',
+          },
+          {
+            column     => 'added_descriptors',
+            header     => 'Added descriptors',
+            query_file => '../sparql/stw/count_added_concepts_by_top.rq',
+            replace    => {
+              '?language'    => '"de"',
+              '?oldVersion'  => '"8.06"',
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Thsys',
+            },
+            result_variable => 'addedConcepts',
+          },
+          {
+            column     => 'deprecated_descriptors',
+            header     => 'Deprecated descriptors',
+            query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
+            replace    => {
+              '?language'    => '"de"',
+              '?oldVersion'  => '"8.06"',
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Thsys',
+            },
             result_variable => 'deprecatedConcepts',
           },
         ],
@@ -264,9 +361,9 @@ my %definition = (
 );
 
 my $dataset = $ARGV[0];
-my $table = $ARGV[1];
+my $table   = $ARGV[1];
 
-if (not ($dataset and $definition{$dataset})) {
+if ( not( $dataset and $definition{$dataset} ) ) {
   print_usage();
   exit;
 }
@@ -274,8 +371,9 @@ if (not ($dataset and $definition{$dataset})) {
 my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
+
   # If a table parameter is give, skip everything else
-  if ($table and $$table_ref{title} ne $table) {
+  if ( $table and $$table_ref{title} ne $table ) {
     next;
   }
   my @column_definitions = @{ $$table_ref{column_definitions} };
@@ -308,7 +406,9 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   print "\n";
 
   # special output for changed categories
-  print_chart_data($csv);
+  foreach my $chart_data_ref ( @{ $$table_ref{chart_data} } ) {
+    print_chart_data( $csv, $table_ref, $chart_data_ref );
+  }
 }
 
 #######################
@@ -316,9 +416,9 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
 sub print_usage {
   print "\nUsage: $0 dataset [table]\n";
   print "\nAvailable datasets and tables:\n";
-  foreach my $dataset (sort keys %definition) {
+  foreach my $dataset ( sort keys %definition ) {
     print "  $dataset\n";
-    foreach my $table_ref (@{$definition{$dataset}{tables}}) {
+    foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
       print "    $$table_ref{title}\n";
     }
   }
@@ -367,6 +467,7 @@ sub get_column {
         unless $row->{ $$columndef_ref{result_variable} };
       $$data_ref{$row_head}{ $$columndef_ref{column} } =
         unquote( $row->{ $$columndef_ref{result_variable} }->as_string );
+
       # the list of row headings is dynamically created here
       if ($first_column) {
         push( @{$row_head_ref}, $row_head );
@@ -415,38 +516,46 @@ sub insert_modified_values {
 # Prints data formatted for insertion into a
 # highcharts.com bar-negative-stack chart
 sub print_chart_data {
-  my $csv = shift or die "param missing\n";
+  my $csv            = shift or die "param missing\n";
+  my $table_ref      = shift or die "param missing\n";
+  my $chart_data_ref = shift or die "param missing\n";
 
   # all but the first line, which contains column headers
-  my @lines = @{$csv->lines}[1..$#{$csv->lines}];
-  my @values;
+  my @lines = @{ $csv->lines }[ 1 .. $#{ $csv->lines } ];
+  my ( @values, $column_ref );
 
   # categories
   print "\n\n  var categories = [ ";
   foreach my $line (@lines) {
-    push (@values, $line->{secondLevelCategory});
+    push( @values, $line->{ $$table_ref{row_head_name} } );
   }
-  print "'", join("', '", @values), "'";
+  print "'", join( "', '", @values ), "'";
   print " ];\n\n";
 
   print "      series: [{\n";
 
-  print "        name: 'Deprecated Descriptors',\n        data: [ ";
+  # use the column referenced by the first entry in chart_data array
+  $column_ref = $$table_ref{column_definitions}[ $$chart_data_ref[0] ];
+  print "        name: '$$column_ref{header}',\n        data: [ ";
   @values = ();
   foreach my $line (@lines) {
-    push (@values, $line->{deprecated_descriptors} || 0);
+    push( @values, $line->{ $$column_ref{column} } || 0 );
   }
-  print join(", -", @values);
-  print "]\n";
-  
+
+  # value has to be negative to build the left-hand part of the stack
+  print join( ", ", map { -$_ } @values );
+  print " ]\n";
+
   print "      }, {\n";
 
-  print "        name: 'Added Descriptors',\n        data: [ ";
+  # use the column referenced by the second entry in chart_data array
+  $column_ref = $$table_ref{column_definitions}[ $$chart_data_ref[1] ];
+  print "        name: '$$column_ref{header}',\n        data: [ ";
   @values = ();
   foreach my $line (@lines) {
-    push (@values, $line->{added_descriptors} || 0);
+    push( @values, $line->{ $$column_ref{column} } || 0 );
   }
-  print join(", ", @values);
+  print join( ", ", @values );
   print " ]\n";
 
   print "      }]\n\n";
