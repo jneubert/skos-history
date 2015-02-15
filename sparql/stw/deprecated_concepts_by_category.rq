@@ -68,12 +68,12 @@ WHERE {
       skos:broader ?category .
     ?category a zbwext:Thsys ;
       skos:broader* ?topCategory .
-    ?scheme skos:hasTopConcept ?topCategory .
-    ?topCategory skos:prefLabel ?topLabel .
+    ?topCategory skos:topConceptOf ?scheme ;
+      skos:prefLabel ?topLabel ;
     #
     # get the second level category and it's label
     ?topCategory skos:narrower ?secondLevelCategory .
-    ?category skos:broader+ ?secondLevelCategory .
+    ?category skos:broader* ?secondLevelCategory .
     ?secondLevelCategory skos:prefLabel ?secondLevelLabel .
   }
   FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)

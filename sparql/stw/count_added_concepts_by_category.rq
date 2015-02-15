@@ -63,7 +63,7 @@ WHERE {
     #
     # get the second level category
     ?topConcept skos:narrower ?secondLevelCategory .
-    ?category skos:broader+ ?secondLevelCategory .
+    ?category skos:broader* ?secondLevelCategory .
     #
     # get the label of the second level category
     ?secondLevelCategory skos:prefLabel ?secondLevelLabel

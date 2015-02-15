@@ -64,7 +64,7 @@ WHERE {
     #
     # get the second level category and it's label
     ?topCategory skos:narrower ?secondLevelCategory .
-    ?category skos:broader+ ?secondLevelCategory .
+    ?category skos:broader* ?secondLevelCategory .
     ?secondLevelCategory skos:prefLabel ?secondLevelLabel .
   }
   FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
