@@ -19,7 +19,7 @@ SELECT DISTINCT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelC
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+    ( <http://zbw.eu/stw/version> zbwext:Thsys undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # get the current and the previous version as default versions
@@ -45,7 +45,7 @@ WHERE {
   GRAPH ?insertionsGraph {
     ?concept skos:prefLabel ?prefLabel
   }
-  # ... without any prefLabel deleted for this concept
+  # ... without any triples for this concept in the old version
   FILTER NOT EXISTS {
     GRAPH ?oldVersionGraph {
       ?concept ?p []
@@ -54,13 +54,13 @@ WHERE {
   GRAPH ?newVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
-    ?concept a ?conceptType .
-    ?concept skos:prefLabel ?prefLabel .
-    ?concept skos:broader ?category .
-    ?category a zbwext:Thsys .
-    ?category skos:broader* ?topCategory .
-    ?scheme skos:hasTopConcept ?topCategory .
-    ?topCategory skos:prefLabel ?topLabel .
+    ?concept a ?conceptType ;
+      skos:prefLabel ?prefLabel ;
+      skos:broader ?category .
+    ?category a zbwext:Thsys ;
+      skos:broader* ?topCategory .
+    ?topCategory skos:topConceptOf ?scheme ;
+      skos:prefLabel ?topLabel .
     #
     # get the second level category and it's label
     ?topCategory skos:narrower ?secondLevelCategory .
@@ -70,3 +70,4 @@ WHERE {
   FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
 }
 ORDER BY ?secondLevelCategoryLabel ?prefLabel
+
