@@ -20,10 +20,13 @@ WHERE {
   }
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta ;
-      sh:deltaTo/dc:identifier ?version ;
-      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo ?newVHR ;
+      sh:deltaFrom ?oldVHR ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
+    ?newVHR xhv:prev ?oldVHR ;
+      dc:identifier ?version .
+    ?oldVHR sh:usingNamedGraph/sd:name ?oldVersionGraph .
     ?insertions a sh:SchemeDeltaInsertions ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
