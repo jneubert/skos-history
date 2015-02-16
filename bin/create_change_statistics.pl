@@ -77,14 +77,14 @@ my %definition = (
           {
             column          => 'deprecated_descriptors',
             header          => 'Deprecated descriptors',
-            query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
+            query_file      => '../sparql/stw/count_deprecated_concepts.rq',
             replace         => { '?conceptType' => 'zbwext:Descriptor', },
             result_variable => 'deprecatedConceptCount',
           },
           {
             column          => 'deprecated_descriptors_replaced',
             header          => 'Redirected descriptors',
-            query_file      => '../sparql/stw/count_deprecated_descriptors.rq',
+            query_file      => '../sparql/stw/count_deprecated_concepts.rq',
             replace         => { '?conceptType' => 'zbwext:Descriptor', },
             result_variable => 'replacedByConceptCount',
           },
