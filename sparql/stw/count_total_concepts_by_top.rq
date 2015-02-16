@@ -38,8 +38,8 @@ WHERE {
     ?concept skos:broader ?category .
     ?category a zbwext:Thsys ;
       skos:broader* ?topConcept .
-    ?topConcept skos:topConceptOf ?scheme ;
-      skos:prefLabel ?topLabel .
+    $scheme skos:hasTopConcept ?topConcept .
+    ?topConcept skos:prefLabel ?topLabel .
     #
   }
   FILTER (lang(?topLabel) = ?language)

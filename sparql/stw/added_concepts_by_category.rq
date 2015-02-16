@@ -59,8 +59,8 @@ WHERE {
       skos:broader ?category .
     ?category a zbwext:Thsys ;
       skos:broader* ?topCategory .
-    ?topCategory skos:topConceptOf ?scheme ;
-      skos:prefLabel ?topLabel .
+    $scheme skos:hasTopConcept $topCategory .
+    ?topCategory skos:prefLabel ?topLabel .
     #
     # get the second level category and it's label
     ?topCategory skos:narrower ?secondLevelCategory .
