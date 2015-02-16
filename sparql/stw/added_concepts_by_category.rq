@@ -19,7 +19,7 @@ SELECT DISTINCT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelC
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Thsys undef undef "en" )
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # get the current and the previous version as default versions
