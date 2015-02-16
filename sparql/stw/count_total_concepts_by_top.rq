@@ -1,0 +1,49 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Count concepts of a certain type
+#
+SELECT  ?topConcept (str(max(?topLabel)) AS ?topConceptLabel) (str(count(?concept)) as ?totalConcepts)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the version to actually use
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    ?vhr dsv:hasVersionHistorySet ?vhs .
+    ?vhr dc:identifier ?newVersionSelected .
+    ?vhr sh:usingNamedGraph/sd:name ?versionGraph .
+  }
+  GRAPH ?versionGraph {
+    # ugly fix for a different custom namespace URI used in STW 8.04
+    BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
+    {
+      ?concept a ?obsoleteConceptType 
+    } UNION {
+      ?concept a ?conceptType
+    }
+    FILTER NOT EXISTS {
+      ?concept owl:deprecated true 
+    }
+    # get the top subject category (concept of subclass Thsys)
+    # subject categories form a mono-hierarchy within STW
+    ?concept skos:broader ?category .
+    ?category a zbwext:Thsys ;
+      skos:broader* ?topConcept .
+    ?topConcept skos:topConceptOf ?scheme ;
+      skos:prefLabel ?topLabel .
+    #
+  }
+  FILTER (lang(?topLabel) = ?language)
+}
+GROUP BY ?topConcept
+ORDER BY ?topConceptLabel
+

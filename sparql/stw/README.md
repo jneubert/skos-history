@@ -24,6 +24,8 @@ Query | Description
 ------|------------
 [count_added_concepts_by_category](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_added_concepts_by_category.rq) | Count added STW concepts by second-level category
 [count_deprecated_concepts_by_category](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_deprecated_concepts_by_category.rq) | Count deprecated STW concepts by second-level category
+[count_added_concepts_by_top](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_added_concepts_by_top.rq) | Count added STW concepts by sub-thesaurus (topConcept)
+[count_deprecated_concepts_by_top](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_deprecated_concepts_by_top.rq) | Count deprecated STW concepts by sub-thesaurus (topConcept)
 [count_added_concepts](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_added_concepts.rq) | Count added STW concepts (of a certain concept type) per version
 [count_deprecated_descriptors](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_deprecated_descriptors.rq) | Count deprecated STW descriptors per version
 [count_added_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/count_added_labels.rq) | Count added alt/prefLabels for STW descriptors in a certain language per version

@@ -1,0 +1,74 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Count concepts deprecated with a certain version
+# by sub-thesaurus (skos:topConcept)
+#
+# Subject categories have a different concept type (subclass of
+# skos:Concept) and form mono-hierarchies within STW. The top
+# level subject categories are the sub-thesauri. A descriptor
+# often belongs to more than one subject category.
+#
+SELECT distinct ?topConcept (str(max(?topLabel)) AS ?topConceptLabel)
+(str(count(distinct ?concept)) as ?deprecatedConcepts)
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+  }
+  # identify the deprecated concepts
+  GRAPH ?insertionsGraph {
+    ?concept owl:deprecated true
+  }
+  GRAPH ?oldVersionGraph {
+    # ugly fix for a different custom namespace URI used in STW 8.04
+    BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
+    BIND (uri(replace(str(zbwext:Thsys), "zbw-extensions", "skos-extensions")) AS ?obsoleteThsys)
+    {
+      ?concept a ?obsoleteConceptType
+    } UNION {
+      ?concept a ?conceptType
+    }
+    ?concept skos:broader ?category .
+    {
+      ?category a ?obsoleteThsys
+    } UNION {
+      ?category a zbwext:Thsys
+    }
+    ?category skos:broader* ?topConcept .
+    ?scheme skos:hasTopConcept ?topConcept .
+  }
+  GRAPH ?newVersionGraph {
+    ?topConcept skos:prefLabel ?topLabel
+  }
+  FILTER (lang(?topLabel) = ?language)
+}
+GROUP BY ?topConcept
+ORDER BY ?topConceptLabel
