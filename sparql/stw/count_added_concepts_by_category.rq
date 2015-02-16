@@ -55,7 +55,7 @@ WHERE {
   GRAPH ?newVersionGraph {
     # get the top subject category (concept of subclass Thsys)
     # subject categories form a mono-hierarchy within STW
-    ?concept a zbwext:Descriptor ;
+    ?concept a ?conceptType ;
       skos:broader ?category .
     ?category a zbwext:Thsys ;
       skos:broader* ?topConcept .
