@@ -50,8 +50,20 @@ WHERE {
   # Compute, for each level of the old hiearchy, the concepts
   # which got deprecated beyond that category
   GRAPH ?oldVersionGraph {
+    # ugly fix for a different custom namespace URI used in STW 8.04
+    BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
+    BIND (uri(replace(str(zbwext:Thsys), "zbw-extensions", "skos-extensions")) AS ?obsoleteThsys)
+    {
+      ?concept a ?obsoleteConceptType
+    } UNION {
+      ?concept a ?conceptType
+    }
     ?concept skos:broader ?category .
-    ?category a zbwext:Thsys .
+    {
+      ?category a ?obsoleteThsys
+    } UNION {
+      ?category a zbwext:Thsys
+    }
   }
   # Aggregate according to the hierarchy of the new (!) version
   GRAPH ?newVersionGraph {

@@ -66,8 +66,13 @@ WHERE {
     # subject categories form a mono-hierarchy within STW
     ?concept skos:prefLabel ?prefLabel ;
       skos:broader ?category .
-    ?category a zbwext:Thsys ;
-      skos:broader* ?topCategory .
+    BIND (uri(replace(str(zbwext:Thsys), "zbw-extensions", "skos-extensions")) AS ?obsoleteThsys)
+    {
+      ?category a ?obsoleteThsys
+    } UNION {
+      ?category a zbwext:Thsys
+    }
+    ?category skos:broader* ?topCategory .
     ?topCategory skos:topConceptOf ?scheme ;
       skos:prefLabel ?topLabel ;
     #
