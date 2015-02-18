@@ -177,6 +177,7 @@ my %definition = (
       {
         title              => 'Concept changes by category',
         row_head_name      => 'secondLevelCategory',
+        chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
         column_definitions => [
           {
             column     => 'secondLevelCategory',
@@ -189,14 +190,20 @@ my %definition = (
             column     => 'total_descriptors_8.06',
             header     => 'Total 8.06',
             query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace    => { '?language' => '"de"', '?version' => '"8.06"', },
+            replace    => {
+              '?newVersion'  => '"8.06"',
+              '?conceptType' => 'zbwext:Descriptor',
+            },
             result_variable => 'totalConcepts',
           },
           {
             column     => 'total_descriptors_8.14',
             header     => 'Total 8.14',
             query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace    => { '?language' => '"de"', '?version' => '"8.14"', },
+            replace    => {
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Descriptor',
+            },
             result_variable => 'totalConcepts',
           },
           {
@@ -204,9 +211,9 @@ my %definition = (
             header     => 'Added descriptors',
             query_file => '../sparql/stw/count_added_concepts_by_category.rq',
             replace    => {
-              '?language'   => '"de"',
-              '?oldVersion' => '"8.06"',
-              '?newVersion' => '"8.14"',
+              '?oldVersion'  => '"8.06"',
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Descriptor',
             },
             result_variable => 'addedConcepts',
           },
@@ -216,18 +223,57 @@ my %definition = (
             query_file =>
               '../sparql/stw/count_deprecated_concepts_by_category.rq',
             replace => {
-              '?language'   => '"de"',
-              '?oldVersion' => '"8.06"',
-              '?newVersion' => '"8.14"',
+              '?oldVersion'  => '"8.06"',
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Descriptor',
             },
             result_variable => 'deprecatedConcepts',
+          },
+          {
+            column     => 'added_thsys',
+            header     => 'Added categories',
+            query_file => '../sparql/stw/count_added_concepts_by_category.rq',
+            replace    => {
+              '?oldVersion'  => '"8.06"',
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Thsys',
+            },
+            result_variable => 'addedConcepts',
+          },
+          {
+            column => 'deprecated_thsys',
+            header => 'Deprecated categories',
+            query_file =>
+              '../sparql/stw/count_deprecated_concepts_by_category.rq',
+            replace => {
+              '?oldVersion'  => '"8.06"',
+              '?newVersion'  => '"8.14"',
+              '?conceptType' => 'zbwext:Thsys',
+            },
+            result_variable => 'deprecatedConcepts',
+          },
+          {
+            column     => 'total_thsys_8.06',
+            header     => 'Total categories 8.06',
+            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace =>
+              { '?newVersion' => '"8.06"', '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'totalConcepts',
+          },
+          {
+            column     => 'total_thsys_8.14',
+            header     => 'Total categories 8.14',
+            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+            replace =>
+              { '?newVersion' => '"8.14"', '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'totalConcepts',
           },
         ],
       },
       {
-        title              => 'Descriptor changes by sub-thesaurus',
+        title              => 'Concept changes by sub-thesaurus',
         row_head_name      => 'topConcept',
-        chart_data         => [ [ 3, 2 ], [ 1, 4 ], ],
+        chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
         column_definitions => [
           {
             column          => 'topConcept',
@@ -237,10 +283,17 @@ my %definition = (
             result_variable => 'topConceptLabel',
           },
           {
-            column     => 'total_descriptors_8.06',
-            header     => 'Total 8.06',
-            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace    => { '?language' => '"de"', '?newVersion' => '"8.06"', },
+            column          => 'total_descriptors_8.06',
+            header          => 'Total descriptors 8.06',
+            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace         => { '?newVersion' => '"8.06"', },
+            result_variable => 'totalConcepts',
+          },
+          {
+            column          => 'total_descriptors_8.14',
+            header          => 'Total 8.14',
+            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace         => { '?newVersion' => '"8.14"', },
             result_variable => 'totalConcepts',
           },
           {
@@ -248,7 +301,6 @@ my %definition = (
             header     => 'Added descriptors',
             query_file => '../sparql/stw/count_added_concepts_by_top.rq',
             replace    => {
-              '?language'   => '"de"',
               '?oldVersion' => '"8.06"',
               '?newVersion' => '"8.14"',
             },
@@ -259,36 +311,14 @@ my %definition = (
             header     => 'Deprecated descriptors',
             query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
             replace    => {
-              '?language'   => '"de"',
               '?oldVersion' => '"8.06"',
               '?newVersion' => '"8.14"',
             },
             result_variable => 'deprecatedConcepts',
           },
           {
-            column     => 'total_descriptors_8.14',
-            header     => 'Total 8.14',
-            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace    => { '?language' => '"de"', '?newVersion' => '"8.14"', },
-            result_variable => 'totalConcepts',
-          },
-        ],
-      },
-      {
-        title              => 'Thsys changes by sub-thesaurus',
-        row_head_name      => 'topConcept',
-        chart_data         => [ [ 2, 1 ], ],
-        column_definitions => [
-          {
-            column          => 'topConcept',
-            header          => 'Sub-thesaurus',
-            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace         => { '?language' => '"en"', },
-            result_variable => 'topConceptLabel',
-          },
-          {
-            column     => 'added_descriptors',
-            header     => 'Added descriptors',
+            column     => 'added_thsys',
+            header     => 'Added categories',
             query_file => '../sparql/stw/count_added_concepts_by_top.rq',
             replace    => {
               '?language'    => '"de"',
@@ -299,8 +329,8 @@ my %definition = (
             result_variable => 'addedConcepts',
           },
           {
-            column     => 'deprecated_descriptors',
-            header     => 'Deprecated descriptors',
+            column     => 'deprecated_thsys',
+            header     => 'Deprecated categories',
             query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
             replace    => {
               '?language'    => '"de"',
@@ -309,6 +339,22 @@ my %definition = (
               '?conceptType' => 'zbwext:Thsys',
             },
             result_variable => 'deprecatedConcepts',
+          },
+          {
+            column     => 'total_thsys_8.06',
+            header     => 'Total categories 8.06',
+            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace =>
+              { '?newVersion' => '"8.06"', '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'totalConcepts',
+          },
+          {
+            column     => 'total_thsys_8.14',
+            header     => 'Total categories 8.14',
+            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
+            replace =>
+              { '?newVersion' => '"8.14"', '?conceptType' => 'zbwext:Thsys', },
+            result_variable => 'totalConcepts',
           },
         ],
       },
