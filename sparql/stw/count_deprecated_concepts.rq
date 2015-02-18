@@ -17,16 +17,19 @@ WHERE {
     ( <http://zbw.eu/stw/version> zbwext:Descriptor )
   }
   GRAPH ?versionHistoryGraph {
-    ?delta a sh:SchemeDelta .
-    ?delta sh:deltaTo/dc:identifier ?version .
-    ?delta sh:deltaTo/sh:usingNamedGraph/sd:name ?versionGraph .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?delta a sh:SchemeDelta ;
+      sh:deltaTo ?newVHR ;
+      sh:deltaFrom ?oldVHR ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?newVHR xhv:prev ?oldVHR ;
+      dc:identifier ?version ;
+      sh:usingNamedGraph/sd:name ?versionGraph .
+    ?oldVHR sh:usingNamedGraph/sd:name ?oldVersionGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # identify the deprecated concepts
   GRAPH ?insertionsGraph {
