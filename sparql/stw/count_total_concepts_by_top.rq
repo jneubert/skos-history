@@ -18,9 +18,9 @@ WHERE {
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
     # select the version to actually use
     BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
-    ?vhr dsv:hasVersionHistorySet ?vhs .
-    ?vhr dc:identifier ?newVersionSelected .
-    ?vhr sh:usingNamedGraph/sd:name ?versionGraph .
+    ?vhr dsv:hasVersionHistorySet ?vhs ;
+      dc:identifier ?newVersionSelected ;
+      sh:usingNamedGraph/sd:name ?versionGraph .
   }
   GRAPH ?versionGraph {
     # ugly fix for a different custom namespace URI used in STW 8.04
