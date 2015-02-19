@@ -22,392 +22,11 @@ use String::Util qw/unquote/;
 use URI::file;
 
 # create utf8 output
-binmode(STDOUT, ":utf8");
+binmode( STDOUT, ":utf8" );
 
 # List of version and data structure for results
 
-# List of queries and parameters for each statistics column
-# (the first column for each table must return the row_head values).
-
-my %definition = (
-  'stw' => {
-    version_history_set => '<http://zbw.eu/stw/version>',
-    tables              => [
-      {
-        title              => 'Concept changes by version',
-        row_head_name      => 'version',
-        column_definitions => [
-          {
-            column          => 'version',
-            header          => 'Version',
-            query_file      => '../sparql/version_overview.rq',
-            result_variable => 'version',
-          },
-          {
-            column          => 'version_date',
-            header          => 'Date',
-            query_file      => '../sparql/version_overview.rq',
-            result_variable => 'date',
-          },
-          {
-            column          => 'total_thsys',
-            header          => 'Total thsys',
-            query_file      => '../sparql/stw/count_concepts.rq',
-            replace         => { '?type' => '"Thsys"', },
-            result_variable => 'conceptCount',
-          },
-          {
-            column          => 'total_descriptors',
-            header          => 'Total descriptors',
-            query_file      => '../sparql/stw/count_concepts.rq',
-            replace         => { '?type' => '"Descriptor"', },
-            result_variable => 'conceptCount',
-          },
-          {
-            column          => 'added_thsys',
-            header          => 'Added thsys',
-            query_file      => '../sparql/stw/count_added_concepts.rq',
-            replace         => { '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'addedConceptCount',
-          },
-          {
-            column          => 'added_descriptors',
-            header          => 'Added descriptors',
-            query_file      => '../sparql/stw/count_added_concepts.rq',
-            replace         => { '?conceptType' => 'zbwext:Descriptor', },
-            result_variable => 'addedConceptCount',
-          },
-          {
-            column          => 'deprecated_descriptors',
-            header          => 'Deprecated descriptors',
-            query_file      => '../sparql/stw/count_deprecated_concepts.rq',
-            replace         => { '?conceptType' => 'zbwext:Descriptor', },
-            result_variable => 'deprecatedConceptCount',
-          },
-          {
-            column          => 'deprecated_descriptors_replaced',
-            header          => 'Redirected descriptors',
-            query_file      => '../sparql/stw/count_deprecated_concepts.rq',
-            replace         => { '?conceptType' => 'zbwext:Descriptor', },
-            result_variable => 'replacedByConceptCount',
-          },
-        ],
-      },
-      {
-        title              => 'Label changes by version',
-        row_head_name      => 'version',
-        column_definitions => [
-          {
-            column          => 'version',
-            header          => 'Version',
-            query_file      => '../sparql/version_overview.rq',
-            result_variable => 'version',
-          },
-          {
-            column          => 'added_labels',
-            header          => 'Added labels (total en)',
-            query_file      => '../sparql/count_added_labels.rq',
-            result_variable => 'addedLabelCount',
-          },
-          {
-            column          => 'deleted_labels',
-            header          => 'Deleted labels (total en)',
-            query_file      => '../sparql/count_deleted_labels.rq',
-            result_variable => 'deletedLabelCount',
-          },
-          {
-            column     => 'added_des_labels_en',
-            header     => 'Added descriptor labels (en)',
-            query_file => '../sparql/stw/count_added_labels.rq',
-            replace =>
-              { '?language' => '"en"', '?conceptType' => 'zbwext:Descriptor', },
-            result_variable => 'addedLabelCount',
-          },
-          {
-            column     => 'deleted_des_labels_en',
-            header     => 'Deleted descriptor labels (en)',
-            query_file => '../sparql/stw/count_deleted_labels.rq',
-            replace    => { '?language' => '"en"', '?type' => '"Descriptor"', },
-            result_variable => 'deletedLabelCount',
-          },
-          {
-            column     => 'added_des_labels_de',
-            header     => 'Added descriptor labels (de)',
-            query_file => '../sparql/stw/count_added_labels.rq',
-            replace =>
-              { '?language' => '"de"', '?conceptType' => 'zbwext:Descriptor', },
-            result_variable => 'addedLabelCount',
-          },
-          {
-            column     => 'deleted_des_labels_de',
-            header     => 'Deleted descriptor labels (de)',
-            query_file => '../sparql/stw/count_deleted_labels.rq',
-            replace    => { '?language' => '"de"', '?type' => '"Descriptor"', },
-            result_variable => 'deletedLabelCount',
-          },
-          {
-            column     => 'added_sys_labels_en',
-            header     => 'Added thsys labels (en)',
-            query_file => '../sparql/stw/count_added_labels.rq',
-            replace =>
-              { '?language' => '"en"', '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'addedLabelCount',
-          },
-          {
-            column          => 'deleted_sys_labels_en',
-            header          => 'Deleted thsys labels (en)',
-            query_file      => '../sparql/stw/count_deleted_labels.rq',
-            replace         => { '?language' => '"en"', '?type' => '"Thsys"', },
-            result_variable => 'deletedLabelCount',
-          },
-          {
-            column     => 'added_sys_labels_de',
-            header     => 'Added thsys labels (de)',
-            query_file => '../sparql/stw/count_added_labels.rq',
-            replace =>
-              { '?language' => '"de"', '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'addedLabelCount',
-          },
-          {
-            column          => 'deleted_sys_labels_de',
-            header          => 'Deleted thsys labels (de)',
-            query_file      => '../sparql/stw/count_deleted_labels.rq',
-            replace         => { '?language' => '"de"', '?type' => '"Thsys"', },
-            result_variable => 'deletedLabelCount',
-          },
-        ],
-      },
-      {
-        title              => 'Concept changes by category',
-        row_head_name      => 'secondLevelCategory',
-        chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
-        column_definitions => [
-          {
-            column     => 'secondLevelCategory',
-            header     => 'Second level category',
-            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace    => { '?language' => '"de"', },
-            result_variable => 'secondLevelCategoryLabel',
-          },
-          {
-            column     => 'total_descriptors_8.06',
-            header     => 'Total 8.06',
-            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace    => {
-              '?newVersion'  => '"8.06"',
-              '?conceptType' => 'zbwext:Descriptor',
-            },
-            result_variable => 'totalConcepts',
-          },
-          {
-            column     => 'total_descriptors_8.14',
-            header     => 'Total 8.14',
-            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace    => {
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Descriptor',
-            },
-            result_variable => 'totalConcepts',
-          },
-          {
-            column     => 'added_descriptors',
-            header     => 'Added descriptors',
-            query_file => '../sparql/stw/count_added_concepts_by_category.rq',
-            replace    => {
-              '?oldVersion'  => '"8.06"',
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Descriptor',
-            },
-            result_variable => 'addedConcepts',
-          },
-          {
-            column => 'deprecated_descriptors',
-            header => 'Deprecated descriptors',
-            query_file =>
-              '../sparql/stw/count_deprecated_concepts_by_category.rq',
-            replace => {
-              '?oldVersion'  => '"8.06"',
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Descriptor',
-            },
-            result_variable => 'deprecatedConcepts',
-          },
-          {
-            column     => 'added_thsys',
-            header     => 'Added categories',
-            query_file => '../sparql/stw/count_added_concepts_by_category.rq',
-            replace    => {
-              '?oldVersion'  => '"8.06"',
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Thsys',
-            },
-            result_variable => 'addedConcepts',
-          },
-          {
-            column => 'deprecated_thsys',
-            header => 'Deprecated categories',
-            query_file =>
-              '../sparql/stw/count_deprecated_concepts_by_category.rq',
-            replace => {
-              '?oldVersion'  => '"8.06"',
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Thsys',
-            },
-            result_variable => 'deprecatedConcepts',
-          },
-          {
-            column     => 'total_thsys_8.06',
-            header     => 'Total categories 8.06',
-            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace =>
-              { '?newVersion' => '"8.06"', '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'totalConcepts',
-          },
-          {
-            column     => 'total_thsys_8.14',
-            header     => 'Total categories 8.14',
-            query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace =>
-              { '?newVersion' => '"8.14"', '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'totalConcepts',
-          },
-        ],
-      },
-      {
-        title              => 'Concept changes by sub-thesaurus',
-        row_head_name      => 'topConcept',
-        chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
-        column_definitions => [
-          {
-            column          => 'topConcept',
-            header          => 'Sub-thesaurus',
-            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace         => { '?language' => '"en"', },
-            result_variable => 'topConceptLabel',
-          },
-          {
-            column          => 'total_descriptors_8.06',
-            header          => 'Total descriptors 8.06',
-            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace         => { '?newVersion' => '"8.06"', },
-            result_variable => 'totalConcepts',
-          },
-          {
-            column          => 'total_descriptors_8.14',
-            header          => 'Total 8.14',
-            query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace         => { '?newVersion' => '"8.14"', },
-            result_variable => 'totalConcepts',
-          },
-          {
-            column     => 'added_descriptors',
-            header     => 'Added descriptors',
-            query_file => '../sparql/stw/count_added_concepts_by_top.rq',
-            replace    => {
-              '?oldVersion' => '"8.06"',
-              '?newVersion' => '"8.14"',
-            },
-            result_variable => 'addedConcepts',
-          },
-          {
-            column     => 'deprecated_descriptors',
-            header     => 'Deprecated descriptors',
-            query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
-            replace    => {
-              '?oldVersion' => '"8.06"',
-              '?newVersion' => '"8.14"',
-            },
-            result_variable => 'deprecatedConcepts',
-          },
-          {
-            column     => 'added_thsys',
-            header     => 'Added categories',
-            query_file => '../sparql/stw/count_added_concepts_by_top.rq',
-            replace    => {
-              '?language'    => '"de"',
-              '?oldVersion'  => '"8.06"',
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Thsys',
-            },
-            result_variable => 'addedConcepts',
-          },
-          {
-            column     => 'deprecated_thsys',
-            header     => 'Deprecated categories',
-            query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
-            replace    => {
-              '?language'    => '"de"',
-              '?oldVersion'  => '"8.06"',
-              '?newVersion'  => '"8.14"',
-              '?conceptType' => 'zbwext:Thsys',
-            },
-            result_variable => 'deprecatedConcepts',
-          },
-          {
-            column     => 'total_thsys_8.06',
-            header     => 'Total categories 8.06',
-            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace =>
-              { '?newVersion' => '"8.06"', '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'totalConcepts',
-          },
-          {
-            column     => 'total_thsys_8.14',
-            header     => 'Total categories 8.14',
-            query_file => '../sparql/stw/count_total_concepts_by_top.rq',
-            replace =>
-              { '?newVersion' => '"8.14"', '?conceptType' => 'zbwext:Thsys', },
-            result_variable => 'totalConcepts',
-          },
-        ],
-      },
-    ],
-  },
-  'thesoz' => {
-    version_history_set => '<http://lod.gesis.org/thesoz/version>',
-    tables              => [
-      {
-        title              => 'Concept changes by version',
-        row_head_name      => 'version',
-        column_definitions => [
-          {
-            column          => 'version',
-            header          => 'Version',
-            query_file      => '../sparql/version_overview.rq',
-            result_variable => 'version',
-          },
-          {
-            column          => 'version_date',
-            header          => 'Date',
-            query_file      => '../sparql/version_overview.rq',
-            result_variable => 'date',
-          },
-          {
-            column          => 'added_concepts',
-            header          => 'Added concepts',
-            query_file      => '../sparql/count_added_concepts.rq',
-            result_variable => 'addedConceptCount',
-          },
-          {
-            column     => 'added_descriptors',
-            header     => 'Added descriptors',
-            query_file => '../sparql/stw/count_added_concepts.rq',
-            replace    => {
-              '?conceptType' => '<http://lod.gesis.org/thesoz/ext/Descriptor>',
-            },
-            result_variable => 'addedConceptCount',
-          },
-          {
-            column          => 'deleted_concepts',
-            header          => 'Deleted concepts',
-            query_file      => '../sparql/count_deleted_concepts.rq',
-            result_variable => 'deletedConceptCount',
-          },
-        ],
-      },
-    ],
-  },
-);
+my %definition = %{ get_definition() };
 
 my $dataset = $ARGV[0];
 my $table   = $ARGV[1];
@@ -419,9 +38,11 @@ if ( not( $dataset and $definition{$dataset} ) ) {
 
 my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 
+# Main loop over all tables of a dataset
+
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
 
-  # If a table parameter is give, skip everything else
+  # If a table parameter is given, skip everything else
   if ( $table and $$table_ref{title} ne $table ) {
     next;
   }
@@ -610,3 +231,403 @@ sub print_chart_data {
   print "      }]\n\n";
 }
 
+sub get_definition {
+
+  # List of queries and parameters for each statistics column
+  # (the first column for each table must return the row_head values).
+
+  my %definition = (
+    'stw' => {
+      version_history_set => '<http://zbw.eu/stw/version>',
+      tables              => [
+        {
+          title              => 'Concept changes by version',
+          row_head_name      => 'version',
+          column_definitions => [
+            {
+              column          => 'version',
+              header          => 'Version',
+              query_file      => '../sparql/version_overview.rq',
+              result_variable => 'version',
+            },
+            {
+              column          => 'version_date',
+              header          => 'Date',
+              query_file      => '../sparql/version_overview.rq',
+              result_variable => 'date',
+            },
+            {
+              column          => 'total_thsys',
+              header          => 'Total thsys',
+              query_file      => '../sparql/stw/count_concepts.rq',
+              replace         => { '?type' => '"Thsys"', },
+              result_variable => 'conceptCount',
+            },
+            {
+              column          => 'total_descriptors',
+              header          => 'Total descriptors',
+              query_file      => '../sparql/stw/count_concepts.rq',
+              replace         => { '?type' => '"Descriptor"', },
+              result_variable => 'conceptCount',
+            },
+            {
+              column          => 'added_thsys',
+              header          => 'Added thsys',
+              query_file      => '../sparql/stw/count_added_concepts.rq',
+              replace         => { '?conceptType' => 'zbwext:Thsys', },
+              result_variable => 'addedConceptCount',
+            },
+            {
+              column          => 'added_descriptors',
+              header          => 'Added descriptors',
+              query_file      => '../sparql/stw/count_added_concepts.rq',
+              replace         => { '?conceptType' => 'zbwext:Descriptor', },
+              result_variable => 'addedConceptCount',
+            },
+            {
+              column          => 'deprecated_descriptors',
+              header          => 'Deprecated descriptors',
+              query_file      => '../sparql/stw/count_deprecated_concepts.rq',
+              replace         => { '?conceptType' => 'zbwext:Descriptor', },
+              result_variable => 'deprecatedConceptCount',
+            },
+            {
+              column          => 'deprecated_descriptors_replaced',
+              header          => 'Redirected descriptors',
+              query_file      => '../sparql/stw/count_deprecated_concepts.rq',
+              replace         => { '?conceptType' => 'zbwext:Descriptor', },
+              result_variable => 'replacedByConceptCount',
+            },
+          ],
+        },
+        {
+          title              => 'Label changes by version',
+          row_head_name      => 'version',
+          column_definitions => [
+            {
+              column          => 'version',
+              header          => 'Version',
+              query_file      => '../sparql/version_overview.rq',
+              result_variable => 'version',
+            },
+            {
+              column          => 'added_labels',
+              header          => 'Added labels (total en)',
+              query_file      => '../sparql/count_added_labels.rq',
+              result_variable => 'addedLabelCount',
+            },
+            {
+              column          => 'deleted_labels',
+              header          => 'Deleted labels (total en)',
+              query_file      => '../sparql/count_deleted_labels.rq',
+              result_variable => 'deletedLabelCount',
+            },
+            {
+              column     => 'added_des_labels_en',
+              header     => 'Added descriptor labels (en)',
+              query_file => '../sparql/stw/count_added_labels.rq',
+              replace    => {
+                '?language'    => '"en"',
+                '?conceptType' => 'zbwext:Descriptor',
+              },
+              result_variable => 'addedLabelCount',
+            },
+            {
+              column     => 'deleted_des_labels_en',
+              header     => 'Deleted descriptor labels (en)',
+              query_file => '../sparql/stw/count_deleted_labels.rq',
+              replace => { '?language' => '"en"', '?type' => '"Descriptor"', },
+              result_variable => 'deletedLabelCount',
+            },
+            {
+              column     => 'added_des_labels_de',
+              header     => 'Added descriptor labels (de)',
+              query_file => '../sparql/stw/count_added_labels.rq',
+              replace    => {
+                '?language'    => '"de"',
+                '?conceptType' => 'zbwext:Descriptor',
+              },
+              result_variable => 'addedLabelCount',
+            },
+            {
+              column     => 'deleted_des_labels_de',
+              header     => 'Deleted descriptor labels (de)',
+              query_file => '../sparql/stw/count_deleted_labels.rq',
+              replace => { '?language' => '"de"', '?type' => '"Descriptor"', },
+              result_variable => 'deletedLabelCount',
+            },
+            {
+              column     => 'added_sys_labels_en',
+              header     => 'Added thsys labels (en)',
+              query_file => '../sparql/stw/count_added_labels.rq',
+              replace =>
+                { '?language' => '"en"', '?conceptType' => 'zbwext:Thsys', },
+              result_variable => 'addedLabelCount',
+            },
+            {
+              column     => 'deleted_sys_labels_en',
+              header     => 'Deleted thsys labels (en)',
+              query_file => '../sparql/stw/count_deleted_labels.rq',
+              replace    => { '?language' => '"en"', '?type' => '"Thsys"', },
+              result_variable => 'deletedLabelCount',
+            },
+            {
+              column     => 'added_sys_labels_de',
+              header     => 'Added thsys labels (de)',
+              query_file => '../sparql/stw/count_added_labels.rq',
+              replace =>
+                { '?language' => '"de"', '?conceptType' => 'zbwext:Thsys', },
+              result_variable => 'addedLabelCount',
+            },
+            {
+              column     => 'deleted_sys_labels_de',
+              header     => 'Deleted thsys labels (de)',
+              query_file => '../sparql/stw/count_deleted_labels.rq',
+              replace    => { '?language' => '"de"', '?type' => '"Thsys"', },
+              result_variable => 'deletedLabelCount',
+            },
+          ],
+        },
+        {
+          title              => 'Concept changes by category',
+          row_head_name      => 'secondLevelCategory',
+          chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
+          column_definitions => [
+            {
+              column     => 'secondLevelCategory',
+              header     => 'Second level category',
+              query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+              replace    => { '?language' => '"de"', },
+              result_variable => 'secondLevelCategoryLabel',
+            },
+            {
+              column     => 'total_descriptors_8.06',
+              header     => 'Total 8.06',
+              query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+              replace    => {
+                '?newVersion'  => '"8.06"',
+                '?conceptType' => 'zbwext:Descriptor',
+              },
+              result_variable => 'totalConcepts',
+            },
+            {
+              column     => 'total_descriptors_8.14',
+              header     => 'Total 8.14',
+              query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+              replace    => {
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Descriptor',
+              },
+              result_variable => 'totalConcepts',
+            },
+            {
+              column     => 'added_descriptors',
+              header     => 'Added descriptors',
+              query_file => '../sparql/stw/count_added_concepts_by_category.rq',
+              replace    => {
+                '?oldVersion'  => '"8.06"',
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Descriptor',
+              },
+              result_variable => 'addedConcepts',
+            },
+            {
+              column => 'deprecated_descriptors',
+              header => 'Deprecated descriptors',
+              query_file =>
+                '../sparql/stw/count_deprecated_concepts_by_category.rq',
+              replace => {
+                '?oldVersion'  => '"8.06"',
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Descriptor',
+              },
+              result_variable => 'deprecatedConcepts',
+            },
+            {
+              column     => 'added_thsys',
+              header     => 'Added categories',
+              query_file => '../sparql/stw/count_added_concepts_by_category.rq',
+              replace    => {
+                '?oldVersion'  => '"8.06"',
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'addedConcepts',
+            },
+            {
+              column => 'deprecated_thsys',
+              header => 'Deprecated categories',
+              query_file =>
+                '../sparql/stw/count_deprecated_concepts_by_category.rq',
+              replace => {
+                '?oldVersion'  => '"8.06"',
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'deprecatedConcepts',
+            },
+            {
+              column     => 'total_thsys_8.06',
+              header     => 'Total categories 8.06',
+              query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+              replace    => {
+                '?newVersion'  => '"8.06"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'totalConcepts',
+            },
+            {
+              column     => 'total_thsys_8.14',
+              header     => 'Total categories 8.14',
+              query_file => '../sparql/stw/count_total_concepts_by_category.rq',
+              replace    => {
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'totalConcepts',
+            },
+          ],
+        },
+        {
+          title              => 'Concept changes by sub-thesaurus',
+          row_head_name      => 'topConcept',
+          chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
+          column_definitions => [
+            {
+              column          => 'topConcept',
+              header          => 'Sub-thesaurus',
+              query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+              replace         => { '?language' => '"en"', },
+              result_variable => 'topConceptLabel',
+            },
+            {
+              column          => 'total_descriptors_8.06',
+              header          => 'Total descriptors 8.06',
+              query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+              replace         => { '?newVersion' => '"8.06"', },
+              result_variable => 'totalConcepts',
+            },
+            {
+              column          => 'total_descriptors_8.14',
+              header          => 'Total 8.14',
+              query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
+              replace         => { '?newVersion' => '"8.14"', },
+              result_variable => 'totalConcepts',
+            },
+            {
+              column     => 'added_descriptors',
+              header     => 'Added descriptors',
+              query_file => '../sparql/stw/count_added_concepts_by_top.rq',
+              replace    => {
+                '?oldVersion' => '"8.06"',
+                '?newVersion' => '"8.14"',
+              },
+              result_variable => 'addedConcepts',
+            },
+            {
+              column     => 'deprecated_descriptors',
+              header     => 'Deprecated descriptors',
+              query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
+              replace    => {
+                '?oldVersion' => '"8.06"',
+                '?newVersion' => '"8.14"',
+              },
+              result_variable => 'deprecatedConcepts',
+            },
+            {
+              column     => 'added_thsys',
+              header     => 'Added categories',
+              query_file => '../sparql/stw/count_added_concepts_by_top.rq',
+              replace    => {
+                '?language'    => '"de"',
+                '?oldVersion'  => '"8.06"',
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'addedConcepts',
+            },
+            {
+              column     => 'deprecated_thsys',
+              header     => 'Deprecated categories',
+              query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
+              replace    => {
+                '?language'    => '"de"',
+                '?oldVersion'  => '"8.06"',
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'deprecatedConcepts',
+            },
+            {
+              column     => 'total_thsys_8.06',
+              header     => 'Total categories 8.06',
+              query_file => '../sparql/stw/count_total_concepts_by_top.rq',
+              replace    => {
+                '?newVersion'  => '"8.06"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'totalConcepts',
+            },
+            {
+              column     => 'total_thsys_8.14',
+              header     => 'Total categories 8.14',
+              query_file => '../sparql/stw/count_total_concepts_by_top.rq',
+              replace    => {
+                '?newVersion'  => '"8.14"',
+                '?conceptType' => 'zbwext:Thsys',
+              },
+              result_variable => 'totalConcepts',
+            },
+          ],
+        },
+      ],
+    },
+    'thesoz' => {
+      version_history_set => '<http://lod.gesis.org/thesoz/version>',
+      tables              => [
+        {
+          title              => 'Concept changes by version',
+          row_head_name      => 'version',
+          column_definitions => [
+            {
+              column          => 'version',
+              header          => 'Version',
+              query_file      => '../sparql/version_overview.rq',
+              result_variable => 'version',
+            },
+            {
+              column          => 'version_date',
+              header          => 'Date',
+              query_file      => '../sparql/version_overview.rq',
+              result_variable => 'date',
+            },
+            {
+              column          => 'added_concepts',
+              header          => 'Added concepts',
+              query_file      => '../sparql/count_added_concepts.rq',
+              result_variable => 'addedConceptCount',
+            },
+            {
+              column     => 'added_descriptors',
+              header     => 'Added descriptors',
+              query_file => '../sparql/stw/count_added_concepts.rq',
+              replace    => {
+                '?conceptType' =>
+                  '<http://lod.gesis.org/thesoz/ext/Descriptor>',
+              },
+              result_variable => 'addedConceptCount',
+            },
+            {
+              column          => 'deleted_concepts',
+              header          => 'Deleted concepts',
+              query_file      => '../sparql/count_deleted_concepts.rq',
+              result_variable => 'deletedConceptCount',
+            },
+          ],
+        },
+      ],
+    },
+  );
+
+  return \%definition;
+}
