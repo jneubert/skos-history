@@ -21,6 +21,9 @@ use RDF::Query::Client;
 use String::Util qw/unquote/;
 use URI::file;
 
+# create utf8 output
+binmode(STDOUT, ":utf8");
+
 # List of version and data structure for results
 
 # List of queries and parameters for each statistics column
@@ -183,7 +186,7 @@ my %definition = (
             column     => 'secondLevelCategory',
             header     => 'Second level category',
             query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-            replace    => { '?language' => '"en"', },
+            replace    => { '?language' => '"de"', },
             result_variable => 'secondLevelCategoryLabel',
           },
           {
