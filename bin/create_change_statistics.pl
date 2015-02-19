@@ -13,6 +13,7 @@
 use strict;
 use warnings;
 use lib qw(lib);
+use utf8;
 
 use Class::CSV;
 use Data::Dumper;
@@ -42,8 +43,11 @@ my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
 
+  # TODO remove next line
+  next if ref( $$table_ref{title} ) eq '';
+
   # If a table parameter is given, skip everything else
-  if ( $table and $$table_ref{title} ne $table ) {
+  if ( $table and $$table_ref{title}{en} ne $table ) {
     next;
   }
   my @column_definitions = @{ $$table_ref{column_definitions} };
@@ -56,28 +60,14 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
       $columndef_ref, \@row_heads, \%data );
   }
 
-  # initialize csv table with column names and headers
-  my ( @columns, @column_headers );
-  foreach my $column_ref (@column_definitions) {
-    push( @columns,        $$column_ref{column} );
-    push( @column_headers, $$column_ref{header} );
-  }
-  my $csv = Class::CSV->new( fields => \@columns );
-  $csv->add_line( \@column_headers );
+  foreach my $lang ( @{ $$table_ref{languages} } ) {
+    my $csv = build_csv( \@column_definitions, \@row_heads, \%data, $lang );
+    print_csv( $table_ref, $csv, $lang );
 
-  # add rows
-  foreach my $row (@row_heads) {
-    $csv->add_line( $data{$row} );
-  }
-
-  # output resulting table
-  print "\n", $$table_ref{title}, "\n\n";
-  $csv->print;
-  print "\n";
-
-  # special output for changed categories
-  foreach my $chart_data_ref ( @{ $$table_ref{chart_data} } ) {
-    print_chart_data( $csv, $table_ref, $chart_data_ref );
+    # special output for changed categories
+    ##foreach my $chart_data_ref ( @{ $$table_ref{chart_data} } ) {
+    ##print_chart_data( $csv, $table_ref, $chart_data_ref );
+    ##}
   }
 }
 
@@ -89,7 +79,10 @@ sub print_usage {
   foreach my $dataset ( sort keys %definition ) {
     print "  $dataset\n";
     foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
-      print "    $$table_ref{title}\n";
+
+      # TODO remove next line
+      next if ref( $$table_ref{title} ) eq '';
+      print "    $$table_ref{title}{en}\n";
     }
   }
   print "\n";
@@ -111,38 +104,60 @@ sub get_column {
   $$columndef_ref{replace}{'?versionHistoryGraph'} =
     $definition{$dataset}{version_history_set};
 
-  # parse VALUES clause
-  my ( $variables_ref, $value_ref ) = parse_values($query);
-
-  # replace values
-  foreach my $variable ( keys %$value_ref ) {
-    if ( defined( $$columndef_ref{replace}{$variable} ) ) {
-      $$value_ref{$variable} = $$columndef_ref{replace}{$variable};
-    }
+  # column must get a sub-stucture by language if multilingual
+  my $multi_lingual = 0;
+  my @languages     = ('en');
+  if ( exists( $$columndef_ref{languages} ) ) {
+    $multi_lingual = 1;
+    @languages     = @{ $$columndef_ref{languages} };
   }
-  $query = insert_modified_values( $query, $variables_ref, $value_ref );
 
-  # execute query
-  my $q        = RDF::Query::Client->new($query);
-  my $iterator = $q->execute($endpoint)
-    or die "Can't execute $$columndef_ref{query_file}\n";
+  foreach my $lang (@languages) {
 
-  # parse and add results
-  while ( my $row = $iterator->next ) {
-    my $row_head = unquote( $row->{$row_head_name}->as_string );
+    # add standard replacement for ?versionHistorySet
+    $$columndef_ref{replace}{'?language'} = "\"$lang\"";
 
-    if ( defined $$data_ref{$row_head} or $first_column ) {
-      die 'Result variable ', $$columndef_ref{result_variable},
-        ' is not defined in ', $$columndef_ref{query_file}, "\n"
-        unless $row->{ $$columndef_ref{result_variable} };
-      $$data_ref{$row_head}{ $$columndef_ref{column} } =
-        unquote( $row->{ $$columndef_ref{result_variable} }->as_string );
+    # parse VALUES clause
+    my ( $variables_ref, $value_ref ) = parse_values($query);
 
-      # the list of row headings is dynamically created here
-      if ($first_column) {
-        push( @{$row_head_ref}, $row_head );
+    # replace values
+    foreach my $variable ( keys %$value_ref ) {
+      if ( defined( $$columndef_ref{replace}{$variable} ) ) {
+        $$value_ref{$variable} = $$columndef_ref{replace}{$variable};
       }
     }
+    $query = insert_modified_values( $query, $variables_ref, $value_ref );
+
+    # execute query
+    my $q        = RDF::Query::Client->new($query);
+    my $iterator = $q->execute($endpoint)
+      or die "Can't execute $$columndef_ref{query_file}\n";
+
+    # parse and add results
+    while ( my $row = $iterator->next ) {
+      my $row_head = unquote( $row->{$row_head_name}->as_string );
+
+      if ( defined $$data_ref{$row_head} or $first_column ) {
+        die 'Result variable ', $$columndef_ref{result_variable},
+          ' is not defined in ', $$columndef_ref{query_file}, "\n"
+          unless $row->{ $$columndef_ref{result_variable} };
+
+        my $value =
+          unquote( $row->{ $$columndef_ref{result_variable} }->as_string );
+        if ($multi_lingual) {
+          $$data_ref{$row_head}{ $$columndef_ref{column} }{$lang} = $value;
+        } else {
+          $$data_ref{$row_head}{ $$columndef_ref{column} } = $value;
+        }
+
+        # the list of row headings is dynamically created here
+        if ($first_column) {
+          push( @{$row_head_ref}, $row_head );
+        }
+      }
+    }
+    # first columns actions must only be executed once, with the first language
+    $first_column = 0;
   }
 }
 
@@ -181,6 +196,47 @@ sub insert_modified_values {
   $query =~ s/\svalues .*? \s+\)\s+\}/$values_clause/ixms;
 
   return $query;
+}
+
+sub build_csv {
+  my @column_definitions = @{ shift() } or die "param missing\n";
+  my @row_heads          = @{ shift() } or die "param missing\n";
+  my $data_ref           = shift        or die "param missing\n";
+  my $lang               = shift        or die "param missing\n";
+
+  # initialize csv table with column names and headers
+  my ( @columns, @column_headers );
+  foreach my $column_ref (@column_definitions) {
+    push( @columns,        $$column_ref{column} );
+    push( @column_headers, $$column_ref{header}{$lang} );
+  }
+  my $csv = Class::CSV->new( fields => \@columns );
+  $csv->add_line( \@column_headers );
+
+  # add rows
+  foreach my $row_head (@row_heads) {
+
+    # map multilingual columns to a flat data structure
+    my %row = %{ $$data_ref{$row_head} };
+    foreach my $column_ref (@column_definitions) {
+      if ( exists( $$column_ref{languages} ) ) {
+        $row{ $$column_ref{column} } = $row{ $$column_ref{column} }{$lang};
+      }
+    }
+    $csv->add_line( \%row );
+  }
+  return $csv;
+}
+
+sub print_csv {
+  my $table_ref = shift or die "param missing\n";
+  my $csv       = shift or die "param missing\n";
+  my $lang      = shift or die "param missing\n";
+
+  # output resulting table
+  print "\n", $$table_ref{title}{$lang}, "\n\n";
+  $csv->print;
+  print "\n";
 }
 
 # Prints data formatted for insertion into a
@@ -489,34 +545,79 @@ sub get_definition {
           ],
         },
         {
-          title              => 'Concept changes by sub-thesaurus',
-          row_head_name      => 'topConcept',
-          chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
+          row_head_name => 'topConcept',
+          languages     => [qw/ en de /],
+          title         => {
+            en => 'Concept changes by sub-thesaurus',
+            de => 'Geänderte Begriffe nach Subthesaurus',
+          },
+          chart_data => {
+            total_descriptors => {
+              title => {
+                en => 'Descriptors by sub-thesaurus',
+                de => 'Deskriptoren nach Subthesaurus',
+              },
+              columns => [ 1, 2 ],
+            },
+            changed_descriptors => {
+              title => {
+                en => 'Added and deprecated descriptors by sub-thesaurus',
+                de => 'Neue und stillgelegte Deskriptoren nach Subthesaurus',
+              },
+              columns => [ 4, 3 ],
+            },
+            changed_thsys => {
+              title => {
+                en => 'Added and deprecated descriptors by sub-thesaurus',
+                de => 'Neue und stillgelegte Deskriptoren nach Subthesaurus',
+              },
+              columns => [ 6, 5 ],
+            },
+            total_thsys => {
+              title => {
+                en => 'Categories by sub-thesaurus',
+                de => 'Systematikstellen nach Subthesaurus',
+              },
+              columns => [ 7, 8 ],
+            },
+          },
           column_definitions => [
             {
-              column          => 'topConcept',
-              header          => 'Sub-thesaurus',
+              column    => 'topConcept',
+              languages => [qw/ en de /],
+              header    => {
+                en => 'Sub-thesaurus',
+                de => 'Subthesaurus',
+              },
               query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
-              replace         => { '?language' => '"en"', },
               result_variable => 'topConceptLabel',
             },
             {
-              column          => 'total_descriptors_8.06',
-              header          => 'Total descriptors 8.06',
+              column => 'total_descriptors_8.06',
+              header => {
+                en => 'Total descriptors 8.06',
+                de => 'Gesamtzahl Deskriptoren 8.06',
+              },
               query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
               replace         => { '?newVersion' => '"8.06"', },
               result_variable => 'totalConcepts',
             },
             {
-              column          => 'total_descriptors_8.14',
-              header          => 'Total 8.14',
+              column => 'total_descriptors_8.14',
+              header => {
+                en => 'Total descriptors 8.14',
+                de => 'Gesamtzahl Deskriptoren 8.14',
+              },
               query_file      => '../sparql/stw/count_total_concepts_by_top.rq',
               replace         => { '?newVersion' => '"8.14"', },
               result_variable => 'totalConcepts',
             },
             {
-              column     => 'added_descriptors',
-              header     => 'Added descriptors',
+              column => 'added_descriptors',
+              header => {
+                en => 'Added descriptors',
+                de => 'Zugefügte Deskriptoren',
+              },
               query_file => '../sparql/stw/count_added_concepts_by_top.rq',
               replace    => {
                 '?oldVersion' => '"8.06"',
@@ -525,8 +626,11 @@ sub get_definition {
               result_variable => 'addedConcepts',
             },
             {
-              column     => 'deprecated_descriptors',
-              header     => 'Deprecated descriptors',
+              column => 'deprecated_descriptors',
+              header => {
+                en => 'Deprecated descriptors',
+                de => 'Stillgelegte Deskriptoren',
+              },
               query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
               replace    => {
                 '?oldVersion' => '"8.06"',
@@ -535,11 +639,13 @@ sub get_definition {
               result_variable => 'deprecatedConcepts',
             },
             {
-              column     => 'added_thsys',
-              header     => 'Added categories',
+              column => 'added_thsys',
+              header => {
+                en => 'Added categories',
+                de => 'Zugefügte Systematikstellen',
+              },
               query_file => '../sparql/stw/count_added_concepts_by_top.rq',
               replace    => {
-                '?language'    => '"de"',
                 '?oldVersion'  => '"8.06"',
                 '?newVersion'  => '"8.14"',
                 '?conceptType' => 'zbwext:Thsys',
@@ -547,11 +653,13 @@ sub get_definition {
               result_variable => 'addedConcepts',
             },
             {
-              column     => 'deprecated_thsys',
-              header     => 'Deprecated categories',
+              column => 'deprecated_thsys',
+              header => {
+                en => 'Deprecated categories',
+                de => 'Stillgelegte Systematikstellen',
+              },
               query_file => '../sparql/stw/count_deprecated_concepts_by_top.rq',
               replace    => {
-                '?language'    => '"de"',
                 '?oldVersion'  => '"8.06"',
                 '?newVersion'  => '"8.14"',
                 '?conceptType' => 'zbwext:Thsys',
@@ -559,8 +667,11 @@ sub get_definition {
               result_variable => 'deprecatedConcepts',
             },
             {
-              column     => 'total_thsys_8.06',
-              header     => 'Total categories 8.06',
+              column => 'total_thsys_8.06',
+              header => {
+                en => 'Total categories 8.06',
+                de => 'Gesamtzahl Systematikstellen 8.06',
+              },
               query_file => '../sparql/stw/count_total_concepts_by_top.rq',
               replace    => {
                 '?newVersion'  => '"8.06"',
@@ -569,8 +680,11 @@ sub get_definition {
               result_variable => 'totalConcepts',
             },
             {
-              column     => 'total_thsys_8.14',
-              header     => 'Total categories 8.14',
+              column => 'total_thsys_8.14',
+              header => {
+                en => 'Total categories 8.14',
+                de => 'Gesamtzahl Systematikstellen 8.14',
+              },
               query_file => '../sparql/stw/count_total_concepts_by_top.rq',
               replace    => {
                 '?newVersion'  => '"8.14"',
