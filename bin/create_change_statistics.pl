@@ -68,6 +68,11 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
     # create the csv data structue
     my $csv = build_csv( $lang, \@column_definitions, \@row_heads, \%data );
 
+    # create custom order of sub-thesauri
+    if ( $$table_ref{row_head_name} eq 'topConcept' ) {
+      $csv = collate_subthes($csv);
+    }
+
     # output for csv
     print_csv( $lang, $table_ref, $csv );
 
@@ -234,6 +239,36 @@ sub build_csv {
   return $csv;
 }
 
+sub collate_subthes {
+  my $csv = shift or die "param missing\n";
+
+  # collation sequence
+  my @subthes_sequence = qw/ B V W P N G A /;
+
+  # parse all csv lines into a hash keyed by subthes
+  # and prepared for adding
+  my %line;
+  foreach my $line ( @{ $csv->lines() } ) {
+    my $subthes = substr( $line->get('topConcept'), 0, 1 );
+    my $fields_ref;
+    foreach my $field ( @{ $csv->fields() } ) {
+      push( @{$fields_ref}, $line->get($field) );
+    }
+    $line{$subthes} = $fields_ref;
+  }
+
+  # initialize a new csv object
+  my $csv2 = Class::CSV->new( fields => $csv->fields() );
+  $csv2->add_line( $csv->fields );
+
+  # add lines according to collation sequence
+  for my $subthes (@subthes_sequence) {
+    $csv2->add_line( $line{$subthes} );
+  }
+
+  return $csv2;
+}
+
 sub print_csv {
   my $lang      = shift or die "param missing\n";
   my $table_ref = shift or die "param missing\n";
@@ -293,7 +328,7 @@ sub print_charts {
     my %tmpl_var = (
       title      => $chart_data{$chart}{title}{$lang},
       subtitle   => 'Version 8.06 to 8.14',
-      is_diff => $chart_data{$chart}{type} eq 'diffs',
+      is_diff    => $chart_data{$chart}{type} eq 'diffs',
       grid_width => get_max(@all_values) + 1,
       height     => get_height($csv),
       categories => $categories,
@@ -605,7 +640,7 @@ sub get_definition {
           },
           chart_data => {
             total_descriptors => {
-              type => 'totals',
+              type  => 'totals',
               title => {
                 en => 'Descriptors (by sub-thesaurus)',
                 de => 'Deskriptoren (nach Subthesaurus)',
@@ -613,7 +648,7 @@ sub get_definition {
               columns => [ 1, 2 ],
             },
             changed_descriptors => {
-              type => 'diffs',
+              type  => 'diffs',
               title => {
                 en => 'Added and deprecated descriptors (by sub-thesaurus)',
                 de => 'Neue und stillgelegte Deskriptoren (nach Subthesaurus)',
@@ -621,7 +656,7 @@ sub get_definition {
               columns => [ 4, 3 ],
             },
             changed_thsys => {
-              type => 'diffs',
+              type  => 'diffs',
               title => {
                 en => 'Added and deprecated descriptors (by sub-thesaurus)',
                 de => 'Neue und stillgelegte Deskriptoren (nach Subthesaurus)',
@@ -629,7 +664,7 @@ sub get_definition {
               columns => [ 6, 5 ],
             },
             total_thsys => {
-              type => 'totals',
+              type  => 'totals',
               title => {
                 en => 'Categories (by sub-thesaurus)',
                 de => 'Systematikstellen (nach Subthesaurus)',
