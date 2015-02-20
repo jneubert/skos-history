@@ -18,12 +18,15 @@ use utf8;
 use Class::CSV;
 use Data::Dumper;
 use File::Slurp;
+use HTML::Template;
 use RDF::Query::Client;
 use String::Util qw/unquote/;
 use URI::file;
 
 # create utf8 output
 binmode( STDOUT, ":utf8" );
+
+my $output_dir = '/var/www/html/beta/tmp2';
 
 # List of version and data structure for results
 
@@ -61,13 +64,15 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
   }
 
   foreach my $lang ( @{ $$table_ref{languages} } ) {
-    my $csv = build_csv( \@column_definitions, \@row_heads, \%data, $lang );
-    print_csv( $table_ref, $csv, $lang );
 
-    # special output for changed categories
-    ##foreach my $chart_data_ref ( @{ $$table_ref{chart_data} } ) {
-    ##print_chart_data( $csv, $table_ref, $chart_data_ref );
-    ##}
+    # create the csv data structue
+    my $csv = build_csv( $lang, \@column_definitions, \@row_heads, \%data );
+
+    # output for csv
+    print_csv( $lang, $table_ref, $csv );
+
+    # output for charts
+    print_charts( $lang, $csv, $table_ref );
   }
 }
 
@@ -156,6 +161,7 @@ sub get_column {
         }
       }
     }
+
     # first columns actions must only be executed once, with the first language
     $first_column = 0;
   }
@@ -199,10 +205,10 @@ sub insert_modified_values {
 }
 
 sub build_csv {
+  my $lang               = shift        or die "param missing\n";
   my @column_definitions = @{ shift() } or die "param missing\n";
   my @row_heads          = @{ shift() } or die "param missing\n";
   my $data_ref           = shift        or die "param missing\n";
-  my $lang               = shift        or die "param missing\n";
 
   # initialize csv table with column names and headers
   my ( @columns, @column_headers );
@@ -229,9 +235,9 @@ sub build_csv {
 }
 
 sub print_csv {
+  my $lang      = shift or die "param missing\n";
   my $table_ref = shift or die "param missing\n";
   my $csv       = shift or die "param missing\n";
-  my $lang      = shift or die "param missing\n";
 
   # output resulting table
   print "\n", $$table_ref{title}{$lang}, "\n\n";
@@ -241,50 +247,71 @@ sub print_csv {
 
 # Prints data formatted for insertion into a
 # highcharts.com bar-negative-stack chart
-sub print_chart_data {
-  my $csv            = shift or die "param missing\n";
-  my $table_ref      = shift or die "param missing\n";
-  my $chart_data_ref = shift or die "param missing\n";
+sub print_charts {
+  my $lang      = shift or die "param missing\n";
+  my $csv       = shift or die "param missing\n";
+  my $table_ref = shift or die "param missing\n";
 
-  # all but the first line, which contains column headers
-  my @lines = @{ $csv->lines }[ 1 .. $#{ $csv->lines } ];
-  my ( @values, $column_ref );
+  my %chart_data = %{ $$table_ref{chart_data} };
+  foreach my $chart ( keys %chart_data ) {
 
-  # categories
-  print "\n\n  var categories = [ ";
-  foreach my $line (@lines) {
-    push( @values, $line->{ $$table_ref{row_head_name} } );
+    # all but the first line, which contains column headers
+    my @lines = @{ $csv->lines }[ 1 .. $#{ $csv->lines } ];
+    my ( @values, $column_ref );
+
+    # categories
+    foreach my $line (@lines) {
+      push( @values, $line->{ $$table_ref{row_head_name} } );
+    }
+    my $categories = "'" . join( "', '", @values ) . "'";
+
+    # use the column referenced by the first entry in chart_data array
+    $column_ref =
+      $$table_ref{column_definitions}[ $chart_data{$chart}{columns}[0] ];
+    my $header1 = $$column_ref{header}{$lang};
+    @values = ();
+    foreach my $line (@lines) {
+      push( @values, $line->{ $$column_ref{column} } || 0 );
+    }
+
+    # value has to be negative to build the left-hand part of the stack
+    my $data1 = join( ", ", map { -$_ } @values );
+
+    # use the column referenced by the second entry in chart_data array
+    $column_ref =
+      $$table_ref{column_definitions}[ $chart_data{$chart}{columns}[1] ];
+    my $header2 = $$column_ref{header}{$lang};
+    @values = ();
+    foreach my $line (@lines) {
+      push( @values, $line->{ $$column_ref{column} } || 0 );
+    }
+    my $data2 = join( ", ", @values );
+
+    # create js file
+    my %tmpl_var = (
+      title      => $$table_ref{title}{$lang},
+      subtitle   => 'Version 8.06 to 8.14',
+      categories => $categories,
+      header1    => $header1,
+      data1      => $data1,
+      header2    => $header2,
+      data2      => $data2,
+    );
+    my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
+    $tmpl->param( \%tmpl_var );
+    my $fn = "$output_dir/$chart.$lang.js";
+    write_file( $fn,  {binmode => ':utf8'}, $tmpl->output() );
+
+    # creae html file
+    %tmpl_var = (
+      lang     => $lang,
+      chart_js => "$chart.$lang.js",
+    );
+    $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.html.tmpl', );
+    $tmpl->param( \%tmpl_var );
+    $fn = "$output_dir/$chart.$lang.html";
+    write_file( $fn,  {binmode => ':utf8'}, $tmpl->output() );
   }
-  print "'", join( "', '", @values ), "'";
-  print " ];\n\n";
-
-  print "      series: [{\n";
-
-  # use the column referenced by the first entry in chart_data array
-  $column_ref = $$table_ref{column_definitions}[ $$chart_data_ref[0] ];
-  print "        name: '$$column_ref{header}',\n        data: [ ";
-  @values = ();
-  foreach my $line (@lines) {
-    push( @values, $line->{ $$column_ref{column} } || 0 );
-  }
-
-  # value has to be negative to build the left-hand part of the stack
-  print join( ", ", map { -$_ } @values );
-  print " ]\n";
-
-  print "      }, {\n";
-
-  # use the column referenced by the second entry in chart_data array
-  $column_ref = $$table_ref{column_definitions}[ $$chart_data_ref[1] ];
-  print "        name: '$$column_ref{header}',\n        data: [ ";
-  @values = ();
-  foreach my $line (@lines) {
-    push( @values, $line->{ $$column_ref{column} } || 0 );
-  }
-  print join( ", ", @values );
-  print " ]\n";
-
-  print "      }]\n\n";
 }
 
 sub get_definition {

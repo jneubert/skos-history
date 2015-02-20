@@ -1,0 +1,60 @@
+/**
+ * Created by Neubert Joachim on 12.02.2015.
+ *
+ * Adapted from http://www.highcharts.com/demo/bar-negative-stack
+ */
+$(function () {
+  var categories = [ <tmpl_var name="categories" /> ];
+  $(document).ready(function () {
+    $('#container').highcharts({
+      chart: {
+        type: 'bar'
+      },
+      title: {
+        text: '<tmpl_var name="title" />'
+      },
+      subtitle: {
+        text: '<tmpl_var name="subtitle" />'
+      },
+      xAxis: [{
+        categories: categories,
+        reversed: true,
+        labels: {
+          step: 1
+        }
+      }],
+      yAxis: {
+        title: {
+          text: null
+        },
+        labels: {
+          formatter: function () {
+            return (Math.abs(this.value));
+          }
+        },
+        min: -300,
+        max: 300
+      },
+
+      plotOptions: {
+        series: {
+          stacking: 'normal'
+        }
+      },
+
+      tooltip: {
+        formatter: function () {
+          return this.series.name + ' from ' + this.point.category +
+              ': ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+        }
+      },
+      series: [{
+        name: '<tmpl_var name="header1" />',
+        data: [ <tmpl_var name="data1" /> ]
+      }, {
+        name: '<tmpl_var name="header2" />',
+        data: [ <tmpl_var name="data2" /> ]
+      }]
+    });
+  });
+});
