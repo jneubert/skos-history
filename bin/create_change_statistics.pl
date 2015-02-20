@@ -19,6 +19,7 @@ use Class::CSV;
 use Data::Dumper;
 use File::Slurp;
 use HTML::Template;
+use JSON -support_by_pp;
 use RDF::Query::Client;
 use String::Util qw/unquote/;
 use URI::file;
@@ -292,39 +293,38 @@ sub print_charts {
   my %chart_data = %{ $$table_ref{chart_data} };
   foreach my $chart ( keys %chart_data ) {
 
+    # create a data structure which can directly been mapped to json
+
+    # get columns referenced for the chart
+    my $column1_ref =
+      $$table_ref{column_definitions}[ $chart_data{$chart}{columns}[0] ];
+    my $column2_ref =
+      $$table_ref{column_definitions}[ $chart_data{$chart}{columns}[1] ];
+
     # all but the first line, which contains column headers
     my @lines = @{ $csv->lines }[ 1 .. $#{ $csv->lines } ];
-    my ( @values, $column_ref );
 
-    # categories
-    foreach my $line (@lines) {
-      push( @values, $line->{ $$table_ref{row_head_name} } );
+    my ( @series, @all_values );
+
+    # set negative value for the first column
+    my $set_negative = 1;
+    foreach my $column_ref ( $column1_ref, $column2_ref ) {
+      my %column;
+      $column{name} = $$column_ref{header}{$lang};
+      my @data;
+      foreach my $line (@lines) {
+        my %cell;
+        $cell{name} = $line->get( $$table_ref{row_head_name} );
+        my $value = $line->get( $$column_ref{column} ) || 0;
+        push( @all_values, $value );
+        # explicitly cast to number, otherwise json generates a string
+        $cell{y} = $set_negative ? -$value : abs($value);
+        push( @data, \%cell );
+      }
+      $column{data} = \@data;
+      push( @series, \%column );
+      $set_negative = 0;
     }
-    my $categories = "'" . join( "', '", @values ) . "'";
-
-    # use the column referenced by the first entry in chart_data array
-    $column_ref =
-      $$table_ref{column_definitions}[ $chart_data{$chart}{columns}[0] ];
-    my $header1 = $$column_ref{header}{$lang};
-    @values = ();
-    foreach my $line (@lines) {
-      push( @values, $line->{ $$column_ref{column} } || 0 );
-    }
-    my @all_values = @values;
-
-    # value has to be negative to build the left-hand part of the stack
-    my $data1 = join( ", ", map { -$_ } @values );
-
-    # use the column referenced by the second entry in chart_data array
-    $column_ref =
-      $$table_ref{column_definitions}[ $chart_data{$chart}{columns}[1] ];
-    my $header2 = $$column_ref{header}{$lang};
-    @values = ();
-    foreach my $line (@lines) {
-      push( @values, $line->{ $$column_ref{column} } || 0 );
-    }
-    push( @all_values, @values );
-    my $data2 = join( ", ", @values );
 
     # create js file
     my %tmpl_var = (
@@ -333,11 +333,7 @@ sub print_charts {
       is_diff    => $chart_data{$chart}{type} eq 'diffs',
       grid_width => get_max(@all_values) + 1,
       height     => get_height($csv),
-      categories => $categories,
-      header1    => $header1,
-      data1      => $data1,
-      header2    => $header2,
-      data2      => $data2,
+      series     => to_json( \@series, { pretty => 1 } ),
     );
     my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
     $tmpl->param( \%tmpl_var );

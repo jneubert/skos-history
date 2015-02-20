@@ -54,13 +54,7 @@ $(function () {
               ': ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
         }
       },
-      series: [{
-        name: '<tmpl_var name="header1" />',
-        data: [ <tmpl_var name="data1" /> ]
-      }, {
-        name: '<tmpl_var name="header2" />',
-        data: [ <tmpl_var name="data2" /> ]
-      }]
+      series: <tmpl_var name="series" />
     });
   });
 });
