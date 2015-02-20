@@ -77,7 +77,9 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
     print_csv( $lang, $table_ref, $csv );
 
     # output for charts
-    print_charts( $lang, $csv, $table_ref );
+    if ( exists( $$table_ref{chart_data} ) ) {
+      print_charts( $lang, $csv, $table_ref );
+    }
   }
 }
 
@@ -384,59 +386,87 @@ sub get_definition {
       version_history_set => '<http://zbw.eu/stw/version>',
       tables              => [
         {
-          title              => 'Concept changes by version',
+          title => {
+            en => 'Concept changes (by version)',
+            de => 'Begriffsänderungen (nach Version)',
+          },
+          languages          => [qw/ en de /],
           row_head_name      => 'version',
           column_definitions => [
             {
-              column          => 'version',
-              header          => 'Version',
+              column => 'version',
+              header => {
+                en => 'Version',
+                de => 'Version',
+              },
               query_file      => '../sparql/version_overview.rq',
               result_variable => 'version',
             },
             {
-              column          => 'version_date',
-              header          => 'Date',
+              column => 'version_date',
+              header => {
+                en => 'Date',
+                de => 'Datum',
+              },
               query_file      => '../sparql/version_overview.rq',
               result_variable => 'date',
             },
             {
-              column          => 'total_thsys',
-              header          => 'Total thsys',
+              column => 'total_thsys',
+              header => {
+                en => 'Total categories',
+                de => 'Gesamtzahl Systematikstellen',
+              },
               query_file      => '../sparql/stw/count_concepts.rq',
               replace         => { '?type' => '"Thsys"', },
               result_variable => 'conceptCount',
             },
             {
-              column          => 'total_descriptors',
-              header          => 'Total descriptors',
+              column => 'total_descriptors',
+              header => {
+                en => 'Total descriptors',
+                de => 'Gesamtzahl Deskriptoren',
+              },
               query_file      => '../sparql/stw/count_concepts.rq',
               replace         => { '?type' => '"Descriptor"', },
               result_variable => 'conceptCount',
             },
             {
-              column          => 'added_thsys',
-              header          => 'Added thsys',
+              column => 'added_thsys',
+              header => {
+                en => 'Added categories',
+                de => 'Zugefügte Systematikstellen',
+              },
               query_file      => '../sparql/stw/count_added_concepts.rq',
               replace         => { '?conceptType' => 'zbwext:Thsys', },
               result_variable => 'addedConceptCount',
             },
             {
-              column          => 'added_descriptors',
-              header          => 'Added descriptors',
+              column => 'added_descriptors',
+              header => {
+                en => 'Added descriptors',
+                de => 'Zugefügte Deskriptoren',
+              },
               query_file      => '../sparql/stw/count_added_concepts.rq',
               replace         => { '?conceptType' => 'zbwext:Descriptor', },
               result_variable => 'addedConceptCount',
             },
             {
-              column          => 'deprecated_descriptors',
-              header          => 'Deprecated descriptors',
+              column => 'deprecated_descriptors',
+              header => {
+                en => 'Deprecated descriptors',
+                de => 'Stillgelegte Deskriptoren',
+              },
               query_file      => '../sparql/stw/count_deprecated_concepts.rq',
               replace         => { '?conceptType' => 'zbwext:Descriptor', },
               result_variable => 'deprecatedConceptCount',
             },
             {
-              column          => 'deprecated_descriptors_replaced',
-              header          => 'Redirected descriptors',
+              column => 'deprecated_descriptors_replaced',
+              header => {
+                en => 'Redirected',
+                de => 'Verweise',
+              },
               query_file      => '../sparql/stw/count_deprecated_concepts.rq',
               replace         => { '?conceptType' => 'zbwext:Descriptor', },
               result_variable => 'replacedByConceptCount',
@@ -532,20 +562,67 @@ sub get_definition {
           ],
         },
         {
-          title              => 'Concept changes by category',
-          row_head_name      => 'secondLevelCategory',
-          chart_data         => [ [ 1, 2 ], [ 4, 3 ], [ 6, 5 ], [ 7, 8 ], ],
+          title => {
+            en => 'Concept changes (by 2nd level category)',
+            de => 'Begriffsänderungen (nach Grobstematikstelle)',
+          },
+          row_head_name => 'secondLevelCategory',
+          languages     => [qw/ en de /],
+          chart_data    => {
+            total_descriptors => {
+              type  => 'totals',
+              title => {
+                en => 'Descriptors (by 2nd level category)',
+                de => 'Deskriptoren (nach Grobsystematikstelle)',
+              },
+              columns => [ 1, 2 ],
+            },
+            changed_descriptors => {
+              type  => 'diffs',
+              title => {
+                en =>
+                  'Added and deprecated descriptors (by 2nd level category)',
+                de =>
+'Neue und stillgelegte Deskriptoren (nach Grobsystematikstelle)',
+              },
+              columns => [ 4, 3 ],
+            },
+            changed_thsys => {
+              type  => 'diffs',
+              title => {
+                en =>
+                  'Added and deprecated descriptors (by 2nd level category)',
+                de =>
+'Neue und stillgelegte Deskriptoren (nach Grobsystematikstelle)',
+              },
+              columns => [ 6, 5 ],
+            },
+            total_thsys => {
+              type  => 'totals',
+              title => {
+                en => 'Categories (by 2nd level category)',
+                de => 'Systematikstellen (nach Grobsystematikstelle)',
+              },
+              columns => [ 7, 8 ],
+            },
+          },
           column_definitions => [
             {
-              column     => 'secondLevelCategory',
-              header     => 'Second level category',
+              column => 'secondLevelCategory',
+              header => {
+                en => '2nd level category',
+                de => 'Grobsystematikstelle',
+              },
+              languages  => [qw/ en de /],
               query_file => '../sparql/stw/count_total_concepts_by_category.rq',
-              replace    => { '?language' => '"de"', },
               result_variable => 'secondLevelCategoryLabel',
             },
             {
-              column     => 'total_descriptors_8.06',
-              header     => 'Total 8.06',
+              column => 'total_descriptors_8.06',
+              header => {
+                en => 'Total descriptors 8.06',
+                de => 'Gesamtzahl Deskriptoren 8.06',
+              },
               query_file => '../sparql/stw/count_total_concepts_by_category.rq',
               replace    => {
                 '?newVersion'  => '"8.06"',
@@ -554,8 +631,11 @@ sub get_definition {
               result_variable => 'totalConcepts',
             },
             {
-              column     => 'total_descriptors_8.14',
-              header     => 'Total 8.14',
+              column => 'total_descriptors_8.14',
+              header => {
+                en => 'Total descriptors 8.14',
+                de => 'Gesamtzahl Deskriptoren 8.14',
+              },
               query_file => '../sparql/stw/count_total_concepts_by_category.rq',
               replace    => {
                 '?newVersion'  => '"8.14"',
@@ -564,8 +644,11 @@ sub get_definition {
               result_variable => 'totalConcepts',
             },
             {
-              column     => 'added_descriptors',
-              header     => 'Added descriptors',
+              column => 'added_descriptors',
+              header => {
+                en => 'Added descriptors',
+                de => 'Zugefügte Deskriptoren',
+              },
               query_file => '../sparql/stw/count_added_concepts_by_category.rq',
               replace    => {
                 '?oldVersion'  => '"8.06"',
@@ -576,7 +659,10 @@ sub get_definition {
             },
             {
               column => 'deprecated_descriptors',
-              header => 'Deprecated descriptors',
+              header => {
+                en => 'Deprecated descriptors',
+                de => 'Stillgelegte Deskriptoren',
+              },
               query_file =>
                 '../sparql/stw/count_deprecated_concepts_by_category.rq',
               replace => {
@@ -587,8 +673,11 @@ sub get_definition {
               result_variable => 'deprecatedConcepts',
             },
             {
-              column     => 'added_thsys',
-              header     => 'Added categories',
+              column => 'added_thsys',
+              header => {
+                en => 'Added categories',
+                de => 'Zugefügte Systematikstellen',
+              },
               query_file => '../sparql/stw/count_added_concepts_by_category.rq',
               replace    => {
                 '?oldVersion'  => '"8.06"',
@@ -599,7 +688,10 @@ sub get_definition {
             },
             {
               column => 'deprecated_thsys',
-              header => 'Deprecated categories',
+              header => {
+                en => 'Deprecated categories',
+                de => 'Stillgelegte Systematikstellen',
+              },
               query_file =>
                 '../sparql/stw/count_deprecated_concepts_by_category.rq',
               replace => {
@@ -610,8 +702,11 @@ sub get_definition {
               result_variable => 'deprecatedConcepts',
             },
             {
-              column     => 'total_thsys_8.06',
-              header     => 'Total categories 8.06',
+              column => 'total_thsys_8.06',
+              header => {
+                en => 'Total categories 8.06',
+                de => 'Gesamtzahl Systematikstellen 8.06',
+              },
               query_file => '../sparql/stw/count_total_concepts_by_category.rq',
               replace    => {
                 '?newVersion'  => '"8.06"',
@@ -620,8 +715,11 @@ sub get_definition {
               result_variable => 'totalConcepts',
             },
             {
-              column     => 'total_thsys_8.14',
-              header     => 'Total categories 8.14',
+              column => 'total_thsys_8.14',
+              header => {
+                en => 'Total categories 8.14',
+                de => 'Gesamtzahl Systematikstellen 8.14',
+              },
               query_file => '../sparql/stw/count_total_concepts_by_category.rq',
               replace    => {
                 '?newVersion'  => '"8.14"',
@@ -632,13 +730,13 @@ sub get_definition {
           ],
         },
         {
-          row_head_name => 'topConcept',
-          languages     => [qw/ en de /],
-          title         => {
+          title => {
             en => 'Concept changes (by sub-thesaurus)',
             de => 'Geänderte Begriffe (nach Subthesaurus)',
           },
-          chart_data => {
+          row_head_name => 'topConcept',
+          languages     => [qw/ en de /],
+          chart_data    => {
             total_descriptors => {
               type  => 'totals',
               title => {
