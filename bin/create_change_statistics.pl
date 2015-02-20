@@ -273,6 +273,7 @@ sub print_charts {
     foreach my $line (@lines) {
       push( @values, $line->{ $$column_ref{column} } || 0 );
     }
+    my @all_values = @values;
 
     # value has to be negative to build the left-hand part of the stack
     my $data1 = join( ", ", map { -$_ } @values );
@@ -285,12 +286,16 @@ sub print_charts {
     foreach my $line (@lines) {
       push( @values, $line->{ $$column_ref{column} } || 0 );
     }
+    push( @all_values, @values );
     my $data2 = join( ", ", @values );
 
     # create js file
     my %tmpl_var = (
-      title      => $$table_ref{title}{$lang},
+      title      => $chart_data{$chart}{title}{$lang},
       subtitle   => 'Version 8.06 to 8.14',
+      is_diff => $chart_data{$chart}{type} eq 'diffs',
+      grid_width => get_max(@all_values) + 1,
+      height     => get_height($csv),
       categories => $categories,
       header1    => $header1,
       data1      => $data1,
@@ -300,7 +305,7 @@ sub print_charts {
     my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
     $tmpl->param( \%tmpl_var );
     my $fn = "$output_dir/$chart.$lang.js";
-    write_file( $fn,  {binmode => ':utf8'}, $tmpl->output() );
+    write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
 
     # creae html file
     %tmpl_var = (
@@ -310,8 +315,28 @@ sub print_charts {
     $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.html.tmpl', );
     $tmpl->param( \%tmpl_var );
     $fn = "$output_dir/$chart.$lang.html";
-    write_file( $fn,  {binmode => ':utf8'}, $tmpl->output() );
+    write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
   }
+}
+
+sub get_max {
+  my @vars = @_;
+
+  my $max = 0;
+  for (@vars) {
+    $max = $_ if $_ > $max;
+  }
+  return $max;
+}
+
+sub get_height {
+  my $csv = shift or die "param missing\n";
+
+  my $line_height = 40;
+
+  my $no_of_lines = scalar( @{ $csv->lines() } );
+
+  return $line_height * $no_of_lines;
 }
 
 sub get_definition {
@@ -575,35 +600,39 @@ sub get_definition {
           row_head_name => 'topConcept',
           languages     => [qw/ en de /],
           title         => {
-            en => 'Concept changes by sub-thesaurus',
-            de => 'Geänderte Begriffe nach Subthesaurus',
+            en => 'Concept changes (by sub-thesaurus)',
+            de => 'Geänderte Begriffe (nach Subthesaurus)',
           },
           chart_data => {
             total_descriptors => {
+              type => 'totals',
               title => {
-                en => 'Descriptors by sub-thesaurus',
-                de => 'Deskriptoren nach Subthesaurus',
+                en => 'Descriptors (by sub-thesaurus)',
+                de => 'Deskriptoren (nach Subthesaurus)',
               },
               columns => [ 1, 2 ],
             },
             changed_descriptors => {
+              type => 'diffs',
               title => {
-                en => 'Added and deprecated descriptors by sub-thesaurus',
-                de => 'Neue und stillgelegte Deskriptoren nach Subthesaurus',
+                en => 'Added and deprecated descriptors (by sub-thesaurus)',
+                de => 'Neue und stillgelegte Deskriptoren (nach Subthesaurus)',
               },
               columns => [ 4, 3 ],
             },
             changed_thsys => {
+              type => 'diffs',
               title => {
-                en => 'Added and deprecated descriptors by sub-thesaurus',
-                de => 'Neue und stillgelegte Deskriptoren nach Subthesaurus',
+                en => 'Added and deprecated descriptors (by sub-thesaurus)',
+                de => 'Neue und stillgelegte Deskriptoren (nach Subthesaurus)',
               },
               columns => [ 6, 5 ],
             },
             total_thsys => {
+              type => 'totals',
               title => {
-                en => 'Categories by sub-thesaurus',
-                de => 'Systematikstellen nach Subthesaurus',
+                en => 'Categories (by sub-thesaurus)',
+                de => 'Systematikstellen (nach Subthesaurus)',
               },
               columns => [ 7, 8 ],
             },
