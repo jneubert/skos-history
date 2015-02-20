@@ -44,16 +44,17 @@ if ( not( $dataset and $definition{$dataset} ) ) {
 my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
 
 # Main loop over all tables of a dataset
-
+my %csv_data;
 foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
 
   # TODO remove next line
   next if ref( $$table_ref{title} ) eq '';
 
   # If a table parameter is given, skip everything else
-  if ( $table and $$table_ref{title}{en} ne $table ) {
+  if ( $table and $$table_ref{name} ne $table ) {
     next;
   }
+  print "\n$$table_ref{name}\n";
   my @column_definitions = @{ $$table_ref{column_definitions} };
   my ( @row_heads, %data );
 
@@ -73,6 +74,7 @@ foreach my $table_ref ( @{ $definition{$dataset}{tables} } ) {
     if ( $$table_ref{row_head_name} eq 'topConcept' ) {
       $csv = collate_subthes($csv);
     }
+    $csv_data{ $$table_ref{name} } = $csv;
 
     # output for csv
     print_csv( $lang, $table_ref, $csv );
@@ -95,7 +97,7 @@ sub print_usage {
 
       # TODO remove next line
       next if ref( $$table_ref{title} ) eq '';
-      print "    $$table_ref{title}{en}\n";
+      print "    $$table_ref{name}\n";
     }
   }
   print "\n";
@@ -111,7 +113,8 @@ sub get_column {
   my $first_column = %{$data_ref} ? undef : 1;
 
   # read query from file (by command line argument)
-  my $query = read_file( $$columndef_ref{query_file} ) or die "Can't read $!\n";
+  my $query = read_file( $$columndef_ref{query_file} )
+    or die "Can't read $!\n";
 
   # add standard replacement for ?versionHistorySet
   $$columndef_ref{replace}{'?versionHistoryGraph'} =
@@ -278,9 +281,10 @@ sub print_csv {
   my $csv       = shift or die "param missing\n";
 
   # output resulting table
-  print "\n", $$table_ref{title}{$lang}, "\n\n";
-  $csv->print;
-  print "\n";
+  my $fn = "$output_dir/$$table_ref{name}.$lang.csv";
+  write_file( $fn, { binmode => ':utf8' }, $csv->string );
+
+  print "  CSV: $$table_ref{title}{$lang}\n";
 }
 
 # Prints data formatted for insertion into a
@@ -317,6 +321,7 @@ sub print_charts {
         $cell{name} = $line->get( $$table_ref{row_head_name} );
         my $value = $line->get( $$column_ref{column} ) || 0;
         push( @all_values, $value );
+
         # explicitly cast to number, otherwise json generates a string
         $cell{y} = $set_negative ? -$value : abs($value);
         push( @data, \%cell );
@@ -349,6 +354,8 @@ sub print_charts {
     $tmpl->param( \%tmpl_var );
     $fn = "$output_dir/$chart.$lang.html";
     write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
+
+    print "  Chart: $chart_data{$chart}{title}{$lang}\n";
   }
 }
 
@@ -386,6 +393,7 @@ sub get_definition {
             en => 'Concept changes (by version)',
             de => 'Begriffsänderungen (nach Version)',
           },
+          name               => 'concepts_by_version',
           languages          => [qw/ en de /],
           row_head_name      => 'version',
           column_definitions => [
@@ -471,6 +479,7 @@ sub get_definition {
         },
         {
           title              => 'Label changes by version',
+          name               => 'labels_by_version',
           row_head_name      => 'version',
           column_definitions => [
             {
@@ -562,6 +571,7 @@ sub get_definition {
             en => 'Concept changes (by 2nd level category)',
             de => 'Begriffsänderungen (nach Grobstematikstelle)',
           },
+          name          => 'concepts_by_category',
           row_head_name => 'secondLevelCategory',
           languages     => [qw/ en de /],
           chart_data    => {
@@ -730,6 +740,7 @@ sub get_definition {
             en => 'Concept changes (by sub-thesaurus)',
             de => 'Geänderte Begriffe (nach Subthesaurus)',
           },
+          name          => 'concepts_by_subthes',
           row_head_name => 'topConcept',
           languages     => [qw/ en de /],
           chart_data    => {
@@ -886,6 +897,7 @@ sub get_definition {
       tables              => [
         {
           title              => 'Concept changes by version',
+          name               => 'concepts_by_version',
           row_head_name      => 'version',
           column_definitions => [
             {
