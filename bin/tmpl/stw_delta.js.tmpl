@@ -4,7 +4,6 @@
  * Adapted from http://www.highcharts.com/demo/bar-negative-stack
  */
 $(function () {
-  var categories = [ <tmpl_var name="categories" /> ];
   <tmpl_if name="is_diff">
   Highcharts.setOptions({
     colors: ['#ED561B', '#50B432']
@@ -23,8 +22,7 @@ $(function () {
         text: '<tmpl_var name="subtitle" />'
       },
       xAxis: [{
-        categories: categories,
-        reversed: true,
+        type: 'category',
         labels: {
           step: 1
         }
@@ -45,16 +43,33 @@ $(function () {
       plotOptions: {
         series: {
           stacking: 'normal'
+          <tmpl_if name="drilldown">,
+          point: {
+            events:{
+              click:function(){
+                var drilldown_url;
+                <tmpl_if name="dd_chart">
+                drilldown_url = './' + this.name.substr(0, 1).toLowerCase()
+                  + '/<tmpl_var name="url_part">';
+                </tmpl_if>
+                <tmpl_if name="dd_report">
+                </tmpl_if>
+                window.open(drilldown_url, '_self');
+              }
+            }
+          }
+          </tmpl_if>
         }
       },
 
       tooltip: {
         formatter: function () {
-          return this.point.category + '<br />' + this.series.name +
+          return this.point.name + '<br />' + this.series.name +
               ': ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
         }
       },
-      series: <tmpl_var name="series" />
+      series:
+<tmpl_var name="series" />
     });
   });
 });

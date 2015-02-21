@@ -31,6 +31,9 @@ my $output_dir = '/var/www/html/beta/tmp2';
 
 # List of version and data structure for results
 
+# subthes collation sequence
+my @subthes_sequence = qw/ B V W P N G A /;
+
 my %definition = %{ get_definition() };
 
 my $dataset = $ARGV[0];
@@ -97,7 +100,8 @@ sub print_usage {
 
       # TODO remove next line
       next if ref( $$table_ref{title} ) eq '';
-      print "    $$table_ref{name}\n";
+      my $charts = join( ', ', sort keys %{ $$table_ref{chart_data} } );
+      print "    $$table_ref{name} (Charts: $charts)\n";
     }
   }
   print "\n";
@@ -248,9 +252,6 @@ sub build_csv {
 sub collate_subthes {
   my $csv = shift or die "param missing\n";
 
-  # collation sequence
-  my @subthes_sequence = qw/ B V W P N G A /;
-
   # parse all csv lines into a hash keyed by subthes
   # and prepared for adding
   my %line;
@@ -294,6 +295,8 @@ sub print_charts {
   my $csv       = shift or die "param missing\n";
   my $table_ref = shift or die "param missing\n";
 
+  my @charts_with_drilldown = ();
+
   my %chart_data = %{ $$table_ref{chart_data} };
   foreach my $chart ( keys %chart_data ) {
 
@@ -331,6 +334,21 @@ sub print_charts {
       $set_negative = 0;
     }
 
+    # set flags to control drilldowns links
+    my $dd_chart =
+      grep( /$$table_ref{name}/, qw/ concepts_by_subthes / )
+      ? 1
+      : 0;
+    my $dd_report =
+          grep( /$$table_ref{name}/, qw/ concepts_by_category / )
+      and grep( /$chart/, qw/ changed_descriptors changed_thsys / )
+      ? 1
+      : 0;
+    my $drilldown =
+      $dd_chart or $dd_report
+      ? 1
+      : 0;
+
     # create js file
     my %tmpl_var = (
       title      => $chart_data{$chart}{title}{$lang},
@@ -339,6 +357,10 @@ sub print_charts {
       grid_width => get_max(@all_values) + 1,
       height     => get_height($csv),
       series     => to_json( \@series, { pretty => 1 } ),
+      drilldown  => $drilldown,
+      dd_chart   => $dd_chart,
+      dd_report  => $dd_report,
+      url_part   => "$chart.$lang.html",
     );
     my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
     $tmpl->param( \%tmpl_var );
