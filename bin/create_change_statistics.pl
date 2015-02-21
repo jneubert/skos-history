@@ -329,7 +329,7 @@ sub print_charts {
 
     foreach my $run (@runs) {
 
-      my ( @series, @all_values );
+      my ( @series, @all_values, $deprecated_name );
 
       # set negative value for the first column
       my $set_negative = 1;
@@ -337,6 +337,11 @@ sub print_charts {
       foreach my $column_ref ( $column1_ref, $column2_ref ) {
         my %column;
         $column{name} = $$column_ref{header}{$lang};
+
+        # set type for use in url creation
+        if ( $chart_data{$chart}{type} eq 'diffs' and $set_negative ) {
+          $deprecated_name = $column{name};
+        }
         my @data;
         foreach my $line (@lines) {
           my %cell;
@@ -371,12 +376,12 @@ sub print_charts {
       # set flags to control drilldowns links
       my $dd_chart = is_subthes_level( $$table_ref{name} );
       my $dd_report =
-            grep( /$$table_ref{name}/, qw/ concepts_by_category / )
-        and grep( /$chart/, qw/ changed_descriptors changed_thsys / )
+        (     grep( /$$table_ref{name}/, qw/ concepts_by_category / )
+          and grep( /$chart/, qw/ changed_descriptors changed_thsys / ) )
         ? 1
         : 0;
       my $drilldown =
-        $dd_chart or $dd_report
+        ( $dd_chart or $dd_report )
         ? 1
         : 0;
 
@@ -386,18 +391,31 @@ sub print_charts {
         $title =~ s/\(/ \"$run\" \(/;
       }
 
+      # set url_part
+      my $url_part;
+      if ( $run eq 'SINGLE' ) {
+        $url_part = "$chart.$lang.html";
+      } else {
+        $url_part =
+            'http://zbw.eu/beta/sparql-lab/stw.html'
+          . '?queryRef=https://api.github.com/repos/jneubert/skos-history'
+          . '/contents/sparql/stw/XXXXX_concepts_by_category.rq'
+          . '&oldVersion=8.12&newVersion=8.14&language=' . $lang . '&hide=1';
+      }
+
       # create js file
       my %tmpl_var = (
-        title      => $title,
-        subtitle   => 'Version 8.06 to 8.14',
-        is_diff    => $chart_data{$chart}{type} eq 'diffs',
-        grid_width => get_max(@all_values) + 1,
-        height     => get_height($no_of_lines),
-        series     => to_json( \@series, { pretty => 1 } ),
-        drilldown  => $drilldown,
-        dd_chart   => $dd_chart,
-        dd_report  => $dd_report,
-        url_part   => "$chart.$lang.html",
+        title           => $title,
+        subtitle        => 'Version 8.06 to 8.14',
+        is_diff         => $chart_data{$chart}{type} eq 'diffs',
+        grid_width      => get_max(@all_values) + 1,
+        height          => get_height($no_of_lines),
+        series          => to_json( \@series, { pretty => 1 } ),
+        drilldown       => $drilldown,
+        dd_chart        => $dd_chart,
+        dd_report       => $dd_report,
+        url_part        => $url_part,
+        deprecated_name => $deprecated_name,
       );
       my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
       $tmpl->param( \%tmpl_var );

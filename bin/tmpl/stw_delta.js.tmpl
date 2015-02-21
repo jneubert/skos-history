@@ -1,5 +1,5 @@
 /**
- * Created by Neubert Joachim on 12.02.2015.
+ * nbt, 12.02.2015
  *
  * Adapted from http://www.highcharts.com/demo/bar-negative-stack
  */
@@ -24,6 +24,10 @@ $(function () {
       xAxis: [{
         type: 'category',
         labels: {
+          useHTML: true,
+          formatter:function(){
+            return '<span class="stwlabel">' + this.value + '</span>';
+          },
           step: 1
         }
       }],
@@ -47,12 +51,22 @@ $(function () {
           point: {
             events:{
               click:function(){
-                var drilldown_url;
+                var drilldown_url, re, change_type;
                 <tmpl_if name="dd_chart">
                 drilldown_url = './' + this.name.substr(0, 1).toLowerCase()
                   + '/<tmpl_var name="url_part">';
                 </tmpl_if>
                 <tmpl_if name="dd_report">
+                drilldown_url = '<tmpl_var name="url_part">'
+                  + '&filter=' + this.name.substr(0, this.name.indexOf(" "));
+                re = new RegExp("XXXXX", "i");
+                // clumsy way to derive the series and its type from its name
+                if (this.series.name === "<tmpl_var name="deprecated_name" />") {
+                  change_type = 'deprecated';
+                } else {
+                  change_type = 'added';
+                }
+                drilldown_url = drilldown_url.replace(re, change_type);
                 </tmpl_if>
                 window.open(drilldown_url, '_self');
               }
@@ -63,6 +77,9 @@ $(function () {
       },
 
       tooltip: {
+        style: {
+          width: 120
+        },
         formatter: function () {
           return this.point.name + '<br />' + this.series.name +
               ': ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
