@@ -34,6 +34,14 @@ my $output_dir = '/var/www/html/beta/tmp2';
 # subthes collation sequence
 my @subthes_sequence = qw/ B V W P N G A /;
 
+# create subdirectories for output
+foreach my $subthes (@subthes_sequence) {
+  my $dir = $output_dir . '/' . lc($subthes);
+  if ( !-d $dir ) {
+    mkdir $dir or die "Could not create $dir: $@!\n";
+  }
+}
+
 my %definition = %{ get_definition() };
 
 my $dataset = $ARGV[0];
@@ -311,74 +319,113 @@ sub print_charts {
     # all but the first line, which contains column headers
     my @lines = @{ $csv->lines }[ 1 .. $#{ $csv->lines } ];
 
-    my ( @series, @all_values );
-
-    # set negative value for the first column
-    my $set_negative = 1;
-    foreach my $column_ref ( $column1_ref, $column2_ref ) {
-      my %column;
-      $column{name} = $$column_ref{header}{$lang};
-      my @data;
-      foreach my $line (@lines) {
-        my %cell;
-        $cell{name} = $line->get( $$table_ref{row_head_name} );
-        my $value = $line->get( $$column_ref{column} ) || 0;
-        push( @all_values, $value );
-
-        # explicitly cast to number, otherwise json generates a string
-        $cell{y} = $set_negative ? -$value : abs($value);
-        push( @data, \%cell );
-      }
-      $column{data} = \@data;
-      push( @series, \%column );
-      $set_negative = 0;
+    # control single or splitted results
+    my @runs;
+    if ( is_subthes_level( $$table_ref{name} ) ) {
+      @runs = ('SINGLE');
+    } else {
+      @runs = @subthes_sequence;
     }
 
-    # set flags to control drilldowns links
-    my $dd_chart =
-      grep( /$$table_ref{name}/, qw/ concepts_by_subthes / )
-      ? 1
-      : 0;
-    my $dd_report =
-          grep( /$$table_ref{name}/, qw/ concepts_by_category / )
-      and grep( /$chart/, qw/ changed_descriptors changed_thsys / )
-      ? 1
-      : 0;
-    my $drilldown =
-      $dd_chart or $dd_report
-      ? 1
-      : 0;
+    foreach my $run (@runs) {
 
-    # create js file
-    my %tmpl_var = (
-      title      => $chart_data{$chart}{title}{$lang},
-      subtitle   => 'Version 8.06 to 8.14',
-      is_diff    => $chart_data{$chart}{type} eq 'diffs',
-      grid_width => get_max(@all_values) + 1,
-      height     => get_height($csv),
-      series     => to_json( \@series, { pretty => 1 } ),
-      drilldown  => $drilldown,
-      dd_chart   => $dd_chart,
-      dd_report  => $dd_report,
-      url_part   => "$chart.$lang.html",
-    );
-    my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
-    $tmpl->param( \%tmpl_var );
-    my $fn = "$output_dir/$chart.$lang.js";
-    write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
+      my ( @series, @all_values );
 
-    # creae html file
-    %tmpl_var = (
-      lang     => $lang,
-      chart_js => "$chart.$lang.js",
-    );
-    $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.html.tmpl', );
-    $tmpl->param( \%tmpl_var );
-    $fn = "$output_dir/$chart.$lang.html";
-    write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
+      # set negative value for the first column
+      my $set_negative = 1;
+      my $no_of_lines  = 0;
+      foreach my $column_ref ( $column1_ref, $column2_ref ) {
+        my %column;
+        $column{name} = $$column_ref{header}{$lang};
+        my @data;
+        foreach my $line (@lines) {
+          my %cell;
+          $cell{name} = $line->get( $$table_ref{row_head_name} );
 
-    print "  Chart: $chart_data{$chart}{title}{$lang}\n";
+          # skip lines belonging to differt subthes
+          if ( $run ne 'SINGLE' ) {
+            next unless substr( $cell{name}, 0, 1 ) eq $run;
+          }
+          $no_of_lines++;
+
+          my $value = $line->get( $$column_ref{column} ) || 0;
+          push( @all_values, $value );
+
+          # explicitly cast to number, otherwise json generates a string
+          $cell{y} = $set_negative ? -$value : abs($value);
+          push( @data, \%cell );
+        }
+        $column{data} = \@data;
+        push( @series, \%column );
+        $set_negative = 0;
+      }
+
+      # direct output to sub-directory for category level
+      my ( $output_path, $fn );
+      if ( $run eq 'SINGLE' ) {
+        $output_path = $output_dir;
+      } else {
+        $output_path = "$output_dir/" . lc($run);
+      }
+
+      # set flags to control drilldowns links
+      my $dd_chart = is_subthes_level( $$table_ref{name} );
+      my $dd_report =
+            grep( /$$table_ref{name}/, qw/ concepts_by_category / )
+        and grep( /$chart/, qw/ changed_descriptors changed_thsys / )
+        ? 1
+        : 0;
+      my $drilldown =
+        $dd_chart or $dd_report
+        ? 1
+        : 0;
+
+      # set title, optionally including subthes
+      my $title = $chart_data{$chart}{title}{$lang};
+      if ( $run ne 'SINGLE' ) {
+        $title =~ s/\(/ \"$run\" \(/;
+      }
+
+      # create js file
+      my %tmpl_var = (
+        title      => $title,
+        subtitle   => 'Version 8.06 to 8.14',
+        is_diff    => $chart_data{$chart}{type} eq 'diffs',
+        grid_width => get_max(@all_values) + 1,
+        height     => get_height($no_of_lines),
+        series     => to_json( \@series, { pretty => 1 } ),
+        drilldown  => $drilldown,
+        dd_chart   => $dd_chart,
+        dd_report  => $dd_report,
+        url_part   => "$chart.$lang.html",
+      );
+      my $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.js.tmpl', );
+      $tmpl->param( \%tmpl_var );
+
+      $fn = "$output_path/$chart.$lang.js";
+      write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
+
+      # creae html file
+      %tmpl_var = (
+        lang     => $lang,
+        chart_js => "$chart.$lang.js",
+      );
+      $tmpl = HTML::Template->new( filename => 'tmpl/stw_delta.html.tmpl', );
+      $tmpl->param( \%tmpl_var );
+      $fn = "$output_path/$chart.$lang.html";
+      write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
+
+      print "  Chart: $fn\n";
+    }
   }
+}
+
+sub is_subthes_level {
+  my $table_name = shift or die "param missing\n";
+
+  return grep( /$table_name/, qw/ concepts_by_subthes / )
+    ? 1
+    : 0;
 }
 
 sub get_max {
@@ -392,13 +439,12 @@ sub get_max {
 }
 
 sub get_height {
-  my $csv = shift or die "param missing\n";
+  my $no_of_lines = shift or die "param missing\n";
 
-  my $line_height = 40;
+  my $header_footer_height = 150;
+  my $line_height          = 16;
 
-  my $no_of_lines = scalar( @{ $csv->lines() } );
-
-  return $line_height * $no_of_lines;
+  return $header_footer_height + ( $line_height * $no_of_lines );
 }
 
 sub get_definition {
