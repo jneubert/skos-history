@@ -27,7 +27,7 @@ use URI::file;
 # create utf8 output
 binmode( STDOUT, ":utf8" );
 
-my $output_dir = '/var/www/html/beta/tmp2';
+my $output_dir = '/var/www/html/beta/stw_deltas';
 
 # List of version and data structure for results
 
@@ -400,7 +400,7 @@ sub print_charts {
             'http://zbw.eu/beta/sparql-lab/stw.html'
           . '?queryRef=https://api.github.com/repos/jneubert/skos-history'
           . '/contents/sparql/stw/XXXXX_concepts_by_category.rq'
-          . '&oldVersion=8.12&newVersion=8.14&language=' . $lang . '&hide=1';
+          . '&oldVersion=8.06&newVersion=8.14&language=' . $lang . '&hide=1';
       }
 
       # create js file
