@@ -39,14 +39,20 @@ $(function () {
           formatter: function () {
             return (Math.abs(this.value));
           }
-        },
+        }
+        <tmpl_if name='is_diff'>,
         min: -<tmpl_var name="grid_width" />,
         max: <tmpl_var name="grid_width" />
+        </tmpl_if>
       },
 
       plotOptions: {
         series: {
+          <tmpl_if name='is_diff'>
           stacking: 'normal'
+          <tmpl_else>
+          stacking: false
+          </tmpl_if>
           <tmpl_if name="drilldown">,
           point: {
             events:{

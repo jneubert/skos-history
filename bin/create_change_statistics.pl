@@ -52,7 +52,8 @@ if ( not( $dataset and $definition{$dataset} ) ) {
   exit;
 }
 
-my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
+#my $endpoint = "http://zbw.eu/beta/sparql/${dataset}v/query";
+my $endpoint = "http://localhost:3030/stwv/query";
 
 # Main loop over all tables of a dataset
 my %csv_data;
@@ -357,7 +358,10 @@ sub print_charts {
           push( @all_values, $value );
 
           # explicitly cast to number, otherwise json generates a string
-          $cell{y} = $set_negative ? -$value : abs($value);
+          $cell{y} =
+            ( $chart_data{$chart}{type} eq 'diffs' and $set_negative )
+            ? -$value
+            : abs($value);
           push( @data, \%cell );
         }
         $column{data} = \@data;
@@ -423,7 +427,7 @@ sub print_charts {
       $fn = "$output_path/$chart.$lang.js";
       write_file( $fn, { binmode => ':utf8' }, $tmpl->output() );
 
-      # creae html file
+      # create html file
       %tmpl_var = (
         lang     => $lang,
         chart_js => "$chart.$lang.js",
@@ -525,7 +529,7 @@ sub get_definition {
               column => 'added_thsys',
               header => {
                 en => 'Added categories',
-                de => 'Zugefügte Systematikstellen',
+                de => 'Neue Systematikstellen',
               },
               query_file      => '../sparql/stw/count_added_concepts.rq',
               replace         => { '?conceptType' => 'zbwext:Thsys', },
@@ -535,7 +539,7 @@ sub get_definition {
               column => 'added_descriptors',
               header => {
                 en => 'Added descriptors',
-                de => 'Zugefügte Deskriptoren',
+                de => 'Neue Deskriptoren',
               },
               query_file      => '../sparql/stw/count_added_concepts.rq',
               replace         => { '?conceptType' => 'zbwext:Descriptor', },
@@ -739,7 +743,7 @@ sub get_definition {
               column => 'added_descriptors',
               header => {
                 en => 'Added descriptors',
-                de => 'Zugefügte Deskriptoren',
+                de => 'Neue Deskriptoren',
               },
               query_file => '../sparql/stw/count_added_concepts_by_category.rq',
               replace    => {
@@ -768,7 +772,7 @@ sub get_definition {
               column => 'added_thsys',
               header => {
                 en => 'Added categories',
-                de => 'Zugefügte Systematikstellen',
+                de => 'Neue Systematikstellen',
               },
               query_file => '../sparql/stw/count_added_concepts_by_category.rq',
               replace    => {
@@ -898,7 +902,7 @@ sub get_definition {
               column => 'added_descriptors',
               header => {
                 en => 'Added descriptors',
-                de => 'Zugefügte Deskriptoren',
+                de => 'Neue Deskriptoren',
               },
               query_file => '../sparql/stw/count_added_concepts_by_top.rq',
               replace    => {
@@ -924,7 +928,7 @@ sub get_definition {
               column => 'added_thsys',
               header => {
                 en => 'Added categories',
-                de => 'Zugefügte Systematikstellen',
+                de => 'Neue Systematikstellen',
               },
               query_file => '../sparql/stw/count_added_concepts_by_top.rq',
               replace    => {
