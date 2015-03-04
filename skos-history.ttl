@@ -16,8 +16,8 @@
     dc:creator "Joachim Neubert" ;
     dc:title "skos-history - Ontology for expressing version deltas of SKOS files"@en ;
     dcterms:created "2013-09-02"^^xsd:date ;
-    dcterms:modified "2014-11-14"^^xsd:date ;
-    dc:date "2014-11-14" ;
+    dcterms:modified "2015-03-13"^^xsd:date ;
+    dc:date "2015-03-13" ;
     rdfs:comment """This ontology proposal is meant to support comparisons between versions of SKOS vocabularies, both on the level of single concepts and on the level of aggregations of certain types of changes. The version deltas are expressed as graphs of insertions and deletions.
 The ontology may be used in conjunction with the proposed dataset versioning ontology (http://purl.org/iso25964/DataSet/Versioning#) for addressing the versions of a (SKOS) dataset via their related version history records."""@en .
 
@@ -101,6 +101,16 @@ sh:hasDelta
     #rdfs:subPropertyOf <???> ;
     rdfs:range sh:SchemeDelta ;
     rdfs:comment "A delta for this version. The subject of the triple may be a dsv:VersionHistoryRecord."@en .
+
+sh:isVersionHistoryOf
+    a owl:ObjectProperty ;
+    rdfs:isDefinedBy <http://purl.org/skos-history/> ;
+    rdfs:label "is Version History Of"@en ;
+    # TODO
+    #rdfs:subPropertyOf <???> ;
+    #rdfs:range dsv:VersionHistorySet;
+    #rdfs:domain skos:ConceptScheme .
+    rdfs:comment "Links the version history set to the skos concept scheme it is about. (Preliminary, may be better located in dsv ontology.)"@en .
 
 # TODO check the following properties as possibly obsolete when using delta ontology
 
