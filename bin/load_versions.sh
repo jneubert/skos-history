@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # nbt, 1.9.2013
 
 # load a series of version and delta graphs into a SPARQL 1.1 RDF dataset
@@ -10,68 +10,124 @@
 
 # START CONFIGURATION
 
-DATASET=$1
-VALID_DATASETS=(stw thesoz yso)
+## Help text
+usage ()
+{
+  echo "usage: load_versions [[-f file ] | [ vocab ] | [-h]]"
+  echo "examples:\n  load_versions -f config.inc\n  load_versions yso"
+  echo "NOTE: the directory of the file needs to be in PATH or the path should be explicit"
+}
 
-if [ -z "$DATASET" ]; then
-  echo "No dataset supplied (valid: ${VALID_DATASETS[*]})"
-  exit
-elif [[ ! ${VALID_DATASETS[*]} =~ $DATASET ]]; then
-  echo "Wrong dataset $DATASET spezified (valid: ${VALID_DATASETS[*]})"
-  exit
+####### Main
+
+# demands 1 or 2 command-line arguments
+if [ $# -lt 1 -o $# -gt 2 ]
+then
+  usage
+  exit 1
 fi
 
-if [ $DATASET == "stw" ]; then
-
-  # is used to store the SKOS files locally
-  #BASEDIR=/opt/thes/var/stw
-  BASEDIR=/tmp/stw_versions
-  FILENAME=rdf/stw.nt
-
-  # publicly available STW versions
-  VERSIONS=(8.04 8.06 8.08 8.10 8.12 8.14 9.0)
-  ##VERSIONS=(8.08 8.10 8.12)
-  SCHEMEURI='http://zbw.eu/stw'
-
-elif [ $DATASET == "thesoz" ]; then
-
-  # thesoz versions must be present locally
-  BASEDIR=/opt/thes/var/thesoz
-  FILENAME=rdf/thesoz.nt
-
-  # publicly available TheSoz versions
-  VERSIONS=(0.7 0.86 0.91 0.92 0.93)
-  SCHEMEURI='http://lod.gesis.org/thesoz/'
-
-elif [ $DATASET == "yso" ]; then
-
-  # thesoz versions must be present locally
-  BASEDIR=/opt/thes/var/yso
-  FILENAME=rdf/yso.nt
-
-  # publicly available TheSoz versions
-  VERSIONS=(20150102 20150128 20150129)
-  SCHEMEURI='http://www.yso.fi/onto/yso/'
-
-fi
-
-# implementation-specific uris
-#IMPL='sesame'
-IMPL='fuseki'
-if [ $IMPL == "sesame" ]; then
-  ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/${DATASET}v
-  PUT_URI=$ENDPOINT/rdf-graphs/service
-  UPDATE_URI=$ENDPOINT/statements
-  QUERY_URI=$ENDPOINT
-elif [ $IMPL == "fuseki" ]; then
-  ENDPOINT=http://localhost:3030/${DATASET}v
-  PUT_URI=$ENDPOINT/data
-  UPDATE_URI=$ENDPOINT/update
-  QUERY_URI=http://zbw.eu/beta/sparql/${DATASET}v/query
+# Handling the command line arguments
+if [ $# -eq 1 ]
+then
+  # Bacwards compatibility with skos-history
+  vocab=$1
 else
-  echo implementation $IMPL not defined
-  exit
+  # Get the configure file path
+  while [ "$1" != "" ]; do
+    case $1 in
+      -f | --file )           shift
+                              configfile=$1
+                              ;;
+      -h | --help )           usage
+                              exit
+                              ;;
+      * )                     usage
+                              exit 1
+    esac
+    shift
+  done
+
+  # reading in the stored variablesb from the configuration file
+  . $configfile
 fi
+
+
+# TODO: replace with a more elegant implementation
+VERSIONS=(20150102 20150128 20150129)
+
+
+
+# Backwards compatibility to skos-history
+if [ ! -z $vocab ]
+then
+  DATASET=$1
+  VALID_DATASETS=(stw thesoz yso)
+
+  if [ -z "$DATASET" ]; then
+    echo "No dataset supplied (valid: ${VALID_DATASETS[*]})"
+    exit
+  elif [[ ! ${VALID_DATASETS[*]} =~ $DATASET ]]; then
+    echo "Wrong dataset $DATASET spezified (valid: ${VALID_DATASETS[*]})"
+    exit
+  fi
+
+  if [ $DATASET == "stw" ]; then
+
+    # is used to store the SKOS files locally
+    #BASEDIR=/opt/thes/var/stw
+    BASEDIR=/tmp/stw_versions
+    FILENAME=rdf/stw.nt
+
+    # publicly available STW versions
+    VERSIONS=(8.04 8.06 8.08 8.10 8.12 8.14 9.0)
+    ##VERSIONS=(8.08 8.10 8.12)
+    SCHEMEURI='http://zbw.eu/stw'
+
+  elif [ $DATASET == "thesoz" ]; then
+
+    # thesoz versions must be present locally
+    BASEDIR=/opt/thes/var/thesoz
+    FILENAME=rdf/thesoz.nt
+
+    # publicly available TheSoz versions
+    VERSIONS=(0.7 0.86 0.91 0.92 0.93)
+    SCHEMEURI='http://lod.gesis.org/thesoz/'
+
+  elif [ $DATASET == "yso" ]; then
+
+    # thesoz versions must be present locally
+    BASEDIR=/opt/thes/var/yso
+    FILENAME=rdf/yso.nt
+
+    # publicly available TheSoz versions
+    VERSIONS=(20150102 20150128 20150129)
+    SCHEMEURI='http://www.yso.fi/onto/yso/'
+
+  fi
+
+  # implementation-specific uris
+  #IMPL='sesame'
+  IMPL='fuseki'
+  if [ $IMPL == "sesame" ]; then
+    ENDPOINT=http://localhost:8080/openrdf-sesame/repositories/${DATASET}v
+    PUT_URI=$ENDPOINT/rdf-graphs/service
+    UPDATE_URI=$ENDPOINT/statements
+    QUERY_URI=$ENDPOINT
+  elif [ $IMPL == "fuseki" ]; then
+    ENDPOINT=http://localhost:3030/${DATASET}v
+    PUT_URI=$ENDPOINT/data
+    UPDATE_URI=$ENDPOINT/update
+    QUERY_URI=http://zbw.eu/beta/sparql/${DATASET}v/query
+  else
+    echo implementation $IMPL not defined
+    exit
+  fi
+fi
+
+
+
+
 
 # END CONFIGURATION
 
