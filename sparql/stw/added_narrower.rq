@@ -1,0 +1,73 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+#
+# Added narrower relations to already existing concepts
+# (newly introduced narrower concepts flagged)
+#
+SELECT DISTINCT ?concept (str(?conceptPrefLabel) AS ?conceptLabel) (?narrowerConcept AS ?addedNarrowerConcept)
+(str(?narrowerConceptPrefLabel) as ?addedNarrowerConceptLabel) ?new
+WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+  }
+  GRAPH ?versionHistoryGraph {
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+  }
+  # newly inserted narrower relations
+  GRAPH ?insertionsGraph {
+    ?concept skos:narrower ?narrowerConcept .
+  }
+  # ... for already existing concepts
+  FILTER exists {
+    GRAPH ?oldVersionGraph {
+      ?concept ?p []
+    }
+  }
+  # restrict to ?conceptType
+  GRAPH ?newVersionGraph {
+    ?concept a ?conceptType ;
+      skos:prefLabel ?conceptPrefLabel .
+    ?narrowerConcept a ?conceptType ;
+      skos:prefLabel ?narrowerConceptPrefLabel .
+    OPTIONAL {
+      ?narrowerConcept skos:notation ?notation .
+    }
+  }
+  # flag narrower concepts which were newly introduced
+  OPTIONAL {
+    BIND ('X' AS ?new)
+    FILTER not exists {
+      GRAPH ?oldVersionGraph {
+        ?narrowerConcept ?p [] .
+      }
+    }
+  }
+  FILTER (lang(?conceptPrefLabel) = ?language && lang(?narrowerConceptPrefLabel) = ?language)
+}
+ORDER BY ?conceptPrefLabel ?notation ?narrowerConceptPrefLabel
+

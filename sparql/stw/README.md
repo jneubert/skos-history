@@ -16,6 +16,8 @@ Query | Description
 [merged_partially](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/merged_partially.rq) | Partially merged deprecated concepts
 [changed_preferred_labels](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/changed_preferred_labels.rq) | Show concepts (by default:descriptors) where the preferred labels has changed, and link to RDFa pages accordingly (for thsys, this includes notation changes)
 [moved_categories_subthes](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/moved_categories_subthes.rq) | Show categories which have been moved to another sub-thesaurus (skos:topConcept)
+[added_narrower](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/added_narrower.rq) | Added narrower relations to already existing concepts (newly introduced narrower concepts flagged)
+[added_broader](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/stw/added_broader.rq) | Added broader relations to already existing concepts (newly introduced broader concepts flagged)
 
 
 __Aggregated information about versions__
