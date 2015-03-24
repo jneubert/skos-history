@@ -52,12 +52,6 @@ else
   . $configfile
 fi
 
-
-# TODO: replace with a more elegant implementation
-VERSIONS=(20150102 20150128 20150129)
-
-
-
 # Backwards compatibility to skos-history
 if [ ! -z $vocab ]
 then
