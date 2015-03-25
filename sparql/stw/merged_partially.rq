@@ -10,8 +10,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # Partially merged deprecated concepts
 #
-SELECT DISTINCT (?oldConcept AS ?deprecatedConcept) (str(?label) AS ?movedLabel) (str(?oldPrefLabel) as ?deprecatedConceptLabel)
-?newConcept (str(?newPrefLabel) as ?newConceptLabel)
+SELECT DISTINCT (?oldConcept AS ?deprecatedConcept) (str(?oldPrefLabel) AS ?deprecatedConceptLabel)
+?replacedByConcept (str(?replacedByLabel) AS ?replacedByConceptLabel)
+(str(?label) AS ?movedLabel)
+?toConcept (str(?newPrefLabel) AS ?toConceptLabel)
+?new
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -44,8 +47,8 @@ WHERE {
   }
   # ... which have been moved to another concept (or perhaps have got another labelType)
   GRAPH ?insertionsGraph {
-    ?newConcept skos:prefLabel | skos:altLabel ?label .
-    ?newConcept ?newLabelType ?label .
+    ?toConcept skos:prefLabel | skos:altLabel ?label .
+    ?toConcept ?newLabelType ?label .
   }
   # restrict to a certain concept type and get additional information
   GRAPH ?oldVersionGraph {
@@ -59,19 +62,31 @@ WHERE {
       ?oldConcept a ?conceptType
     }
   }
-  FILTER (lang(?oldPrefLabel) = ?language)
   GRAPH ?newVersionGraph {
     ?oldConcept owl:deprecated ?deprecated .
     OPTIONAL {
-      ?oldConcept dcterms:isReplacedBy ?replacedByConcept
+      ?oldConcept dcterms:isReplacedBy ?replacedByConcept .
+      ?replacedByConcept skos:prefLabel ?replacedByLabel .
     }
     # (no variant for type URI since newVersion 8.06)
-    ?newConcept a ?conceptType ;
+    ?toConcept a ?conceptType ;
       skos:prefLabel | skos:altLabel ?label ;
       skos:prefLabel ?newPrefLabel .
   }
-  FILTER (lang(?newPrefLabel) = ?language)
   # only look at concepts which are not completely merged
-  FILTER (?newConcept != ?replacedByConcept)
+  FILTER (?toConcept != ?replacedByConcept)
+  # flag new concepts which were newly introduced
+  OPTIONAL {
+    BIND ('X' AS ?new)
+    FILTER not exists {
+      GRAPH ?oldVersionGraph {
+        ?toConcept ?p [] .
+      }
+    }
+  }
+  FILTER (lang(?label) = ?language
+    && lang(?oldPrefLabel) = ?language
+    && lang(?replacedByLabel) = ?language
+    && lang(?newPrefLabel) = ?language )
 }
 ORDER BY ?oldPrefLabel ?label
