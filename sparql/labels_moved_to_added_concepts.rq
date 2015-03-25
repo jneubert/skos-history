@@ -11,7 +11,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # Show the labels which have moved to newly inserted concepts
 #
 SELECT ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel) (str(?label) AS ?movedLabel)
-?newConcept (str(?newPrefLabel) as ?newConceptLabel)
+?newConcept (str(?newPrefLabel) as ?newConceptLabel) ?newNarrowerOld
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
@@ -52,11 +52,19 @@ WHERE {
     }
     ?oldConcept skos:prefLabel ?oldPrefLabel .
   }
-  FILTER (lang(?oldPrefLabel) = ?language)
   #
   GRAPH ?newVersionGraph {
     ?newConcept skos:prefLabel ?newPrefLabel .
   }
-  FILTER (lang(?newPrefLabel) = ?language)
+  # flag if the new concept is directly sub-ordinated to the old one
+  OPTIONAL {
+    GRAPH ?newVersionGraph {
+      BIND ("X" AS ?newNarrowerOld)
+      ?oldConcept skos:narrower ?newConcept
+    }
+  }
+  FILTER (lang(?label) = ?language
+    && lang(?oldPrefLabel) = ?language
+    && lang(?newPrefLabel) = ?language )
 }
 ORDER BY ?newPrefLabel ?label
