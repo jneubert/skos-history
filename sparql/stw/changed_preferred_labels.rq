@@ -14,7 +14,7 @@ SELECT DISTINCT ?old (str(?oldPrefLabel) AS ?oldLabel) (str(?newPrefLabel) AS ?n
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor "8.06" "8.14" "en" )
+    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # get the current and the previous version as default versions
