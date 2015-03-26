@@ -59,7 +59,6 @@ WHERE {
       ?oldConcept a ?conceptType
     }
   }
-  FILTER (lang(?oldPrefLabel) = ?language)
   GRAPH ?newVersionGraph {
     ?newConcept skos:prefLabel | skos:altLabel ?label .
     ?newConcept a ?conceptType .
@@ -68,6 +67,8 @@ WHERE {
     #      ?oldConcept owl:deprecated ?deprecated
     #    } .
   }
-  FILTER (lang(?newPrefLabel) = ?language)
+  FILTER (lang(?label) = ?language
+    && lang(?newPrefLabel) = ?language
+    && lang(?oldPrefLabel) = ?language)
 }
 ORDER BY ?oldPrefLabel ?label
