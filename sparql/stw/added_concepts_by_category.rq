@@ -15,7 +15,8 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # level subject categories are the sub-thesauri. A descriptor
 # often belongs to more than one subject category.
 #
-SELECT DISTINCT ?topCategory (str(?topLabel) AS ?topCategoryLabel) ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
+SELECT DISTINCT ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCategoryLabel)
+(?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -60,14 +61,13 @@ WHERE {
     ?category a zbwext:Thsys ;
       skos:broader* ?topCategory .
     $scheme skos:hasTopConcept $topCategory .
-    ?topCategory skos:prefLabel ?topLabel .
     #
     # get the second level category and it's label
     ?topCategory skos:narrower ?secondLevelCategory .
     ?category skos:broader* ?secondLevelCategory .
     ?secondLevelCategory skos:prefLabel ?secondLevelLabel .
   }
-  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language && lang(?topLabel) = ?language)
+  FILTER (lang(?prefLabel) = ?language && lang(?secondLevelLabel) = ?language)
 }
 ORDER BY ?secondLevelCategoryLabel ?prefLabel
 
