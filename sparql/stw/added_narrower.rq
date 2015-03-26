@@ -11,8 +11,10 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # Added narrower relations to already existing concepts
 # (newly introduced narrower concepts flagged)
 #
-SELECT DISTINCT ?concept (str(?conceptPrefLabel) AS ?conceptLabel) (?narrowerConcept AS ?addedNarrowerConcept)
-(str(?narrowerConceptPrefLabel) as ?addedNarrowerConceptLabel) ?new
+SELECT DISTINCT ?concept (str(?conceptPrefLabel) AS ?conceptLabel)
+?priorIntermediateConcept (str(?intermediateLabel) AS ?priorIntermediateConceptLabel)
+(?narrowerConcept AS ?addedNarrowerConcept) (str(?narrowerConceptPrefLabel) as ?addedNarrowerConceptLabel)
+?new
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -58,6 +60,15 @@ WHERE {
       ?narrowerConcept skos:notation ?notation .
     }
   }
+  # intermediate concept in the prior version (if exists)
+  OPTIONAL {
+    GRAPH ?oldVersionGraph {
+      ?concept skos:narrower ?priorIntermediateConcept .
+      ?priorIntermediateConcept skos:narrower ?narrowerConcept ;
+        skos:prefLabel ?intermediateLabel .
+    }
+    FILTER (lang(?intermediateLabel) = ?language)
+  }
   # flag narrower concepts which were newly introduced
   OPTIONAL {
     BIND ('X' AS ?new)
@@ -70,4 +81,3 @@ WHERE {
   FILTER (lang(?conceptPrefLabel) = ?language && lang(?narrowerConceptPrefLabel) = ?language)
 }
 ORDER BY ?conceptPrefLabel ?notation ?narrowerConceptPrefLabel
-

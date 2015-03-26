@@ -11,8 +11,10 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 # Added broader relations to already existing concepts
 # (newly introduced broader concepts flagged)
 #
-SELECT DISTINCT ?concept (str(?conceptPrefLabel) AS ?conceptLabel) (?broaderConcept AS ?addedBroaderConcept)
-(str(?broaderConceptPrefLabel) as ?addedBroaderConceptLabel) ?new
+SELECT DISTINCT ?concept (str(?conceptPrefLabel) AS ?conceptLabel)
+?priorIntermediateConcept (str(?intermediateLabel) AS ?priorIntermediateConceptLabel)
+(?broaderConcept AS ?addedBroaderConcept) (str(?broaderConceptPrefLabel) as ?addedBroaderConceptLabel)
+?new
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -57,6 +59,15 @@ WHERE {
     OPTIONAL {
       ?broaderConcept skos:notation ?notation .
     }
+  }
+  # intermediate concept in the prior version (if exists)
+  OPTIONAL {
+    GRAPH ?oldVersionGraph {
+      ?concept skos:broader ?priorIntermediateConcept .
+      ?priorIntermediateConcept skos:broader ?broaderConcept ;
+        skos:prefLabel ?intermediateLabel .
+    }
+    FILTER (lang(?intermediateLabel) = ?language)
   }
   # flag broader concepts which were newly introduced
   OPTIONAL {
