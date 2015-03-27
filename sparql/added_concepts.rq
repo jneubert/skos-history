@@ -12,21 +12,28 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 SELECT distinct (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?language ) {
-    ( <http://zbw.eu/stw/version> "en" )
+  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
-    # the compared versions default to the current and the previous one
-    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?oldVersion .
-    ?versionset dsv:currentVersionRecord/dc:identifier ?newVersion .
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
     # get the delta and via that the relevant graphs
     ?delta a sh:SchemeDelta ;
-      sh:deltaFrom/dc:identifier ?oldVersion ;
-      sh:deltaTo/dc:identifier ?newVersion ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      dcterms:hasPart ?insertions .
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
     ?insertions a sh:SchemeDeltaInsertions ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # for each inserted concept, a newly inserted prefLabel must exist ...
   GRAPH ?insertionsGraph {

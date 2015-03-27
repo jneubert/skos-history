@@ -1,3 +1,4 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -13,31 +14,34 @@ SELECT (?concept AS ?deprecatedConcept) (str(?label) AS ?deprecatedConceptLabel)
 (?replacedBy as ?replacedByConcept) (str(?replacedByPrefLabel) AS ?replacedByConceptLabel)
 WHERE {
   # parameters
-  VALUES ( ?versionHistoryGraph ?language ) {
-    ( <http://zbw.eu/stw/version> "en" )
+  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+    ( <http://zbw.eu/stw/version> undef undef "en" )
   }
   GRAPH ?versionHistoryGraph {
-    # use the current version as default
-    ?versionset dsv:currentVersionRecord ?currentVHR .
-    ?currentVHR sh:usingNamedGraph/sd:name ?versionGraph .
-    ?currentVHR sh:hasDelta ?delta .
-    # get the delta to the previous version
-    ?currentVHR xhv:prev ?previousVHR .
-    ?delta sh:deltaTo ?currentVHR .
-    ?delta sh:deltaFrom ?previousVHR .
-    # identify insertions and deletions parts/graphs
-    ?delta dcterms:hasPart ?insertions .
-    ?insertions a sh:SchemeDeltaInsertions .
-    ?insertions sh:usingNamedGraph/sd:name ?insertionsGraph .
-    ?delta dcterms:hasPart ?deletions .
-    ?deletions a sh:SchemeDeltaDeletions .
-    ?deletions sh:usingNamedGraph/sd:name ?deletionsGraph .
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # identify the deprecated concepts
   GRAPH ?insertionsGraph {
     ?concept owl:deprecated true
   }
-  GRAPH ?versionGraph {
+  GRAPH ?newVersionGraph {
     # different kinds of remaining labels should be supported
     {
       ?concept skos:prefLabel ?label
