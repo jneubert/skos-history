@@ -4,10 +4,6 @@
 # load a series of version and delta graphs into a SPARQL 1.1 RDF dataset
 
 
-# Requirements:
-
-# Redland's rapper and rdf.sh`s rdf command should be in $PATH
-
 ## Help text
 usage ()
 {
@@ -149,17 +145,6 @@ load_delta () {
   delta_uri=$BASEURI/$old/delta/$new
   printf "\nCreating and loading $delta_uri\n"
 
-  filebase=$BASEDIR/${old}_${new}
-  diff=$filebase.diff
-
-  # create the diff
-  # (rdf diff converts to sorted n-triples and by default uses /usr/bin/diff)
-  rdf diff $BASEDIR/$old/$FILENAME $BASEDIR/$new/$FILENAME > $diff
-
-  # split into delete and insert files (filtering out blank nodes)
-  grep '^< ' $diff | egrep -v "(^_:|> _:)" | sed 's/^< //' > ${filebase}_deletions.nt
-  grep '^> ' $diff | egrep -v "(^_:|> _:)" | sed 's/^> //' > ${filebase}_insertions.nt
-
   # add triples to version history graph
   statement="
 $PREFIXES
@@ -181,8 +166,36 @@ where {}
     # make variable with first character uppercased
     op_var="$(tr '[:lower:]' '[:upper:]' <<< ${op:0:1})${op:1}"
 
-    # load file
-    sparql_put $delta_uri/$op ${filebase}_$op.nt
+    # compute the difference between the versions
+    # and insert into the delta graph
+    if [ $op == 'deletions' ]; then
+      minuend=$old
+      subtrahend=$new
+    else
+      minuend=$new
+      subtrahend=$old
+    fi
+    statement="
+$PREFIXES
+with <$delta_uri/$op>
+insert {
+  ?s ?p ?o
+}
+where {
+  graph <$BASEURI/$minuend> {
+    ?s ?p ?o
+  }
+  minus {
+    graph <$BASEURI/$subtrahend> {
+      ?s ?p ?o
+    }
+  }
+  # filter out blank nodes
+  filter isIRI(?s)
+  filter (isIRI(?o) || isLiteral(?o) || isNumeric(?o))
+}
+"
+    sparql_update "$statement"
 
     echo add triples to the version graph for $op
     statement="
@@ -213,9 +226,6 @@ where {}
     sparql_update "$statement"
 
   done
-
-  # cleanup
-  /bin/rm $filebase*
 }
 
 ##############
