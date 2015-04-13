@@ -56,5 +56,10 @@ __Technical background information__
 
 __Extension to SKOS-XL__
 
-Some of the example queries have been adapted to work against a [second example endpoint](http://zbw.eu/beta/sparql/thesozv/query) with multiple versions of [Thesaurus for the Social Sciences (TheSoz)](http://www.gesis.org/en/services/research/thesauri-und-klassifikationen/social-science-thesaurus/), which uses [SKOS-XL](http://www.w3.org/TR/skos-reference/skos-xl.html). The queries can be directed to the thesoz example endpoint by adding `&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version` to the URL.
+Some of the example queries have been adapted to work against version of thesauri, which uses [SKOS-XL](http://www.w3.org/TR/skos-reference/skos-xl.html). The queries can be directed to the thesoz or agrovoc example endpoints (see below).
 
+__Further example endpoints__
+
+- TheSoz - add `&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version))
+- YSO - add `&endpoint=http://zbw.eu/beta/sparql/ysov/query&versionHistoryGraph=http://www.yso.fi/onto/yso/` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://www.yso.fi/onto/yso/))
+- Agrovoc - `&endpoint=http://zbw.eu/beta/sparql/agrovocv/query&versionHistoryGraph=http://aims.fao.org/aos/agrovoc` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://aims.fao.org/aos/agrovoc))
