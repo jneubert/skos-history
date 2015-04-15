@@ -154,7 +154,7 @@ where {
 $PREFIXES
 with <$BASEURI>
 insert {
-  <${BASEURI}record/$version> dc:date "$version"^^xsd:date .
+  <${BASEURI}record/$version> dc:date \"$version\"^^xsd:date .
 }
 where {}
 "
