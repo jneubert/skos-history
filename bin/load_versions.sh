@@ -97,26 +97,69 @@ insert {
       dsv:isVersionRecordOf <$BASEURI/$version/download/$DATASET.ttl.zip> ;
       dsv:isVersionRecordOf <$BASEURI/$version/ng> ;
       :usingNamedGraph <$BASEURI/$version/ng> ;
-      dc:date ?fixeddate;
-      dc:identifier ?identifier .
+      dc:date ?fixedDate ;
+      dc:identifier ?fixedIdentifier .
   <$BASEURI/$version/ng> a sd:NamedGraph ;
       sd:name <$BASEURI/$version> .
 }
 where {
   GRAPH <$BASEURI/$version> {
+    # compute identifier (fix missing if necessary)
     # stw and recent thesoz version property
     OPTIONAL { <$SCHEMEURI> owl:versionInfo ?identifier } .
     # old thesoz version prpoperty
     OPTIONAL { <$SCHEMEURI> dcterms:hasVersion ?identifier } .
-    # stw uses dcterms:issued
-    OPTIONAL { <$SCHEMEURI> dcterms:issued ?date }
-    # thesoz uses dcterms:modified (plus dcterms:issued for created date)
-    OPTIONAL { <$SCHEMEURI> dcterms:modified ?modified }
-    BIND(coalesce(strdt(?modified, xsd:date), strdt(?date, xsd:date), ?date) as ?fixeddate)
+    # otherwise, use $version
+    BIND (coalesce(?identifier, \"$version\") as ?fixedIdentifier)
+
+    # compute date as xsd:date (fix if necessary -
+    # date values may occur as string, xsd:date or xsd:dateTime;
+    # strings may take the form of 'yyyy/mm/dd' (thesoz 0.7) or 'yyyy-mm-ddThh:mm:ssZ'
+
+    # stw uses dcterms:issued (string or xsd:date)
+    OPTIONAL {
+      <$SCHEMEURI> dcterms:issued ?issued .
+    }
+    # thesoz et al. use dcterms:modified (in case of thesoz, plus dcterms:issued for created date)
+    OPTIONAL {
+      <$SCHEMEURI> dcterms:modified ?modified .
+    }
+    BIND (str(coalesce(?modified, ?issued)) as ?someStr)
+    BIND (concat(substr(?someStr, 1, 4), '-', substr(?someStr, 6, 2), '-', substr(?someStr, 9, 2)) as ?dateStr)
+    BIND (strdt(?dateStr, xsd:date) as ?fixedDate)
   }
 }
 "
   sparql_update "$statement"
+
+  # special clause for thesauri which have no unique
+  # version date in the data and are enumerated in $VERSIONS by a valid date
+  VERSION_DATE_MISSING=(agrovoc)
+  if [[ $VERSION_DATE_MISSING =~ $DATASET ]] ; then
+    # delete multiple entries, as provided by agrovoc
+    statement="
+$PREFIXES
+with <$BASEURI>
+delete {
+  <${BASEURI}record/$version> dc:date ?x .
+}
+where {
+  <${BASEURI}record/$version> dc:date ?x .
+}
+"
+    sparql_update "$statement"
+
+    # insert triple constructed from version string
+    statement="
+$PREFIXES
+with <$BASEURI>
+insert {
+  <${BASEURI}record/$version> dc:date "$version"^^xsd:date .
+}
+where {}
+"
+    sparql_update "$statement"
+  fi
 
   # complement service description
   statement="
