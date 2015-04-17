@@ -106,7 +106,11 @@ where {
   GRAPH <$BASEURI/$version> {
     # compute identifier (fix missing if necessary)
     # stw and recent thesoz version property
-    OPTIONAL { <$SCHEMEURI> owl:versionInfo ?identifier } .
+    OPTIONAL {
+      <$SCHEMEURI> owl:versionInfo ?identifier
+      # avoid using SVN-generated version strings in e.g. old YSA versions
+      FILTER (!CONTAINS(?identifier, '$'))
+    } .
     # old thesoz version prpoperty
     OPTIONAL { <$SCHEMEURI> dcterms:hasVersion ?identifier } .
     # otherwise, use $version
