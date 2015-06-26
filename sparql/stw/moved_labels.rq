@@ -8,9 +8,10 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
-# show all labels added in the current version
+# show all labels which already existed in the previous version,
+# but were moved to another concept in the current one
 #
-SELECT DISTINCT (str(?label) AS ?movedLabel) ?oldLabelType ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel)
+SELECT DISTINCT (str(?label) AS ?movedLabel) ?oldLabelType ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel) ?isDeprecated
 ?newLabelType ?newConcept (str(?newPrefLabel) as ?newConceptLabel)
 WHERE {
   # parameters
@@ -63,9 +64,13 @@ WHERE {
     ?newConcept skos:prefLabel | skos:altLabel ?label .
     ?newConcept a ?conceptType .
     ?newConcept skos:prefLabel ?newPrefLabel .
-    #    OPTIONAL {
-    #      ?oldConcept owl:deprecated ?deprecated
-    #    } .
+  }
+  OPTIONAL {
+    GRAPH ?newVersionGraph {
+      ?oldConcept owl:deprecated true .
+      ?oldConcept owl:deprecated ?deprecated .
+      BIND(if(?deprecated = true, "✓", '') as ?isDeprecated)
+    }
   }
   FILTER (lang(?label) = ?language
     && lang(?newPrefLabel) = ?language
