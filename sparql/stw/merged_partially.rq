@@ -14,7 +14,7 @@ SELECT DISTINCT (?oldConcept AS ?deprecatedConcept) (str(?oldPrefLabel) AS ?depr
 ?replacedByConcept (str(?replacedByLabel) AS ?replacedByConceptLabel)
 (str(?label) AS ?movedLabel)
 ?toConcept (str(?newPrefLabel) AS ?toConceptLabel)
-?new
+?isNew
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -77,7 +77,7 @@ WHERE {
   FILTER (?toConcept != ?replacedByConcept)
   # flag new concepts which were newly introduced
   OPTIONAL {
-    BIND ('X' AS ?new)
+    BIND ('✓' AS ?isNew)
     FILTER not exists {
       GRAPH ?oldVersionGraph {
         ?toConcept ?p [] .
