@@ -10,7 +10,7 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 # show all labels deleted in the current version
 #
-SELECT DISTINCT (?oldConcept AS ?concept) (str(?prefLabel) AS ?conceptLabel) (str(?label) AS ?deletedLabel)
+SELECT DISTINCT ?concept (str(?prefLabel) AS ?conceptLabel) (str(?label) AS ?deletedLabel)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
@@ -49,15 +49,17 @@ WHERE {
   FILTER (lang(?label) = ?language)
   # restrict to a certain concept type and get additional information
   GRAPH ?oldVersionGraph {
-    ?oldConcept skos:prefLabel | skos:altLabel ?label ;
-      skos:prefLabel ?prefLabel .
+    ?concept skos:prefLabel | skos:altLabel ?label .
     # ugly fix for a different custom namespace URI used in STW 8.04
     BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
     {
-      ?oldConcept a ?obsoleteConceptType
+      ?concept a ?obsoleteConceptType
     } UNION {
-      ?oldConcept a ?conceptType
+      ?concept a ?conceptType
     }
+  }
+  GRAPH ?newVersionGraph {
+    ?concept skos:prefLabel ?prefLabel .
   }
   # restrict output to a certain language
   FILTER (lang(?prefLabel) = ?language)
