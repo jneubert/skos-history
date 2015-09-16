@@ -7,8 +7,8 @@ ontology](http://purl.org/iso25964/DataSet/Versioning#)
 and skos-history approach is implemented in the HTML/RDFa pages of the STW.
 
 The version history set is at http://zbw.eu/stw/version. The current STW
-version (http://zbw.eu/stw/version/latest) links its version history record and
-to that version history set.
+version (http://zbw.eu/stw/version/latest) links to that version history set
+and to its particular version history record Please use the "RDF/XML" or
+"RDF/Turtle" links on the pages to look at the actual triples.
 
-The files in this directory are an early experimental implementation, outdated now.
-
+The files in this directory are an early experimental implementation, outdated now.  
