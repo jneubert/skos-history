@@ -74,11 +74,12 @@ load_version () {
   # (particularly frbrer is Realization Of)
   statement="
 $PREFIXES
-with <$BASEURI/$version>
 insert {
-  <$BASEURI/$version> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <$SCHEMEURI> .
-  <$SCHEMEURI> dsv:hasVersionRecord <${BASEURI}record/$latest> ;
-      :hasVersionHistorySet <$BASEURI> .
+  GRAPH <$BASEURI/$version> {
+    <$BASEURI/$version> <http://iflastandards.info/ns/fr/frbr/frbrer/P2002> <$SCHEMEURI> .
+    <$SCHEMEURI> dsv:hasVersionRecord <${BASEURI}record/$latest> ;
+        :hasVersionHistorySet <$BASEURI> .
+  }
 }
 where {}
 "
@@ -88,19 +89,20 @@ where {}
   # (fix invalid string date format for thesoz and for older stw versions)
   statement="
 $PREFIXES
-with <$BASEURI>
 insert {
-  <${BASEURI}record/$version>
-      a dsv:VersionHistoryRecord ;
-      dsv:hasVersionHistorySet <${BASEURI}> ;
-      dsv:isVersionRecordOf <$BASEURI/$version/download/$DATASET.rdf.zip> ;
-      dsv:isVersionRecordOf <$BASEURI/$version/download/$DATASET.ttl.zip> ;
-      dsv:isVersionRecordOf <$BASEURI/$version/ng> ;
-      :usingNamedGraph <$BASEURI/$version/ng> ;
-      dc:date ?fixedDate ;
-      dc:identifier ?fixedIdentifier .
-  <$BASEURI/$version/ng> a sd:NamedGraph ;
-      sd:name <$BASEURI/$version> .
+  GRAPH <$BASEURI> {
+    <${BASEURI}record/$version>
+        a dsv:VersionHistoryRecord ;
+        dsv:hasVersionHistorySet <${BASEURI}> ;
+        dsv:isVersionRecordOf <$BASEURI/$version/download/$DATASET.rdf.zip> ;
+        dsv:isVersionRecordOf <$BASEURI/$version/download/$DATASET.ttl.zip> ;
+        dsv:isVersionRecordOf <$BASEURI/$version/ng> ;
+        :usingNamedGraph <$BASEURI/$version/ng> ;
+        dc:date ?fixedDate ;
+        dc:identifier ?fixedIdentifier .
+    <$BASEURI/$version/ng> a sd:NamedGraph ;
+        sd:name <$BASEURI/$version> .
+  }
 }
 where {
   GRAPH <$BASEURI/$version> {
@@ -143,12 +145,10 @@ where {
     # delete multiple entries, as provided by agrovoc
     statement="
 $PREFIXES
-with <$BASEURI>
-delete {
-  <${BASEURI}record/$version> dc:date ?x .
-}
-where {
-  <${BASEURI}record/$version> dc:date ?x .
+DELETE WHERE {
+  GRAPH <$BASEURI> {
+    <${BASEURI}record/$version> dc:date ?x .
+  }
 }
 "
     sparql_update "$statement"
@@ -156,9 +156,10 @@ where {
     # insert triple constructed from version string
     statement="
 $PREFIXES
-with <$BASEURI>
 insert {
-  <${BASEURI}record/$version> dc:date \"$version\"^^xsd:date .
+  GRAPH <$BASEURI> {
+    <${BASEURI}record/$version> dc:date \"$version\"^^xsd:date .
+  }
 }
 where {}
 "
@@ -195,13 +196,14 @@ load_delta () {
   # add triples to version history graph
   statement="
 $PREFIXES
-with <$BASEURI>
 insert {
-  <${BASEURI}record/$old> :hasDelta <$delta_uri> .
-  <${BASEURI}record/$new> :hasDelta <$delta_uri> .
-  <$delta_uri> a :SchemeDelta ;
-      :deltaFrom <${BASEURI}record/$old> ;
-      :deltaTo <${BASEURI}record/$new> .
+  GRAPH <$BASEURI> {
+    <${BASEURI}record/$old> :hasDelta <$delta_uri> .
+    <${BASEURI}record/$new> :hasDelta <$delta_uri> .
+    <$delta_uri> a :SchemeDelta ;
+        :deltaFrom <${BASEURI}record/$old> ;
+        :deltaTo <${BASEURI}record/$new> .
+  }
 }
 where {}
 "
@@ -224,9 +226,10 @@ where {}
     fi
     statement="
 $PREFIXES
-with <$delta_uri/$op>
 insert {
-  ?s ?p ?o
+  GRAPH <$delta_uri/$op> {
+    ?s ?p ?o
+  }
 }
 where {
   graph <$BASEURI/$minuend> {
@@ -247,14 +250,15 @@ where {
     echo add triples to the version graph for $op
     statement="
 $PREFIXES
-with <$BASEURI>
 insert {
-  <$delta_uri> dcterms:hasPart <$delta_uri/$op> .
-  <$delta_uri/$op> a :SchemeDelta$op_var ;
-      dcterms:isPartOf <$delta_uri> ;
-      :usingNamedGraph <$delta_uri/$op/ng> .
-  <$delta_uri/$op/ng> a sd:NamedGraph ;
-      sd:name <$delta_uri/$op> .
+  GRAPH <$BASEURI> {
+    <$delta_uri> dcterms:hasPart <$delta_uri/$op> .
+    <$delta_uri/$op> a :SchemeDelta$op_var ;
+        dcterms:isPartOf <$delta_uri> ;
+        :usingNamedGraph <$delta_uri/$op/ng> .
+    <$delta_uri/$op/ng> a sd:NamedGraph ;
+        sd:name <$delta_uri/$op> .
+  }
 }
 where {}
 "
@@ -378,9 +382,10 @@ do
     # load a xhv:prev statement for immediately following versions
     statement="
 $PREFIXES
-with <$BASEURI>
 insert {
-  <${BASEURI}record/$new> xhv:prev <${BASEURI}record/$old> .
+  GRAPH <$BASEURI> {
+    <${BASEURI}record/$new> xhv:prev <${BASEURI}record/$old> .
+  }
 }
 where {}
 "
