@@ -12,3 +12,9 @@ The use cases to be covered are discussed in [List of Use Cases](https://github.
 The [skos-history ontology](http://purl.org/skos-history/) is meant to be used in combination with the [dataset versioning ontology](http://www.essepuntato.it/lode/owlapi/https://raw.githubusercontent.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl) - both being work in progress.
 
 See also the [Ontologies, Thesauri, Vocabularies](https://github.com/jneubert/skos-history/wiki/Ontologies-Thesauri-Vocabularies) and the [Resources](https://github.com/jneubert/skos-history/wiki/Resources) sections.
+
+
+### Contributing
+
+Contributions are very much appreciated - be it in the form of suggestions or bug reports in the [issue queue](https://github.com/jneubert/skos-history/issues), or as patches or pull requests for improved or additional queries or script code. This in particular includes extensions to cover the specifics of not yet well-supported SKOS vocabularies.
+
