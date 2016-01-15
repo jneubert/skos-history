@@ -1,7 +1,7 @@
 STW Thesaurus for Economics
 =========================
 
-Queries on [STW Thesaurus for Economics](http://zbw.eu/stw), which contains subthesauri and a hierarchy of general subject categories (thesaurus groups in [ISO-25964](https://en.wikipedia.org/wiki/ISO_25964)).
+Queries on [STW Thesaurus for Economics](http://zbw.eu/stw), which contains subthesauri and a hierarchy of general subject categories (thesaurus groups in [ISO-25964](https://en.wikipedia.org/wiki/ISO_25964)). These queries are used for generating the change reports on STW production site ([8.14 reports (beta)](http://zbw.eu/stw/version/8.14/changes) are generated live, while [9.0 reports](http://zbw.eu/stw/version/9.0/changes) and [reports on accumulated changes 8.06-9.0](http://zbw.eu/stw/version/latest/relaunch) are pre-computed JSON files.)
 
 
 __Lists of individual changes__
