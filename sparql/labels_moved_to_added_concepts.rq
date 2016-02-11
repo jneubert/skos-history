@@ -13,11 +13,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT distinct ?oldConcept (str(?oldPrefLabel) as ?oldConceptLabel) (str(?label) AS ?movedLabel)
 ?newConcept (str(?newPrefLabel) as ?newConceptLabel) ?isSubconcept
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> undef undef "en" )
+    }
     # get the current and the previous version as default versions
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .

@@ -10,11 +10,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 SELECT  ?topConcept (str(max(?topLabel)) AS ?topConceptLabel) (str(count(?concept)) as ?totalConcepts)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+    }
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
     # select the version to actually use
     BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)

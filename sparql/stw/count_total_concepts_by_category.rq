@@ -17,11 +17,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT distinct ?secondLevelCategory (str(max(?secondLevelLabel)) AS ?secondLevelCategoryLabel)
 (str(count(distinct ?concept)) as ?totalConcepts)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+    }
     # get the current version as default version
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
     # select the versions to actually use

@@ -20,15 +20,16 @@ CONSTRUCT {
     delta:insertion [ ?predicate ?insertion ] .
 }
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?concept ) {
-    ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/10112-4> )
-  }
-  # alternate examples:
-  #   newly introduced thsys "B.04.02.01 Recruitment": <http://zbw.eu/stw/thsys/180783>
-  #   changes in "Welfare analyis": <http://zbw.eu/stw/descriptor/10112-4>
-  #   complete lifecycle of "Virtual community": <http://zbw.eu/stw/descriptor/27212-1>
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?concept ) {
+      ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/10112-4> )
+    }
+    # alternate examples:
+    #   newly introduced thsys "B.04.02.01 Recruitment": <http://zbw.eu/stw/thsys/180783>
+    #   changes in "Welfare analyis": <http://zbw.eu/stw/descriptor/10112-4>
+    #   complete lifecycle of "Virtual community": <http://zbw.eu/stw/descriptor/27212-1>
+    #
     # use subquery to filter out duplicates
     SELECT DISTINCT ?delta ?concept ?conceptDelta ?predicate ?deletion ?insertion
     WHERE {

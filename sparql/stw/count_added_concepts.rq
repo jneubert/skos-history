@@ -14,11 +14,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 SELECT ?version (str(count(distinct ?concept)) as ?addedConceptCount)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?conceptType ) {
+      ( <http://zbw.eu/stw/version> zbwext:Descriptor )
+    }
     ?delta a sh:SchemeDelta ;
       sh:deltaTo ?newVHR ;
       sh:deltaFrom ?oldVHR ;

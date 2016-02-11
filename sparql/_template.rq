@@ -11,12 +11,12 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 SELECT DISTINCT *
 WHERE {
-  # parameters
-  # (?versionHistoryGraph is required - should be scheme uri + '/version')
-  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-    ( undef undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    # (?versionHistoryGraph is required - should be scheme uri + '/version')
+    VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+      ( undef undef undef "en" )
+    }
     # get the current and the previous version as default versions
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .

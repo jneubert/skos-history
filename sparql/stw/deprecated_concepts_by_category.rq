@@ -21,11 +21,11 @@ SELECT DISTINCT ?secondLevelCategory (str(?secondLevelLabel) AS ?secondLevelCate
 (?concept AS ?deprecatedConcept) (str(?prefLabel) AS ?deprecatedConceptLabel)
 (?replacedBy as ?replacedByConcept) (str(?replacedByPrefLabel) AS ?replacedByConceptLabel)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+    }
     # get the current and the previous version as default versions
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .

@@ -11,11 +11,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 #
 SELECT ?version (str(count(distinct ?label)) AS ?addedLabelCount)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?conceptType ?language ) {
+      ( <http://zbw.eu/stw/version> zbwext:Descriptor "en" )
+    }
     ?delta a sh:SchemeDelta ;
       sh:deltaTo/dc:identifier ?version ;
       sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;

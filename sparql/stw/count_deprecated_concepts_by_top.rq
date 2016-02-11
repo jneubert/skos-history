@@ -19,11 +19,11 @@ PREFIX zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
 SELECT distinct ?topConcept (str(max(?topLabel)) AS ?topConceptLabel)
 (str(count(distinct ?concept)) as ?deprecatedConcepts)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?conceptType ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> zbwext:Descriptor undef undef "en" )
+    }
     # get the current and the previous version as default versions
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .

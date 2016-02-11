@@ -13,11 +13,11 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 SELECT (?concept AS ?deprecatedConcept) (str(?label) AS ?deprecatedConceptLabel)
 (?replacedBy as ?replacedByConcept) (str(?replacedByPrefLabel) AS ?replacedByConceptLabel)
 WHERE {
-  # parameters
-  VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-    ( <http://zbw.eu/stw/version> undef undef "en" )
-  }
   GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/stw/version> undef undef "en" )
+    }
     # get the current and the previous version as default versions
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
     ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
