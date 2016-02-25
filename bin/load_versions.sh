@@ -47,13 +47,30 @@ done
 
 sparql_put()
 {
-  curl -X PUT -H "Content-Type: application/x-turtle" -d @$2 $PUT_URI?graph=$1
+  local graph=$1
+  local file=$2
+  if [ ! -f $file ]; then
+    echo "$file does not exist"
+    exit 1
+  fi
+  curl -X PUT -H "Content-Type: application/x-turtle" -d @$file $PUT_URI?graph=$graph
+  local status=$?
+  if [ $status -ne 0 ]; then
+    echo "\nPUT for file $file failed with status $status"
+    exit $status
+  fi
 }
 
 sparql_update()
 {
   # suppress output of returned HTML (in case of fuseki)
   curl -X POST --silent -d "update=$1" $UPDATE_URI > /dev/null
+  local status=$?
+  if [ $status -ne 0 ]; then
+    echo "\nPOST for update failed with status $status - update was:"
+    echo "$1\n"
+    exit $status
+  fi
 }
 
 load_version () {
