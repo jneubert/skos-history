@@ -41,7 +41,7 @@ __Dataset-specific queries__
 
 More often than not, SKOS publications contain information specific to the dataset in question. Dataset-specific queries may exploit and expose this additional information.
 
-- [STW Thesaurus for Economics](stw)
+- [STW Thesaurus for Economics](stw) (beta)
 - [GND subject headings](swdskos) (experimental)
 
 So while the examples will not run with other datasets, they may show how
