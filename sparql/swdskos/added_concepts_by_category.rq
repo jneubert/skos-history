@@ -1,0 +1,60 @@
+# Identify concepts inserted with a certain version, listed by subject category
+#
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
+PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#>
+PREFIX sh: <http://purl.org/skos-history/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX skosxl: <http://www.w3.org/2008/05/skos-xl#>
+PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
+#
+SELECT distinct ?notation ?category (str(?catLabel) as ?categoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
+#SELECT distinct ?notation (str(?catLabel) as ?categoryLabel) (?concept AS ?addedConcept) (str(?prefLabel) AS ?addedConceptLabel)
+WHERE {
+  GRAPH ?versionHistoryGraph {
+    # parameters
+    VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
+      ( <http://zbw.eu/beta/swdskos/version> undef undef "de" )
+    }
+    # get the current and the previous version as default versions
+    ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .
+    ?versionset dsv:currentVersionRecord/dc:identifier ?latestVersion .
+    # select the versions to actually use
+    BIND(coalesce(?oldVersion, ?previousVersion) AS ?oldVersionSelected)
+    BIND(coalesce(?newVersion, ?latestVersion) AS ?newVersionSelected)
+    # get the delta and via that the relevant graphs
+    ?delta a sh:SchemeDelta ;
+      sh:deltaFrom/dc:identifier ?oldVersionSelected ;
+      sh:deltaTo/dc:identifier ?newVersionSelected ;
+      sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
+      dcterms:hasPart ?insertions ;
+      dcterms:hasPart ?deletions .
+    ?insertions a sh:SchemeDeltaInsertions ;
+      sh:usingNamedGraph/sd:name ?insertionsGraph .
+    ?deletions a sh:SchemeDeltaDeletions ;
+      sh:usingNamedGraph/sd:name ?deletionsGraph .
+  }
+  # for each inserted concept, a newly inserted prefLabel must exist ...
+  GRAPH ?insertionsGraph {
+    ?concept skosxl:prefLabel/skosxl:literalForm | skos:prefLabel ?prefLabel ;
+      gndo:gndSubjectCategory ?category 
+    .
+  }
+  # ... and the concept must not exist in the old version
+  FILTER NOT EXISTS {
+    GRAPH ?oldVersionGraph {
+      ?concept ?p []
+    }
+  }
+  GRAPH ?newVersionGraph {
+    ?category skos:prefLabel ?catLabel ;
+              skos:notation ?notation .
+  }
+  # restrict output to a certain language
+  FILTER ( lang(?prefLabel) = ?language )
+}
+ORDER BY ?category ?prefLabel
+

@@ -41,7 +41,8 @@ __Dataset-specific queries__
 
 More often than not, SKOS publications contain information specific to the dataset in question. Dataset-specific queries may exploit and expose this additional information.
 
-- [STW Thesaurus for Economics](stw).
+- [STW Thesaurus for Economics](stw)
+- [GND subject headings](swdskos) (experimental)
 
 So while the examples will not run with other datasets, they may show how
 value can be added by exploiting custom data structures, while at the same
@@ -58,8 +59,10 @@ __Extension to SKOS-XL__
 
 Some of the example queries have been adapted to work against version of thesauri, which uses [SKOS-XL](http://www.w3.org/TR/skos-reference/skos-xl.html). The queries can be directed to the thesoz or agrovoc example endpoints (see below).
 
-__Further example endpoints__
+__Further (purely experimental) example endpoints__
 
 - TheSoz - add `&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version))
 - YSO - add `&endpoint=http://zbw.eu/beta/sparql/ysov/query&versionHistoryGraph=http://www.yso.fi/onto/yso/version` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/ysov/query&versionHistoryGraph=http://www.yso.fi/onto/yso/version))
 - Agrovoc - add `&endpoint=http://zbw.eu/beta/sparql/agrovocv/query&versionHistoryGraph=http://aims.fao.org/aos/agrovoc/version` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/agrovocv/query&versionHistoryGraph=http://aims.fao.org/aos/agrovoc/version))
+- GND subject headings - add `&endpoint=http://zbw.eu/beta/sparql/swdskosv/query&versionHistoryGraph=http://zbw.eu/beta/swdskos/version&language=de` to the URL ([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/swdskosv/query&versionHistoryGraph=http://zbw.eu/beta/swdskos/version))
+
