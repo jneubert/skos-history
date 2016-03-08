@@ -1,2 +1,0 @@
-Obsolete directory, follow symlinks.
-
