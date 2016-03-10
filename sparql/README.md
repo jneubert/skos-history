@@ -7,7 +7,7 @@ __Overview__
 
 | Query | Description |
 |-------|-------------|
-| [version_overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | The available scheme versions with their publication dates|
+| [version_overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq) | Discover the version history graph and all available scheme versions |
 
 __Lists of concepts__
 
