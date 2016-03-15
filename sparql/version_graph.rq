@@ -15,9 +15,12 @@ CONSTRUCT {
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {
-    ( <http://zbw.eu/stw/version> )
+##    ( <http://zbw.eu/stw/version> )
+    ( undef )
   }
   GRAPH ?versionHistoryGraph {
+    # identify the graph via 
+    ?vhs dsv:currentVersionRecord [] .
     ?s ?p ?o
   }
 }
