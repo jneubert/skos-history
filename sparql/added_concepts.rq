@@ -27,12 +27,12 @@ WHERE {
       sh:deltaFrom/dc:identifier ?oldVersionSelected ;
       sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      dcterms:hasPart ?insertions ;
-      dcterms:hasPart ?deletions .
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph .
     ?insertions a sh:SchemeDeltaInsertions ;
+      dcterms:isPartOf ?delta ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
+      dcterms:isPartOf ?delta ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
   }
   # for each inserted concept, a newly inserted prefLabel must exist ...

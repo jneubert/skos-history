@@ -28,12 +28,12 @@ WHERE {
       sh:deltaFrom/dc:identifier ?oldVersionSelected ;
       sh:deltaTo/dc:identifier ?newVersionSelected ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
-      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph ;
-      dcterms:hasPart ?insertions ;
-      dcterms:hasPart ?deletions .
+      sh:deltaTo/sh:usingNamedGraph/sd:name ?newVersionGraph .
     ?deletions a sh:SchemeDeltaDeletions ;
+      dcterms:isPartOf ?delta ;
       sh:usingNamedGraph/sd:name ?deletionsGraph .
     ?insertions a sh:SchemeDeltaInsertions ;
+      dcterms:isPartOf ?delta ;
       sh:usingNamedGraph/sd:name ?insertionsGraph .
   }
 
