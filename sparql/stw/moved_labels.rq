@@ -69,7 +69,7 @@ WHERE {
     GRAPH ?newVersionGraph {
       ?oldConcept owl:deprecated true .
       ?oldConcept owl:deprecated ?deprecated .
-      BIND(if(?deprecated = true, "✓", '') as ?isDeprecated)
+      BIND(if(?deprecated = true, str(true), '') as ?isDeprecated)
     }
   }
   FILTER (lang(?label) = ?language

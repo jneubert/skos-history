@@ -71,7 +71,7 @@ WHERE {
   }
   # flag broader concepts which were newly introduced
   OPTIONAL {
-    BIND ('✓' AS ?isNew)
+    BIND (str(true) AS ?isNew)
     FILTER not exists {
       GRAPH ?oldVersionGraph {
         ?broaderConcept ?p [] .

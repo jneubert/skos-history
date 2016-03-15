@@ -63,8 +63,8 @@ WHERE {
   # flag if the new concept is directly sub-ordinated to the old one
   OPTIONAL {
     GRAPH ?newVersionGraph {
-      BIND ('✓' AS ?isSubconcept)
       ?oldConcept skos:narrower ?newConcept
+      BIND (str(true) AS ?isSubconcept)
     }
   }
   FILTER (lang(?label) = ?language

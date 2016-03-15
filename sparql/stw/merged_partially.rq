@@ -77,7 +77,7 @@ WHERE {
   FILTER (?toConcept != ?replacedByConcept)
   # flag new concepts which were newly introduced
   OPTIONAL {
-    BIND ('✓' AS ?isNew)
+    BIND (str(true) AS ?isNew)
     FILTER not exists {
       GRAPH ?oldVersionGraph {
         ?toConcept ?p [] .
