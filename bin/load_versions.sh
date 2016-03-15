@@ -53,7 +53,7 @@ sparql_put()
     echo "$file does not exist"
     exit 1
   fi
-  curl -X PUT -H "Content-Type: application/x-turtle" -d @$file $PUT_URI?graph=$graph
+  curl --silent -X PUT -H "Content-Type: application/x-turtle" -d @$file $PUT_URI?graph=$graph > /dev/null
   local status=$?
   if [ $status -ne 0 ]; then
     echo "\nPUT for file $file failed with status $status"
@@ -84,7 +84,7 @@ load_version () {
   fi
 
   # load the version graph
-  printf "\nLoading $BASEURI/$version\n"
+  printf "\nLoading version $BASEURI/$version\n"
   sparql_put $BASEURI/$version $BASEDIR/$version/$FILENAME
 
   # add triples to the version graph
@@ -208,7 +208,7 @@ load_delta () {
   fi
 
   delta_uri=$BASEURI/$old/delta/$new
-  printf "\nCreating and loading $delta_uri\n"
+  printf "\nCreating the delta $delta_uri\n"
 
   # add triples to version history graph
   statement="
@@ -264,7 +264,6 @@ where {
 "
     sparql_update "$statement"
 
-    echo add triples to the version graph for $op
     statement="
 $PREFIXES
 insert {
@@ -345,7 +344,8 @@ sparql_update "$statement"
 
 # load latest version to the version history graph
 latest=${VERSIONS[${#VERSIONS[@]} - 1]}
-echo Creating version history
+echo ""
+echo Initializing the version history graph with the current version
 statement="
 $PREFIXES
 insert {
@@ -414,3 +414,5 @@ where {}
     load_delta $old $latest
   fi
 done
+
+echo ""
