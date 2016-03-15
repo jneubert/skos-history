@@ -48,14 +48,15 @@ WHERE {
   # restrict to actual movements
   FILTER (?oldConcept != ?newConcept)
   #
-  GRAPH ?oldVersionGraph {
-    # restrict target concepts to newly inserted ones
-    FILTER NOT EXISTS {
-      ?newConcept ?p []
+  # restrict target concepts to newly inserted ones
+  FILTER NOT EXISTS {
+    GRAPH ?oldVersionGraph {
+      ?newConcept ?p [] .
     }
+  }
+  GRAPH ?oldVersionGraph {
     ?oldConcept skos:prefLabel ?oldPrefLabel .
   }
-  #
   GRAPH ?newVersionGraph {
     ?newConcept skos:prefLabel ?newPrefLabel .
   }
