@@ -1,7 +1,10 @@
-SPARQL query examples
-=====================
+SPARQL queries
+==============
 
-The queries in this directory can be executed via an [interactive SPARQL GUI](http://zbw.eu/labs/en/blog/publishing-sparql-queries-live) against an [example endpoint](http://zbw.eu/beta/sparql/stwv/query) with different versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs):
+The queries linked from this page provide examples on how a skos-history version store can be utilized to create useful change reports. The queries can be executed via an [interactive SPARQL GUI](http://zbw.eu/labs/en/blog/publishing-sparql-queries-live) against an [example endpoint](http://zbw.eu/beta/sparql/stwv/query) with different versions of [STW Thesaurus for Economics](http://zbw.eu/stw), prepared as s skos-history version store acccording to [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs).
+
+
+## Generic queries for any SKOS vocabulary
 
 __Overview__
 
@@ -37,17 +40,6 @@ __History of selected concepts__
 | [concept_deltas](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_deltas.rq) | All version deltas for the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) _(Insert other example concept uris into the VALUES clause - suggestions in the comment.)_ |
 | [concept_history](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/concept_history.rq) | Early alternative approach for the history of the concept [Personnel selection](http://zbw.eu/stw/descriptor/12571-4) (changes in pref/altLabels only) |
 
-__Dataset-specific queries__
-
-More often than not, SKOS publications contain information specific to the dataset in question. Dataset-specific queries may exploit and expose this additional information.
-
-- [STW Thesaurus for Economics](stw) (beta)
-- [GND subject headings](swdskos) (experimental)
-
-So while the examples will not run with other datasets, they may show how
-value can be added by exploiting custom data structures, while at the same
-time making use of a common version history scheme.
-
 __Technical background information__
 
 | Query | Description |
@@ -59,7 +51,20 @@ __Extension to SKOS-XL__
 
 Some of the example queries have been adapted to work against version of thesauri, which uses [SKOS-XL](http://www.w3.org/TR/skos-reference/skos-xl.html). The queries can be directed to the thesoz or agrovoc example endpoints (see below).
 
-__Further (purely experimental) example endpoints__
+
+## Dataset-specific queries
+
+More often than not, SKOS publications contain information specific to the dataset in question. Dataset-specific queries may exploit and expose this additional information.
+
+- [STW Thesaurus for Economics](stw) (beta)
+- [GND subject headings](swdskos) (experimental)
+
+So while the examples will not run with other datasets, they may show how
+value can be added by exploiting custom data structures, while at the same
+time making use of a common version history scheme.
+
+
+## Further (purely experimental) skos-history example endpoints
 
 - TheSoz - add `&endpoint=http://zbw.eu/beta/sparql/thesozv/query` to the URL<br />([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/thesozv/query&versionHistoryGraph=http://lod.gesis.org/thesoz/version) - `?versionHistoryGraph` is `http://lod.gesis.org/thesoz/version`)
 - YSO - add `&endpoint=http://zbw.eu/beta/sparql/ysov/query` to the URL<br />([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/ysov/query&versionHistoryGraph=http://www.yso.fi/onto/yso/version) - `?versionHistoryGraph` is `http://www.yso.fi/onto/yso/version`)
