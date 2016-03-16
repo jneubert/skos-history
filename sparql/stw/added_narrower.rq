@@ -71,7 +71,7 @@ WHERE {
   }
   # flag narrower concepts which were newly introduced
   OPTIONAL {
-    BIND (str(true) AS ?isNew)
+    BIND (true AS ?isNew)
     FILTER not exists {
       GRAPH ?oldVersionGraph {
         ?narrowerConcept ?p [] .

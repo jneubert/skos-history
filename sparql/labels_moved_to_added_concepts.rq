@@ -64,7 +64,7 @@ WHERE {
   OPTIONAL {
     GRAPH ?newVersionGraph {
       ?oldConcept skos:narrower ?newConcept
-      BIND (str(true) AS ?isSubconcept)
+      BIND (true AS ?isSubconcept)
     }
   }
   FILTER (lang(?label) = ?language
