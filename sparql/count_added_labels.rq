@@ -12,7 +12,7 @@ SELECT ?version (str(count(distinct ?label)) AS ?addedLabelCount)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
-    ( <http://zbw.eu/stw/version> "en" )
+    ( undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta ;

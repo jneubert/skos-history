@@ -13,7 +13,7 @@ SELECT ?version (str(count(?concept)) as ?deprecatedConceptCount)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {
-    ( <http://zbw.eu/stw/version> )
+    ( undef )
   }
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta .

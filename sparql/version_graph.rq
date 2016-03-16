@@ -15,7 +15,6 @@ CONSTRUCT {
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {
-##    ( <http://zbw.eu/stw/version> )
     ( undef )
   }
   GRAPH ?versionHistoryGraph {

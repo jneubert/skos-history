@@ -19,7 +19,7 @@ SELECT distinct ?topConcept (str(?topLabel) AS ?topConceptLabel) (?concept AS ?a
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
-    ( <http://zbw.eu/stw/version> "en" )
+    ( undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # the compared versions default to the current and the previous one

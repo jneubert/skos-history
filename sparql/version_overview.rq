@@ -5,6 +5,10 @@ PREFIX dsv: <http://purl.org/iso25964/DataSet/Versioning#>
 #
 SELECT ?versionHistoryGraph (?vhr AS ?versionHistoryRecord) (?identifier AS ?version) (str(?vhrDate) AS ?date) ?current
 WHERE {
+  # parameters
+  VALUES ( ?versionHistoryGraph ) {
+    ( undef )
+  }
   GRAPH ?versionHistoryGraph {
     ?vhr dsv:hasVersionHistorySet ?vhs .
     ?vhr dc:date ?vhrDate .

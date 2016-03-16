@@ -13,7 +13,7 @@ SELECT ?version (str(count(distinct ?concept)) as ?deletedConceptCount)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {
-    ( <http://zbw.eu/stw/version> )
+    ( undef )
   }
   # get deletiions and insertions graph for every version
   GRAPH ?versionHistoryGraph {

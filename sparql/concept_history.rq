@@ -18,7 +18,7 @@ WHERE {
   GRAPH ?versionHistoryGraph {
     # parameters
     VALUES ( ?versionHistoryGraph ?concept ) {
-      ( <http://zbw.eu/stw/version> <http://zbw.eu/stw/descriptor/12571-4> )
+      ( undef <http://zbw.eu/stw/descriptor/12571-4> )
     }
     ?vhr a dsv:VersionHistoryRecord .
     ?vhr sh:hasDelta ?delta .

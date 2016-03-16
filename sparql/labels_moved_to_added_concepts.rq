@@ -16,7 +16,7 @@ WHERE {
   GRAPH ?versionHistoryGraph {
     # parameters
     VALUES ( ?versionHistoryGraph ?oldVersion ?newVersion ?language ) {
-      ( <http://zbw.eu/stw/version> undef undef "en" )
+      ( undef undef undef "en" )
     }
     # get the current and the previous version as default versions
     ?versionset dsv:currentVersionRecord/xhv:prev/dc:identifier ?previousVersion .

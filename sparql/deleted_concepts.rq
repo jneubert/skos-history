@@ -17,7 +17,7 @@ SELECT distinct (str(?concept) AS ?deletedConcept) (str(?prefLabel) AS ?deletedC
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ?language ) {
-    ( <http://zbw.eu/stw/version> "en" )
+    ( undef "en" )
   }
   GRAPH ?versionHistoryGraph {
     # the compared versions default to the current and the previous one
