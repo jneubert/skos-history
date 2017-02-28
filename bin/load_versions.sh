@@ -157,8 +157,8 @@ where {
 
   # special clause for thesauri which have no unique
   # version date in the data and are enumerated in $VERSIONS by a valid date
-  VERSION_DATE_MISSING=(agrovoc)
-  if [[ $VERSION_DATE_MISSING =~ $DATASET ]] ; then
+  VERSION_DATE_MISSING="agrovoc jel"
+  if [[ $VERSION_DATE_MISSING =~ (^|[[:space:]])$DATASET($|[[:space:]]) ]] ; then
     # delete multiple entries, as provided by agrovoc
     statement="
 $PREFIXES
