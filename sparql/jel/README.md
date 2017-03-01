@@ -12,9 +12,9 @@ Query | Description
 [deleted_concepts (aggregated)](http://zbw.eu/beta/sparql-lab/?endpoint=http://zbw.eu/beta/sparql/jelv/query&queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/deleted_concepts.rq&oldVersion=2008-10&newVersion=2017-01) | All deleted concepts (from 2008-10 on)
 
 
-### Technical queries
+### Technical background information
 
-_NOTE: JEL download files do not come with version identifiers. The downloads on http://zbw.eu/beta/external_identifiers/jel/ carry version dates and identifiers, which reflect to (rather arbitrary) time of the download. Because the files were extracted from RDFa, some of the version strings carry language tags and must be referenced as, e.g., `"2012-09"@en`._
+_NOTE: The original JEL download files do not come with version identifiers. The Linked Data downloads on http://zbw.eu/beta/external_identifiers/jel/ carry version dates and identifiers, which reflect to (rather arbitrary) time of the download. Because the files were extracted from language-specific RDFa pages, some of the version strings carry language tags and must be referenced as, e.g., `"2012-09"@en`._
 
 Query | Description
 ------|------------
