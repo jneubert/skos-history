@@ -61,7 +61,7 @@ WHERE {
       skos:prefLabel ?categoryLabel .
 
   }
-  FILTER (lang(?secondLevelLabel) = ?language)
+  FILTER (lang(?categoryLabel) = ?language)
 }
 GROUP BY ?category ?categoryLabel
 ORDER BY ?categoryLabel
