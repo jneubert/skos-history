@@ -9,7 +9,10 @@ PREFIX xhv: <http://www.w3.org/1999/xhtml/vocab#>
 #
 # count concepts inserted per version
 #
-SELECT ?version (str(count(distinct ?concept)) as ?addedConceptCount)
+# note: for the STW, results differ from the STW-specific queries,
+#       cf. Issue #26 (Incorrect results in standard count queries)
+#
+SELECT ?version ?oldVersion (str(count(distinct ?concept)) as ?addedConceptCount)
 WHERE {
   # parameters
   VALUES ( ?versionHistoryGraph ) {
@@ -19,6 +22,7 @@ WHERE {
   GRAPH ?versionHistoryGraph {
     ?delta a sh:SchemeDelta ;
       sh:deltaTo/dc:identifier ?version ;
+      sh:deltaFrom/dc:identifier ?oldVersion ;
       sh:deltaFrom/sh:usingNamedGraph/sd:name ?oldVersionGraph ;
       dcterms:hasPart ?insertions ;
       dcterms:hasPart ?deletions .
@@ -38,5 +42,5 @@ WHERE {
     }
   }
 }
-GROUP BY ?version
-ORDER BY ?version
+GROUP BY ?version ?oldVersion
+ORDER BY ?version ?oldVersion
