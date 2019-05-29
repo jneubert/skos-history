@@ -13,6 +13,7 @@ The [skos-history ontology](http://purl.org/skos-history/) is meant to be used i
 
 See also the [Ontologies, Thesauri, Vocabularies](https://github.com/jneubert/skos-history/wiki/Ontologies-Thesauri-Vocabularies) and the [Resources](https://github.com/jneubert/skos-history/wiki/Resources) sections.
 
+A tool that automatically generates the SPARQL queries for diffing various SKOS profiles is available at [EU Vocabularies repository](https://github.com/eu-vocabularies/skos-history-query-generator).
 
 ### Contributing
 
