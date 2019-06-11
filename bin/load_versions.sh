@@ -3,8 +3,9 @@
 
 # load a series of version and delta graphs into a SPARQL 1.1 RDF dataset
 
-
-## Help text
+#######################
+# demands 1 or 2 command-line arguments
+#######################
 usage ()
 {
   echo "usage: load_versions.sh [[-f file ] | [-h]]"
@@ -12,7 +13,9 @@ usage ()
   echo "NOTE: the directory of the file needs to be in PATH or the path should be explicit"
 }
 
-## Read configuration
+#######################
+# Read configuration
+#######################
 
 # demands 1 or 2 command-line arguments
 if [ $# -lt 1 -o $# -gt 2 ]
@@ -37,9 +40,21 @@ while [ "$1" != "" ]; do
   shift
 done
 
-# reading in the stored variablesb from the configuration file
+
+# reading in the stored variables from the configuration file
 . $configfile
 
+#######################
+# setting default variable values
+#######################
+
+# MIME type in the HEADER Content-Type:
+# application/rdf+xml		RDF/XML
+# text/n3					N3
+# text/turtle 				Turtle
+# application/x-turtle      Turtle (pre-registration media type is also accepted)
+# application/json			JSON-LD
+INPUT_MIME_TYPE="${INPUT_MIME_TYPE:-application/x-turtle}"
 
 #######################
 # function definitions
@@ -53,7 +68,6 @@ sparql_put()
     echo "$file does not exist"
     exit 1
   fi
-  #curl --silent -X PUT -H "Content-Type: application/x-turtle" -d @$file $PUT_URI?graph=$graph > /dev/null
   curl --silent -X PUT -H "Content-Type: $INPUT_MIME_TYPE" -d @$file $PUT_URI?graph=$graph > /dev/null
   local status=$?
   if [ $status -ne 0 ]; then
