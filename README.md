@@ -15,6 +15,8 @@ See also the [Ontologies, Thesauri, Vocabularies](https://github.com/jneubert/sk
 
 A tool that automatically generates the SPARQL queries for diffing various SKOS profiles is available at [EU Vocabularies repository](https://github.com/eu-vocabularies/skos-history-query-generator).
 
+Two examples are provided with basic configurations and sample data to test loading the datasets to SPARQL endpoint and to run the automatic query execution to get the SKOS diff fragments.   
+
 ### Contributing
 
 Contributions are very much appreciated - be it in the form of suggestions or bug reports in the [issue queue](https://github.com/jneubert/skos-history/issues), or as patches or pull requests for improved or additional queries or script code. This in particular includes extensions to cover the specifics of not yet well-supported SKOS vocabularies.
