@@ -53,7 +53,7 @@ sparql_put()
     echo "$file does not exist"
     exit 1
   fi
-  curl --silent -X PUT -H "Content-Type: application/x-turtle" -d @$file $PUT_URI?graph=$graph > /dev/null
+  curl --silent -X PUT -H "Content-Type: text/turtle" -d @$file $PUT_URI?graph=$graph > /dev/null
   local status=$?
   if [ $status -ne 0 ]; then
     echo "\nPUT for file $file failed with status $status"
