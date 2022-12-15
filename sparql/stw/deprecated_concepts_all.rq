@@ -1,0 +1,36 @@
+# List all deprecated concepts and (optionally) their replacements, 
+# (workarround for the currently not working accross multiple versions
+# deprecated_concepts_by_category.rq)
+
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+prefix zbwext: <http://zbw.eu/namespaces/zbw-extensions/>
+prefix skosext: <http://zbw.eu/namespaces/skos-extensions/>
+#
+SELECT ?concept (str(?label) as ?conceptLabel) ?replacement (str(?repLabel) as ?replacementLabel)
+WHERE {
+  values ( ?graph ?conceptType ?language ) {
+    ( undef zbwext:Descriptor "en" )
+  }
+  graph ?graph {
+    ?concept a ?conceptType ;
+            owl:deprecated true .
+    {?concept rdfs:label ?label } UNION {?concept skos:prefLabel ?label }.
+    
+    OPTIONAL {
+      # replacements, which were later on replaced themselves, are not
+      # shown, as they have no skos:prefLabel (by STW convention)
+      ?concept dcterms:isReplacedBy ?replacement .
+      ?replacement skos:prefLabel ?repLabel .
+    }
+  }
+  filter (lang(?label) = ?language)
+  optional {
+    filter (lang(?repLabel) = ?language)
+  }
+}
+ORDER BY ?label
+
