@@ -43,7 +43,7 @@ WHERE {
   # ... which were not attached to some (other) concept now
   FILTER NOT EXISTS {
     GRAPH ?insertionsGraph {
-      [] skos:prefLabel | skos:altLabel ?label
+      [] skos:prefLabel | skos:altLabel | zbwext:altLabelNarrower | zbwext:altLabelRelated ?label
     }
   }
   FILTER (lang(?label) = ?language)
