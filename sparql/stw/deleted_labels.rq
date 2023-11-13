@@ -51,12 +51,15 @@ WHERE {
   GRAPH ?oldVersionGraph {
     ?concept skos:prefLabel | skos:altLabel ?label .
     # ugly fix for a different custom namespace URI used in STW 8.04
-    BIND (uri(replace(str(?conceptType), "zbw-extensions", "skos-extensions")) AS ?obsoleteConceptType)
-    {
-      ?concept a ?obsoleteConceptType
-    } UNION {
-      ?concept a ?conceptType
+    # REMARK: Previously, we used a `UNION`+`BIND` construct here (see git 
+    # history). However, apparently using such a construct could introduce a 
+    # significant performance hit.
+    # SeeAlso: https://stackoverflow.com/questions/43373293/sparql-bind-inside-union-is-too-slow
+    values (?ct) { 
+      (zbwext:Descriptor)
+      (<https://www.zbw.eu/de/namespaces/skos-extensions/Descriptor>)
     }
+    ?concept a ?ct
   }
   GRAPH ?newVersionGraph {
     ?concept skos:prefLabel ?prefLabel .
