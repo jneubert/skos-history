@@ -57,17 +57,9 @@ Some of the example queries have been adapted to work against version of thesaur
 More often than not, SKOS publications contain information specific to the dataset in question. Dataset-specific queries may exploit and expose this additional information.
 
 - [STW Thesaurus for Economics](stw) (beta)
-- [GND subject headings](swdskos) (experimental)
+- The experimental version stores for TheSoz, YSO, Agrovoc and GND subject headings are not available any more.
 
 So while the examples will not run with other datasets, they may show how
 value can be added by exploiting custom data structures, while at the same
 time making use of a common version history scheme.
-
-
-## Further (purely experimental) skos-history example endpoints
-
-- TheSoz - add `&endpoint=http://zbw.eu/beta/sparql/thesozv/query` to the URL<br />([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/thesozv/query))
-- YSO - add `&endpoint=http://zbw.eu/beta/sparql/ysov/query` to the URL<br />([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/ysov/query))
-- Agrovoc - add `&endpoint=http://zbw.eu/beta/sparql/agrovocv/query` to the URL<br />([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/agrovocv/query))
-- GND subject headings - add `&endpoint=http://zbw.eu/beta/sparql/swdskosv/query&language=de` to the URL<br />([version overview](http://zbw.eu/beta/sparql-lab/?queryRef=https://api.github.com/repos/jneubert/skos-history/contents/sparql/version_overview.rq&endpoint=http://zbw.eu/beta/sparql/swdskosv/query))
 
