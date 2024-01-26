@@ -9,7 +9,7 @@ The use cases to be covered are discussed in [List of Use Cases](https://github.
 
 [Versions and Deltas as Named Graphs](https://github.com/jneubert/skos-history/wiki/Versions-and-Deltas-as-Named-Graphs) are introduced as an approach to provide the infrastructure to these ends. [SPARQL queries](https://github.com/jneubert/skos-history/tree/master/sparql) can be applied to an example version store created according to this approach, and can be modified for own explorations. A [tutorial](https://github.com/jneubert/skos-history/wiki/Tutorial) describes how to apply this approach to arbitrary SKOS vocabularies, using the code provided here. 
 
-The [skos-history ontology](http://purl.org/skos-history/) is meant to be used in combination with the [dataset versioning ontology](http://www.essepuntato.it/lode/owlapi/https://raw.githubusercontent.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl) - both being work in progress.
+The [skos-history ontology](https://raw.github.com/jneubert/skos-history/main/skos-history.ttl) is meant to be used in combination with the [dataset versioning ontology](https://raw.githubusercontent.com/JohanDS/Dataset-versioning--for-KOS-data-sets-/master/DataSetVersioning.owl) - both being work in progress.
 
 See also the [Ontologies, Thesauri, Vocabularies](https://github.com/jneubert/skos-history/wiki/Ontologies-Thesauri-Vocabularies) and the [Resources](https://github.com/jneubert/skos-history/wiki/Resources) sections.
 
